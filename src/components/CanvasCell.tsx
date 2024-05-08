@@ -19,7 +19,7 @@ const StyledCanvasCell = styled("div")(({ theme }) => ({
   height: "10px",
 }));
 
-export function CanvasCell({ x, y }: CanvasCellProps) {
+export function CanvasCell({ x, y }: CanvasCellProps): JSX.Element {
   const dispatch = useAppDispatch();
 
   const cellValue = useAppSelector((state) => state.app.gridRepr[x][y]);

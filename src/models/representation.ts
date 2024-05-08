@@ -28,6 +28,16 @@ export function getCanvasGridRepresentation(
   return grid;
 }
 
+export function getCanvasRepresentation(shapes: Shape[]): CellValueMap {
+  let repr: CellValueMap = {};
+
+  shapes.forEach((shape) => {
+    repr = _.merge(repr, getShapeRepresentation(shape));
+  });
+
+  return repr;
+}
+
 export function getShapeRepresentation(shape: Shape): CellValueMap {
   const repr: CellValueMap = {};
 

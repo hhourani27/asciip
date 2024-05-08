@@ -27,7 +27,7 @@ const initState = (): AppState => {
       rows,
       cols,
     },
-    shapes: [],
+    shapes: [{ type: "RECTANGLE", tl: { x: 0, y: 0 }, br: { x: 30, y: 3 } }],
     gridRepr: _.times(rows, () => _.fill(Array(cols), "\u00A0")),
 
     selectedTool: "SELECT",
