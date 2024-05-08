@@ -16,6 +16,7 @@
     "@types/node": "^16.18.97",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
+    "lodash": "^4.17.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2",
@@ -49,9 +50,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@types/lodash": "^4.17.1",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "globals": "^15.1.0",
+    "ts-jest": "^29.1.2",
     "typescript-eslint": "^7.8.0"
   }
 }
