@@ -26,9 +26,9 @@ export function CanvasCell({ x, y }: CanvasCellProps): JSX.Element {
 
   return (
     <StyledCanvasCell
-      onMouseDown={() => dispatch(appActions.onCellMouseDown({ x, y }))}
-      onMouseUp={() => dispatch(appActions.onCellMouseUp({ x, y }))}
-      onMouseEnter={() => dispatch(appActions.onCellHover({ x, y }))}
+      onMouseDown={() => dispatch(appActions.onCellMouseDown({ r: x, c: y }))}
+      onMouseUp={() => dispatch(appActions.onCellMouseUp({ r: x, c: y }))}
+      onMouseEnter={() => dispatch(appActions.onCellHover({ r: x, c: y }))}
     >
       {cellValue}
     </StyledCanvasCell>

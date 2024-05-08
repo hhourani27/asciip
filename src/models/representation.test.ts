@@ -8,8 +8,8 @@ describe("getShapeRepresentation()", () => {
   test("Representation of 6x6 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 5, y: 5 },
+      tl: { r: 0, c: 0 },
+      br: { r: 5, c: 5 },
     };
 
     const repr = getShapeRepresentation(rectangle);
@@ -27,8 +27,8 @@ describe("getShapeRepresentation()", () => {
   test("Representation of 3x3 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 2, y: 2 },
+      tl: { r: 0, c: 0 },
+      br: { r: 2, c: 2 },
     };
 
     const repr = getShapeRepresentation(rectangle);
@@ -43,8 +43,8 @@ describe("getShapeRepresentation()", () => {
   test("Representation of 2x2 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 1, y: 1 },
+      tl: { r: 0, c: 0 },
+      br: { r: 1, c: 1 },
     };
 
     const repr = getShapeRepresentation(rectangle);
@@ -58,8 +58,8 @@ describe("getShapeRepresentation()", () => {
   test("Representation of 1x1 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 0, y: 0 },
+      tl: { r: 0, c: 0 },
+      br: { r: 0, c: 0 },
     };
 
     const repr = getShapeRepresentation(rectangle);
@@ -74,8 +74,8 @@ describe("getCanvasGridRepresentation()", () => {
   test("Grid with a single rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 3, y: 3 },
+      tl: { r: 0, c: 0 },
+      br: { r: 3, c: 3 },
     };
 
     const grid = getCanvasGridRepresentation(4, 4, [rectangle]);
@@ -91,14 +91,14 @@ describe("getCanvasGridRepresentation()", () => {
   test("Grid with 2 rectangles", () => {
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 0, y: 0 },
-      br: { x: 3, y: 3 },
+      tl: { r: 0, c: 0 },
+      br: { r: 3, c: 3 },
     };
 
     const rectangle2: Rectangle = {
       type: "RECTANGLE",
-      tl: { x: 1, y: 1 },
-      br: { x: 3, y: 3 },
+      tl: { r: 1, c: 1 },
+      br: { r: 3, c: 3 },
     };
 
     const grid = getCanvasGridRepresentation(4, 4, [rectangle1, rectangle2]);

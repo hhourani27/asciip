@@ -20,14 +20,14 @@ type AppState = {
 };
 
 const initState = (): AppState => {
-  const [rows, cols] = [200, 200];
+  const [rows, cols] = [400, 400];
 
   return {
     canvasSize: {
       rows,
       cols,
     },
-    shapes: [{ type: "RECTANGLE", tl: { x: 0, y: 0 }, br: { x: 30, y: 3 } }],
+    shapes: [{ type: "RECTANGLE", tl: { r: 0, c: 0 }, br: { r: 30, c: 3 } }],
     gridRepr: _.times(rows, () => _.fill(Array(cols), "\u00A0")),
 
     selectedTool: "SELECT",
@@ -73,14 +73,14 @@ export const appSlice = createSlice({
       ) {
         if (!_.isEqual(state.creationProgress.curr, action.payload)) {
           const curr = action.payload;
-          const tl = {
-            x: Math.min(state.creationProgress.start.x, curr.x),
-            y: Math.min(state.creationProgress.start.y, curr.y),
+          const tl: Coords = {
+            r: Math.min(state.creationProgress.start.r, curr.r),
+            c: Math.min(state.creationProgress.start.c, curr.c),
           };
 
-          const br = {
-            x: Math.max(state.creationProgress.start.x, curr.x),
-            y: Math.max(state.creationProgress.start.y, curr.y),
+          const br: Coords = {
+            r: Math.max(state.creationProgress.start.r, curr.r),
+            c: Math.max(state.creationProgress.start.c, curr.c),
           };
           state.creationProgress = {
             start: state.creationProgress.start,

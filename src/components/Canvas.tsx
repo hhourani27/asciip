@@ -1,8 +1,10 @@
 import { useTheme } from "@mui/material";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useEffect, useRef } from "react";
 import _ from "lodash";
 import { getCanvasRepresentation } from "../models/representation";
+import { Coords } from "../models/shapes";
+import { appActions } from "../store/appSlice";
 
 const FONT_SIZE = 16;
 const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
@@ -36,6 +38,7 @@ function drawHorizontalGridLine(
 }
 
 export default function Canvas(): JSX.Element {
+  const dispatch = useAppDispatch();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const theme = useTheme();
 
@@ -50,6 +53,15 @@ export default function Canvas(): JSX.Element {
   const repr = getCanvasRepresentation(
     newShape ? [...shapes, newShape] : shapes
   );
+
+  const getCellCoords = (eventX: number, eventY: number): Coords => {
+    const canvas = canvasRef.current!;
+    const rect = canvas.getBoundingClientRect();
+    const x = eventX - rect.left;
+    const y = eventY - rect.top;
+
+    return { r: Math.floor(y / CELL_HEIGHT), c: Math.floor(x / CELL_WIDTH) };
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -99,7 +111,18 @@ export default function Canvas(): JSX.Element {
       ref={canvasRef}
       width={canvasWidth} // Logical width
       height={canvasHeight} // Logical height
-      style={{ width: canvasWidth, height: canvasHeight }} // Make width/height=logical width/height so pixel calculations are easier
+      style={{ width: canvasWidth, height: canvasHeight, flex: 1 }} // Make width/height=logical width/height so pixel calculations are easier
+      onMouseDown={(e) =>
+        dispatch(
+          appActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
+        )
+      }
+      onMouseUp={(e) =>
+        dispatch(appActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY)))
+      }
+      onMouseMove={(e) =>
+        dispatch(appActions.onCellHover(getCellCoords(e.clientX, e.clientY)))
+      }
     ></canvas>
   );
 }
