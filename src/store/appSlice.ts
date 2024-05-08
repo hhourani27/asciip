@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Coords, Shape } from "../models/shapes";
 import _ from "lodash";
+import { Grid, getCanvasGridRepresentation } from "../models/representation";
 
 export type Tool = "SELECT" | "RECTANGLE";
 
@@ -11,24 +12,32 @@ type AppState = {
   };
 
   shapes: Shape[];
+  // Although this is a derived state variable, but I'm adding it to the App state to optimize the rendering of the grid
+  gridRepr: Grid;
 
   selectedTool: Tool;
   creationProgress: null | { start: Coords; curr: Coords; shape: Shape };
 };
 
-const initialState: AppState = {
-  canvasSize: {
-    rows: 100,
-    cols: 100,
-  },
-  shapes: [{ type: "RECTANGLE", tl: { x: 0, y: 0 }, br: { x: 2, y: 2 } }],
-  selectedTool: "SELECT",
-  creationProgress: null,
+const initState = (): AppState => {
+  const [rows, cols] = [200, 200];
+
+  return {
+    canvasSize: {
+      rows,
+      cols,
+    },
+    shapes: [],
+    gridRepr: _.times(rows, () => _.fill(Array(cols), "\u00A0")),
+
+    selectedTool: "SELECT",
+    creationProgress: null,
+  };
 };
 
 export const appSlice = createSlice({
   name: "app",
-  initialState,
+  initialState: initState(),
   reducers: {
     setTool: (state, action: PayloadAction<Tool>) => {
       state.selectedTool = action.payload;
@@ -45,12 +54,16 @@ export const appSlice = createSlice({
             br: action.payload,
           },
         };
+
+        updateGrid(state);
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
       if (state.creationProgress != null) {
         state.shapes.push(state.creationProgress.shape);
         state.creationProgress = null;
+
+        updateGrid(state);
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
@@ -75,10 +88,24 @@ export const appSlice = createSlice({
             shape: { type: "RECTANGLE", tl, br },
           };
         }
+
+        updateGrid(state);
       }
     },
   },
 });
+
+const updateGrid = (state: AppState): void => {
+  const allShapes = state.creationProgress
+    ? [...state.shapes, state.creationProgress.shape]
+    : state.shapes;
+
+  state.gridRepr = getCanvasGridRepresentation(
+    state.canvasSize.rows,
+    state.canvasSize.cols,
+    allShapes
+  );
+};
 
 export const appReducer = appSlice.reducer;
 export const appActions = appSlice.actions;

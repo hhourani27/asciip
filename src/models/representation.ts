@@ -5,14 +5,27 @@ export type CellValueMap = {
   [key: number]: { [key: number]: string };
 };
 
-export function getCanvasRepresentation(shapes: Shape[]): CellValueMap {
-  let repr: CellValueMap = {};
+export type Grid = string[][];
 
+export function getCanvasGridRepresentation(
+  rows: number,
+  cols: number,
+  shapes: Shape[]
+): Grid {
+  const grid: Grid = _.times(rows, () => _.fill(Array(cols), "\u00A0"));
+
+  let repr: CellValueMap = {};
   shapes.forEach((shape) => {
     repr = _.merge(repr, getShapeRepresentation(shape));
   });
 
-  return repr;
+  for (const x in repr) {
+    for (const y in repr[x]) {
+      grid[x][y] = repr[x][y];
+    }
+  }
+
+  return grid;
 }
 
 export function getShapeRepresentation(shape: Shape): CellValueMap {
