@@ -24,7 +24,10 @@ export default function Toolbar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="static"
+      sx={{ flexGrow: 0, flexShrink: 0, flexBasis: "auto" }}
+    >
       <MuiToolbar>
         <ToggleButtonGroup
           value={selectedTool}

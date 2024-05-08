@@ -4,12 +4,21 @@ import { Box } from "@mui/material";
 import Toolbar from "./components/Toolbar";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
+import Canvas from "./components/Canvas";
 
 function App() {
   return (
     <Provider store={store}>
-      <Box sx={{ flexGrow: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          height: "100%",
+        }}
+      >
         <Toolbar />
+        <Canvas />
       </Box>
     </Provider>
   );
