@@ -3,17 +3,18 @@ import { Coords, Shape } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
-import { translate } from "../models/transformation";
+import { getResizePoints, resize, translate } from "../models/transformation";
 
 export type Tool = "SELECT" | "RECTANGLE";
 
 export type ShapeObject = { id: string; shape: Shape };
+export type CanvasSize = {
+  rows: number;
+  cols: number;
+};
 
 export type AppState = {
-  canvasSize: {
-    rows: number;
-    cols: number;
-  };
+  canvasSize: CanvasSize;
 
   shapes: ShapeObject[];
 
@@ -22,8 +23,9 @@ export type AppState = {
 
   // Properties set when selectedTool === SELECT
   selectedShapeId: null | string;
-  nextActionOnClick: null | "SELECT" | "MOVE";
+  nextActionOnClick: null | "SELECT" | "MOVE" | "RESIZE";
   moveProgress: null | { start: Coords; startShape: Shape };
+  resizeProgress: null | { resizePoint: Coords; startShape: Shape };
 };
 
 export const initState = (shapes?: ShapeObject[]): AppState => {
@@ -41,6 +43,7 @@ export const initState = (shapes?: ShapeObject[]): AppState => {
     selectedShapeId: null,
     nextActionOnClick: null,
     moveProgress: null,
+    resizeProgress: null,
   };
 };
 
@@ -66,12 +69,23 @@ export const appSlice = createSlice({
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        if (state.moveProgress == null && state.nextActionOnClick === "MOVE") {
+        if (state.nextActionOnClick === "MOVE" && state.moveProgress == null) {
           const selectedShapeObj = state.shapes.find(
             (s) => s.id === state.selectedShapeId
           )!;
           state.moveProgress = {
             start: action.payload,
+            startShape: { ...selectedShapeObj.shape },
+          };
+        } else if (
+          state.nextActionOnClick === "RESIZE" &&
+          state.resizeProgress == null
+        ) {
+          const selectedShapeObj = state.shapes.find(
+            (s) => s.id === state.selectedShapeId
+          )!;
+          state.resizeProgress = {
+            resizePoint: action.payload,
             startShape: { ...selectedShapeObj.shape },
           };
         }
@@ -90,10 +104,11 @@ export const appSlice = createSlice({
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
-      if (state.moveProgress != null) {
+      if (state.moveProgress) {
         state.moveProgress = null;
-      }
-      if (state.creationProgress != null) {
+      } else if (state.resizeProgress) {
+        state.resizeProgress = null;
+      } else if (state.creationProgress != null) {
         const newShape: ShapeObject = {
           id: uuidv4(),
           shape: state.creationProgress.shape,
@@ -104,7 +119,7 @@ export const appSlice = createSlice({
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        if (state.moveProgress != null) {
+        if (state.moveProgress) {
           // Get selected shape
           const selectedShapeIdx: number = state.shapes.findIndex(
             (s) => s.id === state.selectedShapeId
@@ -120,11 +135,31 @@ export const appSlice = createSlice({
           );
           // Replace translated shape
           state.shapes[selectedShapeIdx].shape = translatedShape;
+        } else if (state.resizeProgress) {
+          // Get selected shape
+          const selectedShapeIdx: number = state.shapes.findIndex(
+            (s) => s.id === state.selectedShapeId
+          )!;
+          // Resize shape
+          const resizePoint = state.resizeProgress.resizePoint;
+          const to = action.payload;
+          const delta = { r: to.r - resizePoint.r, c: to.c - resizePoint.c };
+          const resizedShape: Shape = resize(
+            state.resizeProgress.startShape,
+            resizePoint,
+            delta,
+            state.canvasSize
+          );
+          // Replace resized shape
+          state.shapes[selectedShapeIdx].shape = resizedShape;
         } else {
-          const shape = getShapeAtCoords(state.shapes, action.payload);
-          if (shape) {
-            if (shape.id === state.selectedShapeId) {
-              state.nextActionOnClick = "MOVE";
+          const shapeObj = getShapeAtCoords(state.shapes, action.payload);
+          if (shapeObj) {
+            if (shapeObj.id === state.selectedShapeId) {
+              const resizePoints = getResizePoints(shapeObj.shape);
+              if (resizePoints.find((rp) => _.isEqual(rp, action.payload)))
+                state.nextActionOnClick = "RESIZE";
+              else state.nextActionOnClick = "MOVE";
             } else {
               state.nextActionOnClick = "SELECT";
             }
