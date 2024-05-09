@@ -1,13 +1,10 @@
 import { useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
-import {
-  CellValueMap,
-  getCanvasRepresentation,
-} from "../../models/representation";
 import { Coords } from "../../models/shapes";
-import { appActions } from "../../store/appSlice";
-import { drawGrid } from "./draw";
+import { appActions, appSelectors } from "../../store/appSlice";
+import { drawGrid, drawShapes } from "./draw";
+import _ from "lodash";
 
 const FONT_SIZE = 16;
 const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
@@ -19,17 +16,18 @@ export default function Canvas(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const theme = useTheme();
 
+  const hoveredCell = useRef<Coords | null>(null);
+
   const rowCount = useAppSelector((state) => state.app.canvasSize.rows);
   const colCount = useAppSelector((state) => state.app.canvasSize.cols);
   const canvasWidth = colCount * CELL_WIDTH;
   const canvasHeight = rowCount * CELL_HEIGHT;
 
-  const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
   const shapes = useAppSelector((state) => state.app.shapes);
-
-  const repr: CellValueMap = getCanvasRepresentation(
-    newShape ? [...shapes, newShape] : shapes
+  const selectedShape = useAppSelector((state) =>
+    appSelectors.selectedShape(state)
   );
+  const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
 
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;
@@ -59,19 +57,28 @@ export default function Canvas(): JSX.Element {
     );
 
     // Draw shapes
-    ctx.fillStyle = "black";
-    ctx.font = `${FONT_SIZE}px Courier New`;
-    ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
-    for (const row in repr) {
-      for (const col in repr[row]) {
-        const value = repr[row][col];
-        const x = parseInt(col) * CELL_WIDTH;
-        const y = parseInt(row) * CELL_HEIGHT + 0.5 * CELL_HEIGHT;
 
-        ctx.fillText(value, x, y);
-      }
-    }
-  }, [canvasHeight, canvasWidth, colCount, repr, rowCount, theme.palette.grey]);
+    // Draw unselected shapes
+    const unselectedShapes = shapes.filter(
+      (shape) => shape.id !== selectedShape?.id
+    );
+    drawShapes(ctx, unselectedShapes, "black");
+
+    // Draw selected shape
+    if (selectedShape) drawShapes(ctx, [selectedShape], "blue");
+
+    // Draw new shape
+    if (newShape) drawShapes(ctx, [newShape], "black");
+  }, [
+    canvasHeight,
+    canvasWidth,
+    colCount,
+    newShape,
+    rowCount,
+    selectedShape,
+    shapes,
+    theme.palette.grey,
+  ]);
 
   return (
     <div
@@ -92,8 +99,17 @@ export default function Canvas(): JSX.Element {
             appActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
           )
         }
-        onMouseMove={(e) =>
-          dispatch(appActions.onCellHover(getCellCoords(e.clientX, e.clientY)))
+        onMouseMove={(e) => {
+          const newCoords = getCellCoords(e.clientX, e.clientY);
+          if (!_.isEqual(hoveredCell.current, newCoords)) {
+            hoveredCell.current = newCoords;
+            dispatch(
+              appActions.onCellHover(getCellCoords(e.clientX, e.clientY))
+            );
+          }
+        }}
+        onClick={(e) =>
+          dispatch(appActions.onClick(getCellCoords(e.clientX, e.clientY)))
         }
       ></canvas>
     </div>

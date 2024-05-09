@@ -1,12 +1,15 @@
-import { Shape } from "./shapes";
+import { ShapeWithId } from "../store/appSlice";
+import { Coords, Shape } from "./shapes";
 import _ from "lodash";
 
 export type CellValueMap = {
   [key: number]: { [key: number]: string };
 };
 
+// TODO: This is no longer used, delete it in the future
 export type Grid = string[][];
 
+// TODO: This is no longer used, delete it in the future
 export function getCanvasGridRepresentation(
   rows: number,
   cols: number,
@@ -66,4 +69,18 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
   }
 
   return repr;
+}
+
+/**
+ *
+ * @returns the shapes whose edge touch the coordinate. If there are multiple shapes, they are returned in the same order than shapes[]
+ */
+export function getShapesAtCoords(
+  shapes: ShapeWithId[],
+  { r, c }: Coords
+): ShapeWithId[] {
+  return shapes.filter((shape) => {
+    const repr = getShapeRepresentation(shape);
+    return r in repr && c in repr[r];
+  });
 }

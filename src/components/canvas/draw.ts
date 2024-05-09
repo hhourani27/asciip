@@ -1,4 +1,9 @@
 import _ from "lodash";
+import { Shape } from "../../models/shapes";
+import {
+  CellValueMap,
+  getCanvasRepresentation,
+} from "../../models/representation";
 
 const FONT_SIZE = 16;
 const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
@@ -48,4 +53,25 @@ export function drawGrid(
   _.forEach(_.range(0, rowCount), (row) => {
     drawHorizontalGridLine(ctx, row * CELL_HEIGHT, canvasWidth, color);
   });
+}
+
+export function drawShapes(
+  ctx: CanvasRenderingContext2D,
+  shapes: Shape[],
+  color: string
+) {
+  const repr: CellValueMap = getCanvasRepresentation(shapes);
+
+  ctx.fillStyle = color;
+  ctx.font = `${FONT_SIZE}px Courier New`;
+  ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
+  for (const row in repr) {
+    for (const col in repr[row]) {
+      const value = repr[row][col];
+      const x = parseInt(col) * CELL_WIDTH;
+      const y = parseInt(row) * CELL_HEIGHT + 0.5 * CELL_HEIGHT;
+
+      ctx.fillText(value, x, y);
+    }
+  }
 }

@@ -1,8 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Coords, Shape } from "../models/shapes";
 import _ from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { getShapesAtCoords } from "../models/representation";
 
 export type Tool = "SELECT" | "RECTANGLE";
+
+export type ShapeWithId = { id: string } & Shape;
 
 type AppState = {
   canvasSize: {
@@ -10,10 +14,11 @@ type AppState = {
     cols: number;
   };
 
-  shapes: Shape[];
+  shapes: ShapeWithId[];
 
   selectedTool: Tool;
   creationProgress: null | { start: Coords; curr: Coords; shape: Shape };
+  selectedShape: null | string;
 };
 
 const initState = (): AppState => {
@@ -24,10 +29,11 @@ const initState = (): AppState => {
       rows,
       cols,
     },
-    shapes: [{ type: "RECTANGLE", tl: { r: 0, c: 0 }, br: { r: 30, c: 3 } }],
+    shapes: [],
 
     selectedTool: "SELECT",
     creationProgress: null,
+    selectedShape: null,
   };
 };
 
@@ -37,8 +43,20 @@ export const appSlice = createSlice({
   reducers: {
     setTool: (state, action: PayloadAction<Tool>) => {
       state.selectedTool = action.payload;
+      if (action.payload !== "SELECT") {
+        state.selectedShape = null;
+      }
     },
-
+    onClick: (state, action: PayloadAction<Coords>) => {
+      if (state.selectedTool === "SELECT") {
+        const shapes = getShapesAtCoords(state.shapes, action.payload);
+        if (shapes.length > 0) {
+          state.selectedShape = shapes[shapes.length - 1].id;
+        } else {
+          state.selectedShape = null;
+        }
+      }
+    },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "RECTANGLE") {
         state.creationProgress = {
@@ -54,7 +72,11 @@ export const appSlice = createSlice({
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
       if (state.creationProgress != null) {
-        state.shapes.push(state.creationProgress.shape);
+        const newShape: ShapeWithId = {
+          id: uuidv4(),
+          ...state.creationProgress.shape,
+        };
+        state.shapes.push(newShape);
         state.creationProgress = null;
       }
     },
@@ -77,13 +99,19 @@ export const appSlice = createSlice({
           state.creationProgress = {
             start: state.creationProgress.start,
             curr,
-            shape: { type: "RECTANGLE", tl, br },
+            shape: { ...state.creationProgress.shape, tl, br },
           };
         }
       }
+    },
+  },
+  selectors: {
+    selectedShape: (state) => {
+      return state.shapes.find((shape) => shape.id === state.selectedShape);
     },
   },
 });
 
 export const appReducer = appSlice.reducer;
 export const appActions = appSlice.actions;
+export const appSelectors = appSlice.selectors;
