@@ -22,10 +22,8 @@ export function generateMouseMoveActions(
 
   actions.push(appActions.onCellHover(curr));
   while (!_.isEqual(curr, to)) {
-    curr.r =
-      curr.r <= to.r ? Math.max(curr.r + 1, to.r) : Math.min(curr.r - 1, to.r);
-    curr.c =
-      curr.c <= to.c ? Math.max(curr.c + 1, to.c) : Math.min(curr.c - 1, to.c);
+    curr.r = curr.r < to.r ? curr.r + 1 : curr.r > to.r ? curr.r - 1 : curr.r;
+    curr.c = curr.c < to.c ? curr.c + 1 : curr.c > to.c ? curr.c - 1 : curr.c;
     actions.push(appActions.onCellHover(curr));
   }
 

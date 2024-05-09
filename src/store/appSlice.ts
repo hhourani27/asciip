@@ -152,8 +152,12 @@ export const appSlice = createSlice({
           );
           // Replace resized shape
           state.shapes[selectedShapeIdx].shape = resizedShape;
-        } else {
-          const shapeObj = getShapeAtCoords(state.shapes, action.payload);
+        } else if (!state.moveProgress && !state.resizeProgress) {
+          const shapeObj = getShapeAtCoords(
+            state.shapes,
+            action.payload,
+            state.selectedShapeId ?? undefined
+          );
           if (shapeObj) {
             if (shapeObj.id === state.selectedShapeId) {
               const resizePoints = getResizePoints(shapeObj.shape);
