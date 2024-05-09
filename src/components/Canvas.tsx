@@ -68,6 +68,8 @@ export default function Canvas(): JSX.Element {
     if (canvas == null) return;
     const ctx = canvas.getContext("2d")!;
 
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw grid
@@ -92,37 +94,48 @@ export default function Canvas(): JSX.Element {
     });
 
     // Draw shapes
+    ctx.fillStyle = "black";
+    ctx.font = `${FONT_SIZE}px Courier New`;
+    ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
     for (const row in repr) {
       for (const col in repr[row]) {
         const value = repr[row][col];
         const x = parseInt(col) * CELL_WIDTH;
         const y = parseInt(row) * CELL_HEIGHT + 0.5 * CELL_HEIGHT;
 
-        ctx.fillStyle = "black";
-        ctx.font = `${FONT_SIZE}px Courier New`;
-        ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
         ctx.fillText(value, x, y);
       }
     }
   }, [canvasHeight, canvasWidth, colCount, repr, rowCount, theme.palette.grey]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={canvasWidth} // Logical width
-      height={canvasHeight} // Logical height
-      style={{ width: canvasWidth, height: canvasHeight, flex: 1 }} // Make width/height=logical width/height so pixel calculations are easier
-      onMouseDown={(e) =>
-        dispatch(
-          appActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
-        )
-      }
-      onMouseUp={(e) =>
-        dispatch(appActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY)))
-      }
-      onMouseMove={(e) =>
-        dispatch(appActions.onCellHover(getCellCoords(e.clientX, e.clientY)))
-      }
-    ></canvas>
+    <div
+      style={{
+        maxWidth: "100vw",
+        maxHeight: "100vh",
+        flex: 1,
+        overflow: "scroll",
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        width={canvasWidth} // Logical width
+        height={canvasHeight} // Logical height
+        style={{ width: canvasWidth, height: canvasHeight, overflow: "scroll" }} // Make width/height=logical width/height so pixel calculations are easier
+        onMouseDown={(e) =>
+          dispatch(
+            appActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
+          )
+        }
+        onMouseUp={(e) =>
+          dispatch(
+            appActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
+          )
+        }
+        onMouseMove={(e) =>
+          dispatch(appActions.onCellHover(getCellCoords(e.clientX, e.clientY)))
+        }
+      ></canvas>
+    </div>
   );
 }

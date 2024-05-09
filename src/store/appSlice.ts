@@ -20,7 +20,7 @@ type AppState = {
 };
 
 const initState = (): AppState => {
-  const [rows, cols] = [400, 400];
+  const [rows, cols] = [100, 800];
 
   return {
     canvasSize: {
