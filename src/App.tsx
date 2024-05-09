@@ -1,10 +1,9 @@
 import React from "react";
-import "./App.css";
 import { Box } from "@mui/material";
 import Toolbar from "./components/Toolbar";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
-import Canvas from "./components/Canvas";
+import Canvas from "./components/canvas/Canvas";
 
 function App() {
   return (
@@ -14,7 +13,8 @@ function App() {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
-          height: "100%",
+          height: "100vh",
+          width: "100vw",
         }}
       >
         <Toolbar />
