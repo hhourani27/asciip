@@ -111,17 +111,12 @@ export default function Canvas(): JSX.Element {
   return (
     <div
       style={{
-        maxWidth: "100vw",
-        maxHeight: "100vh",
         flex: 1,
         overflow: "scroll",
       }}
     >
       <canvas
         ref={canvasRef}
-        width={canvasWidth} // Logical width
-        height={canvasHeight} // Logical height
-        style={{ width: canvasWidth, height: canvasHeight, overflow: "scroll" }} // Make width/height=logical width/height so pixel calculations are easier
         onMouseDown={(e) =>
           dispatch(
             appActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
