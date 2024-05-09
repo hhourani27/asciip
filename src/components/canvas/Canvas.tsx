@@ -24,8 +24,8 @@ export default function Canvas(): JSX.Element {
   const canvasHeight = rowCount * CELL_HEIGHT;
 
   const shapes = useAppSelector((state) => state.app.shapes);
-  const selectedShape = useAppSelector((state) =>
-    appSelectors.selectedShape(state)
+  const selectedShapeObj = useAppSelector((state) =>
+    appSelectors.selectedShapeObj(state)
   );
   const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
 
@@ -75,13 +75,13 @@ export default function Canvas(): JSX.Element {
     // Draw shapes
 
     // Draw unselected shapes
-    const unselectedShapes = shapes.filter(
-      (shape) => shape.id !== selectedShape?.id
-    );
+    const unselectedShapes = shapes
+      .filter((shape) => shape.id !== selectedShapeObj?.id)
+      .map((obj) => obj.shape);
     drawShapes(ctx, unselectedShapes, "black");
 
     // Draw selected shape
-    if (selectedShape) drawShapes(ctx, [selectedShape], "blue");
+    if (selectedShapeObj) drawShapes(ctx, [selectedShapeObj.shape], "blue");
 
     // Draw new shape
     if (newShape) drawShapes(ctx, [newShape], "black");
@@ -92,7 +92,7 @@ export default function Canvas(): JSX.Element {
     newShape,
     nextActionOnClick,
     rowCount,
-    selectedShape,
+    selectedShapeObj,
     shapes,
     theme.palette.grey,
   ]);

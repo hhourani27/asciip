@@ -5,6 +5,7 @@ export const store = configureStore({
   reducer: {
     app: appReducer,
   },
+  devTools: { maxAge: 1000 },
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

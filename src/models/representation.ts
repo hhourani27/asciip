@@ -1,4 +1,4 @@
-import { ShapeWithId } from "../store/appSlice";
+import { ShapeObject } from "../store/appSlice";
 import { Coords, Shape } from "./shapes";
 import _ from "lodash";
 
@@ -6,10 +6,9 @@ export type CellValueMap = {
   [key: number]: { [key: number]: string };
 };
 
-// TODO: This is no longer used, delete it in the future
 export type Grid = string[][];
 
-// TODO: This is no longer used, delete it in the future
+// TODO: This is not used right now, it may be used for the export feature
 export function getCanvasGridRepresentation(
   rows: number,
   cols: number,
@@ -76,11 +75,28 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
  * @returns the shapes whose edge touch the coordinate. If there are multiple shapes, they are returned in the same order than shapes[]
  */
 export function getShapesAtCoords(
-  shapes: ShapeWithId[],
+  shapeObjs: ShapeObject[],
   { r, c }: Coords
-): ShapeWithId[] {
-  return shapes.filter((shape) => {
-    const repr = getShapeRepresentation(shape);
+): ShapeObject[] {
+  return shapeObjs.filter((obj) => {
+    const repr = getShapeRepresentation(obj.shape);
     return r in repr && c in repr[r];
   });
+}
+
+/**
+ *
+ * @returns a single shape whose edge touch the coordinate. If there are multiple shapes returns according to pos
+ */
+export function getShapeAtCoords(
+  shapes: ShapeObject[],
+  coords: Coords,
+  pos: number = 0
+): ShapeObject | null {
+  const touchedShapes = getShapesAtCoords(shapes, coords);
+
+  if (touchedShapes.length === 0) return null;
+  if (pos >= touchedShapes.length) return null;
+
+  return touchedShapes.slice().reverse()[pos];
 }

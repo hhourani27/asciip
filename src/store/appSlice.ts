@@ -2,29 +2,31 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { Coords, Shape } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getShapesAtCoords } from "../models/representation";
+import { getShapeAtCoords } from "../models/representation";
+import { translate } from "../models/transformation";
 
 export type Tool = "SELECT" | "RECTANGLE";
 
-export type ShapeWithId = { id: string } & Shape;
+export type ShapeObject = { id: string; shape: Shape };
 
-type AppState = {
+export type AppState = {
   canvasSize: {
     rows: number;
     cols: number;
   };
 
-  shapes: ShapeWithId[];
+  shapes: ShapeObject[];
 
   selectedTool: Tool;
   creationProgress: null | { start: Coords; curr: Coords; shape: Shape };
 
   // Properties set when selectedTool === SELECT
-  selectedShape: null | string;
+  selectedShapeId: null | string;
   nextActionOnClick: null | "SELECT" | "MOVE";
+  moveProgress: null | { start: Coords; startShape: Shape };
 };
 
-const initState = (): AppState => {
+export const initState = (shapes?: ShapeObject[]): AppState => {
   const [rows, cols] = [100, 800];
 
   return {
@@ -32,12 +34,13 @@ const initState = (): AppState => {
       rows,
       cols,
     },
-    shapes: [],
+    shapes: shapes ?? [],
 
     selectedTool: "SELECT",
     creationProgress: null,
-    selectedShape: null,
+    selectedShapeId: null,
     nextActionOnClick: null,
+    moveProgress: null,
   };
 };
 
@@ -48,21 +51,32 @@ export const appSlice = createSlice({
     setTool: (state, action: PayloadAction<Tool>) => {
       state.selectedTool = action.payload;
       if (action.payload !== "SELECT") {
-        state.selectedShape = null;
+        state.selectedShapeId = null;
         state.nextActionOnClick = null;
       }
     },
     onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        const shapes = getShapesAtCoords(state.shapes, action.payload);
-        if (shapes.length > 0) {
-          state.selectedShape = shapes[shapes.length - 1].id;
-        } else {
-          state.selectedShape = null;
+        const shape = getShapeAtCoords(state.shapes, action.payload);
+        if (shape) {
+          state.selectedShapeId = shape.id;
+          state.nextActionOnClick = "MOVE";
         }
       }
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
+      if (state.selectedTool === "SELECT") {
+        if (state.moveProgress == null && state.nextActionOnClick === "MOVE") {
+          const selectedShapeObj = state.shapes.find(
+            (s) => s.id === state.selectedShapeId
+          )!;
+          state.moveProgress = {
+            start: action.payload,
+            startShape: { ...selectedShapeObj.shape },
+          };
+        }
+      }
+
       if (state.selectedTool === "RECTANGLE") {
         state.creationProgress = {
           start: action.payload,
@@ -76,10 +90,13 @@ export const appSlice = createSlice({
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
+      if (state.moveProgress != null) {
+        state.moveProgress = null;
+      }
       if (state.creationProgress != null) {
-        const newShape: ShapeWithId = {
+        const newShape: ShapeObject = {
           id: uuidv4(),
-          ...state.creationProgress.shape,
+          shape: state.creationProgress.shape,
         };
         state.shapes.push(newShape);
         state.creationProgress = null;
@@ -87,11 +104,33 @@ export const appSlice = createSlice({
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        const shapes = getShapesAtCoords(state.shapes, action.payload);
-        if (shapes.length > 0) {
-          state.nextActionOnClick = "SELECT";
+        if (state.moveProgress != null) {
+          // Get selected shape
+          const selectedShapeIdx: number = state.shapes.findIndex(
+            (s) => s.id === state.selectedShapeId
+          )!;
+          // Translate shape
+          const from = state.moveProgress.start;
+          const to = action.payload;
+          const delta = { r: to.r - from.r, c: to.c - from.c };
+          const translatedShape: Shape = translate(
+            state.moveProgress.startShape,
+            delta,
+            state.canvasSize
+          );
+          // Replace translated shape
+          state.shapes[selectedShapeIdx].shape = translatedShape;
         } else {
-          state.nextActionOnClick = null;
+          const shape = getShapeAtCoords(state.shapes, action.payload);
+          if (shape) {
+            if (shape.id === state.selectedShapeId) {
+              state.nextActionOnClick = "MOVE";
+            } else {
+              state.nextActionOnClick = "SELECT";
+            }
+          } else {
+            state.nextActionOnClick = null;
+          }
         }
       }
 
@@ -120,8 +159,8 @@ export const appSlice = createSlice({
     },
   },
   selectors: {
-    selectedShape: (state) => {
-      return state.shapes.find((shape) => shape.id === state.selectedShape);
+    selectedShapeObj: (state) => {
+      return state.shapes.find((shape) => shape.id === state.selectedShapeId);
     },
   },
 });
