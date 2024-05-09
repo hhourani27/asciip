@@ -16,6 +16,20 @@ export function translate(
   else return shape;
 }
 
+export function getResizePoints(shape: Shape): Coords[] {
+  switch (shape.type) {
+    case "RECTANGLE": {
+      const { tl, br } = shape;
+      return [
+        { r: tl.r, c: tl.c },
+        { r: tl.r, c: br.c },
+        { r: br.r, c: br.c },
+        { r: br.r, c: tl.c },
+      ];
+    }
+  }
+}
+
 function isShapeLegal(
   shape: Shape,
   canvasSize: { rows: number; cols: number }
