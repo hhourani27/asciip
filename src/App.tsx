@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import Toolbar from "./components/Toolbar";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
-import Canvas from "./components/Canvas";
+import Canvas from "./components/canvas/Canvas";
 
 function App() {
   return (

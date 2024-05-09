@@ -1,41 +1,18 @@
 import { useTheme } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
-import _ from "lodash";
-import { getCanvasRepresentation } from "../models/representation";
-import { Coords } from "../models/shapes";
-import { appActions } from "../store/appSlice";
+import {
+  CellValueMap,
+  getCanvasRepresentation,
+} from "../../models/representation";
+import { Coords } from "../../models/shapes";
+import { appActions } from "../../store/appSlice";
+import { drawGrid } from "./draw";
 
 const FONT_SIZE = 16;
 const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
 const CELL_WIDTH = FONT_WIDTH;
 const CELL_HEIGHT = FONT_SIZE;
-
-function drawVerticalGridLine(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  height: number,
-  color: string
-) {
-  ctx.beginPath();
-  ctx.moveTo(x, 0); // Starting point
-  ctx.lineTo(x, height); // Ending point
-  ctx.strokeStyle = color; // Line color
-  ctx.stroke(); // Draw the line
-}
-
-function drawHorizontalGridLine(
-  ctx: CanvasRenderingContext2D,
-  y: number,
-  width: number,
-  color: string
-) {
-  ctx.beginPath();
-  ctx.moveTo(0, y); // Starting point
-  ctx.lineTo(width, y); // Ending point
-  ctx.strokeStyle = color; // Line color
-  ctx.stroke(); // Draw the line
-}
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -50,7 +27,7 @@ export default function Canvas(): JSX.Element {
   const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
   const shapes = useAppSelector((state) => state.app.shapes);
 
-  const repr = getCanvasRepresentation(
+  const repr: CellValueMap = getCanvasRepresentation(
     newShape ? [...shapes, newShape] : shapes
   );
 
@@ -72,26 +49,14 @@ export default function Canvas(): JSX.Element {
     canvas.height = canvasHeight;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw grid
-    drawVerticalGridLine(ctx, 0, canvasHeight, theme.palette.grey["200"]);
-    _.forEach(_.range(0, colCount), (col) => {
-      drawVerticalGridLine(
-        ctx,
-        col * CELL_WIDTH,
-        canvasHeight,
-        theme.palette.grey["200"]
-      );
-    });
-
-    drawHorizontalGridLine(ctx, 0, canvasWidth, theme.palette.grey["200"]);
-    _.forEach(_.range(0, rowCount), (row) => {
-      drawHorizontalGridLine(
-        ctx,
-        row * CELL_HEIGHT,
-        canvasWidth,
-        theme.palette.grey["200"]
-      );
-    });
+    drawGrid(
+      ctx,
+      canvasWidth,
+      canvasHeight,
+      rowCount,
+      colCount,
+      theme.palette.grey["200"]
+    );
 
     // Draw shapes
     ctx.fillStyle = "black";
