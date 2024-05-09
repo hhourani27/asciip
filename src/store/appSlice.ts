@@ -18,7 +18,10 @@ type AppState = {
 
   selectedTool: Tool;
   creationProgress: null | { start: Coords; curr: Coords; shape: Shape };
+
+  // Properties set when selectedTool === SELECT
   selectedShape: null | string;
+  nextActionOnClick: null | "SELECT" | "MOVE";
 };
 
 const initState = (): AppState => {
@@ -34,6 +37,7 @@ const initState = (): AppState => {
     selectedTool: "SELECT",
     creationProgress: null,
     selectedShape: null,
+    nextActionOnClick: null,
   };
 };
 
@@ -45,9 +49,10 @@ export const appSlice = createSlice({
       state.selectedTool = action.payload;
       if (action.payload !== "SELECT") {
         state.selectedShape = null;
+        state.nextActionOnClick = null;
       }
     },
-    onClick: (state, action: PayloadAction<Coords>) => {
+    onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
         const shapes = getShapesAtCoords(state.shapes, action.payload);
         if (shapes.length > 0) {
@@ -81,6 +86,15 @@ export const appSlice = createSlice({
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
+      if (state.selectedTool === "SELECT") {
+        const shapes = getShapesAtCoords(state.shapes, action.payload);
+        if (shapes.length > 0) {
+          state.nextActionOnClick = "SELECT";
+        } else {
+          state.nextActionOnClick = null;
+        }
+      }
+
       if (
         state.selectedTool === "RECTANGLE" &&
         state.creationProgress != null

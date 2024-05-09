@@ -29,6 +29,10 @@ export default function Canvas(): JSX.Element {
   );
   const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
 
+  const nextActionOnClick = useAppSelector(
+    (state) => state.app.nextActionOnClick
+  );
+
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
@@ -43,10 +47,22 @@ export default function Canvas(): JSX.Element {
     if (canvas == null) return;
     const ctx = canvas.getContext("2d")!;
 
+    // Set canvas dimension
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
+
+    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Set the cursor
+    canvas.style.cursor =
+      nextActionOnClick === "SELECT"
+        ? "pointer"
+        : nextActionOnClick === "MOVE"
+        ? "move"
+        : "default";
+
+    // Draw the grid
     drawGrid(
       ctx,
       canvasWidth,
@@ -74,6 +90,7 @@ export default function Canvas(): JSX.Element {
     canvasWidth,
     colCount,
     newShape,
+    nextActionOnClick,
     rowCount,
     selectedShape,
     shapes,
@@ -109,7 +126,7 @@ export default function Canvas(): JSX.Element {
           }
         }}
         onClick={(e) =>
-          dispatch(appActions.onClick(getCellCoords(e.clientX, e.clientY)))
+          dispatch(appActions.onCellClick(getCellCoords(e.clientX, e.clientY)))
         }
       ></canvas>
     </div>
