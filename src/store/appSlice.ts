@@ -66,6 +66,9 @@ export const appSlice = createSlice({
         if (shape) {
           state.selectedShapeId = shape.id;
           state.nextActionOnClick = "MOVE";
+        } else {
+          state.selectedShapeId = null;
+          state.nextActionOnClick = "SELECT";
         }
       }
     },
