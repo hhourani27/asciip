@@ -7,16 +7,32 @@ export function translate(
   delta: Coords,
   canvasSize: CanvasSize
 ): Shape {
-  const translatedShape = { ...shape };
-  if (shape.type === "RECTANGLE") {
-    const { tl, br } = translatedShape;
-    translatedShape.tl = { r: tl.r + delta.r, c: tl.c + delta.c };
-    translatedShape.br = { r: br.r + delta.r, c: br.c + delta.c };
-  }
+  // The shape bouding box cannot go outside the canvas. So adjust delta accordingly
+  const bb = getBoundingBox(shape);
+  const corrDelta: Coords = {
+    r:
+      delta.r > 0
+        ? Math.min(delta.r, canvasSize.rows - 1 - bb.bottom)
+        : delta.r < 0
+        ? Math.max(delta.r, 0 - bb.top)
+        : 0,
+    c:
+      delta.c > 0
+        ? Math.min(delta.c, canvasSize.cols - 1 - bb.right)
+        : delta.c < 0
+        ? Math.max(delta.c, 0 - bb.left)
+        : 0,
+  };
 
-  // If we translated outside the canvas bounds, then return the original shape
-  if (isShapeLegal(translatedShape, canvasSize)) return translatedShape;
-  else return shape;
+  switch (shape.type) {
+    case "RECTANGLE": {
+      return {
+        type: "RECTANGLE",
+        tl: { r: shape.tl.r + corrDelta.r, c: shape.tl.c + corrDelta.c },
+        br: { r: shape.br.r + corrDelta.r, c: shape.br.c + corrDelta.c },
+      };
+    }
+  }
 }
 
 export function resize(
@@ -105,6 +121,24 @@ function isShapeLegal(
       if (shape.br.r < 0 || shape.br.r >= canvasSize.rows) return false;
       if (shape.br.c < 0 || shape.br.c >= canvasSize.cols) return false;
       return true;
+    }
+  }
+}
+
+function getBoundingBox(shape: Shape): {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+} {
+  switch (shape.type) {
+    case "RECTANGLE": {
+      return {
+        top: shape.tl.r,
+        bottom: shape.br.r,
+        left: shape.tl.c,
+        right: shape.br.c,
+      };
     }
   }
 }

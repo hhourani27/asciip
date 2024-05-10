@@ -28,15 +28,17 @@ export type AppState = {
   resizeProgress: null | { resizePoint: Coords; startShape: Shape };
 };
 
-export const initState = (shapes?: ShapeObject[]): AppState => {
-  const [rows, cols] = [100, 800];
-
+export type StateInitOptions = {
+  shapes?: ShapeObject[];
+  canvasSize?: CanvasSize;
+};
+export const initState = (opt?: StateInitOptions): AppState => {
   return {
-    canvasSize: {
-      rows,
-      cols,
+    canvasSize: opt?.canvasSize ?? {
+      rows: 100,
+      cols: 150,
     },
-    shapes: shapes ?? [],
+    shapes: opt?.shapes ?? [],
 
     selectedTool: "SELECT",
     creationProgress: null,

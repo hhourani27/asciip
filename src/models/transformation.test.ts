@@ -97,6 +97,25 @@ describe("translate()", () => {
     expect(translatedRectangle.br).toEqual({ r: 9, c: 9 });
   });
 
+  test("Cannot translate rectangle beyond right border (test 2)", () => {
+    const canvasSize = { rows: 10, cols: 10 };
+
+    const rectangle: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 2, c: 6 },
+      br: { r: 4, c: 8 },
+    };
+
+    const translatedRectangle = translate(
+      rectangle,
+      { r: 0, c: 2 },
+      canvasSize
+    );
+
+    expect(translatedRectangle.tl).toEqual({ r: 2, c: 7 });
+    expect(translatedRectangle.br).toEqual({ r: 4, c: 9 });
+  });
+
   test("Cannot translate rectangle beyond bottom border", () => {
     const canvasSize = { rows: 10, cols: 10 };
 
