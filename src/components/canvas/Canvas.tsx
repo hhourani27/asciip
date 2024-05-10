@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
 import { Coords } from "../../models/shapes";
 import { appActions, appSelectors } from "../../store/appSlice";
-import { drawGrid, drawShapes } from "./draw";
+import { drawGrid, drawSelectedShape, drawShapes } from "./draw";
 import _ from "lodash";
 
 const FONT_SIZE = 16;
@@ -60,6 +60,8 @@ export default function Canvas(): JSX.Element {
         ? "pointer"
         : nextActionOnClick === "MOVE"
         ? "move"
+        : nextActionOnClick === "RESIZE"
+        ? "grabbing"
         : "default";
 
     // Draw the grid
@@ -81,7 +83,7 @@ export default function Canvas(): JSX.Element {
     drawShapes(ctx, unselectedShapes, "black");
 
     // Draw selected shape
-    if (selectedShapeObj) drawShapes(ctx, [selectedShapeObj.shape], "blue");
+    if (selectedShapeObj) drawSelectedShape(ctx, selectedShapeObj.shape);
 
     // Draw new shape
     if (newShape) drawShapes(ctx, [newShape], "black");

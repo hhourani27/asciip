@@ -91,12 +91,14 @@ export function getShapesAtCoords(
 export function getShapeAtCoords(
   shapes: ShapeObject[],
   coords: Coords,
-  pos: number = 0
+  priorityId?: string // If multiple shapes ate at coords, return the shape that has id = priorityId, else return the last one
 ): ShapeObject | null {
   const touchedShapes = getShapesAtCoords(shapes, coords);
 
   if (touchedShapes.length === 0) return null;
-  if (pos >= touchedShapes.length) return null;
 
-  return touchedShapes.slice().reverse()[pos];
+  if (priorityId) {
+    const priorityShape = touchedShapes.find((s) => s.id === priorityId);
+    return priorityShape ?? touchedShapes[touchedShapes.length - 1];
+  } else return touchedShapes[touchedShapes.length - 1];
 }
