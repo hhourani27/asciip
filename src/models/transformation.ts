@@ -9,27 +9,28 @@ export function translate(
 ): Shape {
   // The shape bouding box cannot go outside the canvas. So adjust delta accordingly
   const bb = getBoundingBox(shape);
-  const corrDelta: Coords = {
-    r:
-      delta.r > 0
-        ? Math.min(delta.r, canvasSize.rows - 1 - bb.bottom)
-        : delta.r < 0
-        ? Math.max(delta.r, 0 - bb.top)
-        : 0,
-    c:
-      delta.c > 0
-        ? Math.min(delta.c, canvasSize.cols - 1 - bb.right)
-        : delta.c < 0
-        ? Math.max(delta.c, 0 - bb.left)
-        : 0,
-  };
+  const cappedDelta = capDelta(delta, bb, canvasSize);
 
   switch (shape.type) {
     case "RECTANGLE": {
       return {
         type: "RECTANGLE",
-        tl: { r: shape.tl.r + corrDelta.r, c: shape.tl.c + corrDelta.c },
-        br: { r: shape.br.r + corrDelta.r, c: shape.br.c + corrDelta.c },
+        tl: { r: shape.tl.r + cappedDelta.r, c: shape.tl.c + cappedDelta.c },
+        br: { r: shape.br.r + cappedDelta.r, c: shape.br.c + cappedDelta.c },
+      };
+    }
+    case "LINE": {
+      return {
+        type: "LINE",
+        start: {
+          r: shape.start.r + cappedDelta.r,
+          c: shape.start.c + cappedDelta.c,
+        },
+        inflection: {
+          r: shape.inflection.r + cappedDelta.r,
+          c: shape.inflection.c + cappedDelta.c,
+        },
+        end: { r: shape.end.r + cappedDelta.r, c: shape.end.c + cappedDelta.c },
       };
     }
   }
@@ -44,6 +45,8 @@ export function resize(
   // If the resize point is not legal for this shape, then return the same shape
   const resizePoints = getResizePoints(shape);
   if (!resizePoints.find((rp) => _.isEqual(rp, resizePoint))) return shape;
+
+  const cappedDelta = capDelta(delta, resizePoint, canvasSize);
 
   switch (shape.type) {
     case "RECTANGLE": {
@@ -61,21 +64,21 @@ export function resize(
 
       const new_tl =
         resizePointType === "TL"
-          ? { r: tl.r + delta.r, c: tl.c + delta.c }
+          ? { r: tl.r + cappedDelta.r, c: tl.c + cappedDelta.c }
           : resizePointType === "TR"
-          ? { r: tl.r + delta.r, c: tl.c }
+          ? { r: tl.r + cappedDelta.r, c: tl.c }
           : resizePointType === "BR"
           ? { r: tl.r, c: tl.c }
-          : { r: tl.r, c: tl.c + delta.c };
+          : { r: tl.r, c: tl.c + cappedDelta.c };
 
       const new_br =
         resizePointType === "TL"
           ? { r: br.r, c: br.c }
           : resizePointType === "TR"
-          ? { r: br.r, c: br.c + delta.c }
+          ? { r: br.r, c: br.c + cappedDelta.c }
           : resizePointType === "BR"
-          ? { r: br.r + delta.r, c: br.c + delta.c }
-          : { r: br.r + delta.r, c: br.c };
+          ? { r: br.r + cappedDelta.r, c: br.c + cappedDelta.c }
+          : { r: br.r + cappedDelta.r, c: br.c };
 
       // The new TL and BR may be inverted. Correct it
       const corrected_tl = {
@@ -93,6 +96,43 @@ export function resize(
       if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
       else return shape;
     }
+    case "LINE": {
+      const { start, inflection, end } = shape;
+      const resizePointType: "START" | "INFLECTION" | "END" = _.isEqual(
+        resizePoint,
+        start
+      )
+        ? "START"
+        : _.isEqual(resizePoint, inflection)
+        ? "INFLECTION"
+        : "END";
+
+      const new_point = {
+        r: resizePoint.r + cappedDelta.r,
+        c: resizePoint.c + cappedDelta.c,
+      };
+
+      switch (resizePointType) {
+        case "START": {
+          return {
+            ...shape,
+            start: new_point,
+          };
+        }
+        case "END": {
+          return {
+            ...shape,
+            end: new_point,
+          };
+        }
+        case "INFLECTION": {
+          return {
+            ...shape,
+            inflection: new_point,
+          };
+        }
+      }
+    }
   }
 }
 
@@ -107,6 +147,9 @@ export function getResizePoints(shape: Shape): Coords[] {
         { r: br.r, c: tl.c },
       ];
     }
+    case "LINE": {
+      return [shape.start, shape.inflection, shape.end];
+    }
   }
 }
 
@@ -114,23 +157,22 @@ function isShapeLegal(
   shape: Shape,
   canvasSize: { rows: number; cols: number }
 ): boolean {
-  switch (shape.type) {
-    case "RECTANGLE": {
-      if (shape.tl.r < 0 || shape.tl.r >= canvasSize.rows) return false;
-      if (shape.tl.c < 0 || shape.tl.c >= canvasSize.cols) return false;
-      if (shape.br.r < 0 || shape.br.r >= canvasSize.rows) return false;
-      if (shape.br.c < 0 || shape.br.c >= canvasSize.cols) return false;
-      return true;
-    }
-  }
+  const bb = getBoundingBox(shape);
+  if (bb.top < 0) return false;
+  if (bb.bottom >= canvasSize.rows) return false;
+  if (bb.left < 0) return false;
+  if (bb.right >= canvasSize.cols) return false;
+
+  return true;
 }
 
-function getBoundingBox(shape: Shape): {
+export type BoundingBox = {
   top: number;
   bottom: number;
   left: number;
   right: number;
-} {
+};
+export function getBoundingBox(shape: Shape): BoundingBox {
   switch (shape.type) {
     case "RECTANGLE": {
       return {
@@ -140,5 +182,62 @@ function getBoundingBox(shape: Shape): {
         right: shape.br.c,
       };
     }
+    case "LINE": {
+      return {
+        top: Math.min(shape.start.r, shape.inflection.r, shape.end.r),
+        bottom: Math.max(shape.start.r, shape.inflection.r, shape.end.r),
+        left: Math.min(shape.start.c, shape.inflection.c, shape.end.c),
+        right: Math.max(shape.start.c, shape.inflection.c, shape.end.c),
+      };
+    }
+  }
+}
+
+/**
+ * Cap the delta coords so that the bounding box doesn't go outside of the canvas
+ */
+function capDelta(
+  delta: Coords,
+  points: BoundingBox | Coords,
+  canvasSize: CanvasSize
+): Coords {
+  if ("left" in points) {
+    const bb = points;
+
+    const cappedDelta: Coords = {
+      r:
+        delta.r > 0
+          ? Math.min(delta.r, canvasSize.rows - 1 - bb.bottom)
+          : delta.r < 0
+          ? Math.max(delta.r, 0 - bb.top)
+          : 0,
+      c:
+        delta.c > 0
+          ? Math.min(delta.c, canvasSize.cols - 1 - bb.right)
+          : delta.c < 0
+          ? Math.max(delta.c, 0 - bb.left)
+          : 0,
+    };
+
+    return cappedDelta;
+  } else {
+    const p = points;
+
+    const cappedDelta: Coords = {
+      r:
+        delta.r > 0
+          ? Math.min(delta.r, canvasSize.rows - 1 - p.r)
+          : delta.r < 0
+          ? Math.max(delta.r, 0 - p.r)
+          : 0,
+      c:
+        delta.c > 0
+          ? Math.min(delta.c, canvasSize.cols - 1 - p.c)
+          : delta.c < 0
+          ? Math.max(delta.c, 0 - p.c)
+          : 0,
+    };
+
+    return cappedDelta;
   }
 }

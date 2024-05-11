@@ -9,4 +9,15 @@ export type Rectangle = {
   br: Coords;
 };
 
-export type Shape = Rectangle;
+export type Line = {
+  type: "LINE";
+  start: Coords;
+  inflection: Coords;
+  end: Coords;
+};
+
+export type Shape = Rectangle | Line;
+
+export function getLineInflection(start: Coords, end: Coords): Coords {
+  return { r: end.r, c: start.c };
+}

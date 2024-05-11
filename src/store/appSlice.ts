@@ -1,11 +1,17 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Coords, Shape } from "../models/shapes";
+import {
+  Coords,
+  Line,
+  Rectangle,
+  Shape,
+  getLineInflection,
+} from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 
-export type Tool = "SELECT" | "RECTANGLE";
+export type Tool = "SELECT" | "RECTANGLE" | "LINE";
 
 export type ShapeObject = { id: string; shape: Shape };
 export type CanvasSize = {
@@ -94,9 +100,7 @@ export const appSlice = createSlice({
             startShape: { ...selectedShapeObj.shape },
           };
         }
-      }
-
-      if (state.selectedTool === "RECTANGLE") {
+      } else if (state.selectedTool === "RECTANGLE") {
         state.creationProgress = {
           start: action.payload,
           curr: action.payload,
@@ -104,6 +108,17 @@ export const appSlice = createSlice({
             type: "RECTANGLE",
             tl: action.payload,
             br: action.payload,
+          },
+        };
+      } else if (state.selectedTool === "LINE") {
+        state.creationProgress = {
+          start: action.payload,
+          curr: action.payload,
+          shape: {
+            type: "LINE",
+            start: action.payload,
+            inflection: action.payload,
+            end: action.payload,
           },
         };
       }
@@ -176,28 +191,51 @@ export const appSlice = createSlice({
             state.nextActionOnClick = null;
           }
         }
-      }
-
-      if (
-        state.selectedTool === "RECTANGLE" &&
+      } else if (
+        (state.selectedTool === "RECTANGLE" || state.selectedTool === "LINE") &&
         state.creationProgress != null
       ) {
         if (!_.isEqual(state.creationProgress.curr, action.payload)) {
           const curr = action.payload;
-          const tl: Coords = {
-            r: Math.min(state.creationProgress.start.r, curr.r),
-            c: Math.min(state.creationProgress.start.c, curr.c),
-          };
+          switch (state.selectedTool) {
+            case "RECTANGLE": {
+              const tl: Coords = {
+                r: Math.min(state.creationProgress.start.r, curr.r),
+                c: Math.min(state.creationProgress.start.c, curr.c),
+              };
 
-          const br: Coords = {
-            r: Math.max(state.creationProgress.start.r, curr.r),
-            c: Math.max(state.creationProgress.start.c, curr.c),
-          };
-          state.creationProgress = {
-            start: state.creationProgress.start,
-            curr,
-            shape: { ...state.creationProgress.shape, tl, br },
-          };
+              const br: Coords = {
+                r: Math.max(state.creationProgress.start.r, curr.r),
+                c: Math.max(state.creationProgress.start.c, curr.c),
+              };
+              state.creationProgress = {
+                start: state.creationProgress.start,
+                curr,
+                shape: {
+                  ...(state.creationProgress.shape as Rectangle),
+                  tl,
+                  br,
+                },
+              };
+              break;
+            }
+            case "LINE": {
+              state.creationProgress = {
+                start: state.creationProgress.start,
+                curr,
+                shape: {
+                  ...(state.creationProgress.shape as Line),
+                  start: state.creationProgress.start,
+                  end: curr,
+                  inflection: getLineInflection(
+                    state.creationProgress.start,
+                    curr
+                  ),
+                },
+              };
+              break;
+            }
+          }
         }
       }
     },
