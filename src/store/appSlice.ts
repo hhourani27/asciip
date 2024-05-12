@@ -4,7 +4,7 @@ import {
   Line,
   Rectangle,
   Shape,
-  getLineInflection,
+  getInflectionPoint,
 } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
@@ -227,7 +227,7 @@ export const appSlice = createSlice({
                   ...(state.creationProgress.shape as Line),
                   start: state.creationProgress.start,
                   end: curr,
-                  inflection: getLineInflection(
+                  inflection: getInflectionPoint(
                     state.creationProgress.start,
                     curr
                   ),

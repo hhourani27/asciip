@@ -57,6 +57,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "globals": "^15.1.0",
+    "jest-extended": "^4.0.2",
     "ts-jest": "^29.1.2",
     "typescript-eslint": "^7.8.0"
   }

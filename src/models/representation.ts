@@ -1,5 +1,5 @@
 import { ShapeObject } from "../store/appSlice";
-import { Coords, Shape } from "./shapes";
+import { Coords, Shape, getCanonicalPath } from "./shapes";
 import _ from "lodash";
 import { getBoundingBox } from "./transformation";
 
@@ -70,20 +70,48 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
       return repr;
     }
     case "LINE": {
+      // Prepare the objects in the repr
       const bb = getBoundingBox(shape);
       for (let x = bb.top; x <= bb.bottom; x++) {
         repr[x] = {};
       }
 
-      const { start, inflection, end } = shape;
+      const { start, end } = shape;
 
-      _.merge(repr, drawHorizontalLine(start.r, start.c, inflection.c));
-      _.merge(repr, drawVerticalLine(inflection.c, start.r, end.r));
-      _.merge(repr, drawHorizontalLine(end.r, inflection.c, end.c));
+      const path = getCanonicalPath(shape);
+      path.forEach((segment) => {
+        switch (segment.type) {
+          case "HORIZONTAL": {
+            _.merge(
+              repr,
+              drawHorizontalLine(segment.r, segment.c_from, segment.c_to)
+            );
+            repr[segment.r][segment.c_from] = "+";
+            repr[segment.r][segment.c_to] = "+";
+            break;
+          }
+          case "VERTICAL": {
+            _.merge(
+              repr,
+              drawVerticalLine(segment.c, segment.r_from, segment.r_to)
+            );
+            repr[segment.r_from][segment.c] = "+";
+            repr[segment.r_to][segment.c] = "+";
+          }
+        }
+      });
 
-      repr[start.r][start.c] = "$";
-      repr[inflection.r][inflection.c] = "+";
-      repr[end.r][end.c] = "&";
+      const lastSegment = path[path.length - 1];
+      repr[end.r][end.c] =
+        lastSegment.type === "HORIZONTAL" &&
+        lastSegment.direction === "LEFT_TO_RIGHT"
+          ? ">"
+          : lastSegment.type === "HORIZONTAL" &&
+            lastSegment.direction === "RIGHT_TO_LEFT"
+          ? "<"
+          : lastSegment.type === "VERTICAL" && lastSegment.direction === "DOWN"
+          ? "v"
+          : "^";
 
       return repr;
     }
