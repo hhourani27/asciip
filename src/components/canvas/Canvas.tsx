@@ -130,6 +130,11 @@ export default function Canvas(): JSX.Element {
         onClick={(e) =>
           dispatch(appActions.onCellClick(getCellCoords(e.clientX, e.clientY)))
         }
+        onDoubleClick={(e) =>
+          dispatch(
+            appActions.onCellDoubleClick(getCellCoords(e.clientX, e.clientY))
+          )
+        }
       ></canvas>
     </div>
   );

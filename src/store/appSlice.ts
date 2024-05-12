@@ -72,6 +72,24 @@ export const appSlice = createSlice({
     onCtrlKey: (state, action: PayloadAction<boolean>) => {
       state.ctrlPressed = action.payload;
     },
+    onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
+      if (state.creationProgress?.shape.type === "LINE") {
+        const newShape: Shape | null = isShapeLegal(
+          state.creationProgress.shape
+        )
+          ? state.creationProgress.shape
+          : state.creationProgress.checkpoint;
+
+        if (newShape) {
+          const newShapeObj: ShapeObject = {
+            id: uuidv4(),
+            shape: newShape,
+          };
+          state.shapes.push(newShapeObj);
+        }
+        state.creationProgress = null;
+      }
+    },
     onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
         const shape = getShapeAtCoords(state.shapes, action.payload);
@@ -81,6 +99,33 @@ export const appSlice = createSlice({
         } else {
           state.selectedShapeId = null;
           state.nextActionOnClick = "SELECT";
+        }
+      } else if (state.selectedTool === "LINE") {
+        if (state.creationProgress == null) {
+          state.creationProgress = {
+            start: action.payload,
+            curr: action.payload,
+            checkpoint: null,
+            shape: {
+              type: "LINE",
+              segments: [createZeroWidthSegment(action.payload)],
+            },
+          };
+        } else if (state.creationProgress.shape.type === "LINE") {
+          if (isShapeLegal(state.creationProgress.shape)) {
+            state.creationProgress.checkpoint = _.cloneDeep(
+              state.creationProgress.shape
+            );
+
+            const lastPoint =
+              state.creationProgress.shape.segments[
+                state.creationProgress.shape.segments.length - 1
+              ].end;
+            state.creationProgress.start = lastPoint;
+            state.creationProgress.shape.segments.push(
+              createZeroWidthSegment(lastPoint)
+            );
+          }
         }
       }
     },
@@ -117,28 +162,6 @@ export const appSlice = createSlice({
             br: action.payload,
           },
         };
-      } else if (state.selectedTool === "LINE") {
-        // Case 1: Create a new line
-        if (state.creationProgress == null) {
-          state.creationProgress = {
-            start: action.payload,
-            curr: action.payload,
-            checkpoint: null,
-            shape: {
-              type: "LINE",
-              segments: [createZeroWidthSegment(action.payload)],
-            },
-          };
-        }
-        // Case 2: There's currently a line being created, add a new segment
-        else if (
-          state.creationProgress.shape.type === "LINE" &&
-          state.ctrlPressed
-        ) {
-          state.creationProgress.shape.segments.push(
-            createLineSegment(state.creationProgress.start, action.payload)
-          );
-        }
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
@@ -147,20 +170,14 @@ export const appSlice = createSlice({
       } else if (state.resizeProgress) {
         state.resizeProgress = null;
       } else if (state.creationProgress) {
-        if (state.creationProgress.shape.type === "LINE" && state.ctrlPressed) {
-          // Case : I'm creating a line, but since I'm pressing Ctrl, I want to continue adding a segment
-          if (isShapeLegal(state.creationProgress.shape)) {
-            state.creationProgress.checkpoint = state.creationProgress.shape;
-            state.creationProgress.start = action.payload;
-          }
-        } else {
+        if (state.creationProgress.shape.type === "RECTANGLE") {
           // Else, I finished creating a shape
 
           const newShape: Shape | null = isShapeLegal(
             state.creationProgress.shape
           )
             ? state.creationProgress.shape
-            : state.creationProgress.checkpoint;
+            : null;
 
           if (newShape) {
             const newShapeObj: ShapeObject = {
