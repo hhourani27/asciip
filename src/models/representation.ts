@@ -1,5 +1,5 @@
 import { ShapeObject } from "../store/appSlice";
-import { Coords, Shape, getCanonicalPath } from "./shapes";
+import { Coords, Shape } from "./shapes";
 import _ from "lodash";
 import { getBoundingBox } from "./transformation";
 
@@ -76,40 +76,41 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
         repr[x] = {};
       }
 
-      const { start, end } = shape;
-
-      const path = getCanonicalPath(shape);
-      path.forEach((segment) => {
-        switch (segment.type) {
+      shape.segments.forEach((segment) => {
+        switch (segment.axis) {
           case "HORIZONTAL": {
             _.merge(
               repr,
-              drawHorizontalLine(segment.r, segment.c_from, segment.c_to)
+              drawHorizontalLine(
+                segment.start.r,
+                segment.start.c,
+                segment.end.c
+              )
             );
-            repr[segment.r][segment.c_from] = "+";
-            repr[segment.r][segment.c_to] = "+";
+            repr[segment.start.r][segment.start.c] = "+";
+            repr[segment.start.r][segment.end.c] = "+";
             break;
           }
           case "VERTICAL": {
             _.merge(
               repr,
-              drawVerticalLine(segment.c, segment.r_from, segment.r_to)
+              drawVerticalLine(segment.start.c, segment.start.r, segment.end.r)
             );
-            repr[segment.r_from][segment.c] = "+";
-            repr[segment.r_to][segment.c] = "+";
+            repr[segment.start.r][segment.start.c] = "+";
+            repr[segment.start.r][segment.end.c] = "+";
           }
         }
       });
 
-      const lastSegment = path[path.length - 1];
-      repr[end.r][end.c] =
-        lastSegment.type === "HORIZONTAL" &&
+      const lastSegment = shape.segments[shape.segments.length - 1];
+      repr[lastSegment.end.r][lastSegment.end.c] =
+        lastSegment.axis === "HORIZONTAL" &&
         lastSegment.direction === "LEFT_TO_RIGHT"
           ? ">"
-          : lastSegment.type === "HORIZONTAL" &&
+          : lastSegment.axis === "HORIZONTAL" &&
             lastSegment.direction === "RIGHT_TO_LEFT"
           ? "<"
-          : lastSegment.type === "VERTICAL" && lastSegment.direction === "DOWN"
+          : lastSegment.axis === "VERTICAL" && lastSegment.direction === "DOWN"
           ? "v"
           : "^";
 

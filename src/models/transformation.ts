@@ -21,16 +21,18 @@ export function translate(
     }
     case "LINE": {
       return {
-        type: "LINE",
-        start: {
-          r: shape.start.r + cappedDelta.r,
-          c: shape.start.c + cappedDelta.c,
-        },
-        inflection: {
-          r: shape.inflection.r + cappedDelta.r,
-          c: shape.inflection.c + cappedDelta.c,
-        },
-        end: { r: shape.end.r + cappedDelta.r, c: shape.end.c + cappedDelta.c },
+        ...shape,
+        segments: shape.segments.map((segment) => ({
+          ...segment,
+          start: {
+            r: segment.start.r + cappedDelta.r,
+            c: segment.start.c + cappedDelta.c,
+          },
+          end: {
+            r: segment.end.r + cappedDelta.r,
+            c: segment.end.c + cappedDelta.c,
+          },
+        })),
       };
     }
   }
@@ -97,41 +99,7 @@ export function resize(
       else return shape;
     }
     case "LINE": {
-      const { start, inflection, end } = shape;
-      const resizePointType: "START" | "INFLECTION" | "END" = _.isEqual(
-        resizePoint,
-        start
-      )
-        ? "START"
-        : _.isEqual(resizePoint, inflection)
-        ? "INFLECTION"
-        : "END";
-
-      const new_point = {
-        r: resizePoint.r + cappedDelta.r,
-        c: resizePoint.c + cappedDelta.c,
-      };
-
-      switch (resizePointType) {
-        case "START": {
-          return {
-            ...shape,
-            start: new_point,
-          };
-        }
-        case "END": {
-          return {
-            ...shape,
-            end: new_point,
-          };
-        }
-        case "INFLECTION": {
-          return {
-            ...shape,
-            inflection: new_point,
-          };
-        }
-      }
+      return shape;
     }
   }
 }
@@ -148,7 +116,7 @@ export function getResizePoints(shape: Shape): Coords[] {
       ];
     }
     case "LINE": {
-      return [shape.start, shape.inflection, shape.end];
+      return [];
     }
   }
 }
@@ -183,11 +151,16 @@ export function getBoundingBox(shape: Shape): BoundingBox {
       };
     }
     case "LINE": {
+      const points = [
+        ...shape.segments.map((s) => s.start),
+        ...shape.segments.map((s) => s.end),
+      ];
+
       return {
-        top: Math.min(shape.start.r, shape.inflection.r, shape.end.r),
-        bottom: Math.max(shape.start.r, shape.inflection.r, shape.end.r),
-        left: Math.min(shape.start.c, shape.inflection.c, shape.end.c),
-        right: Math.max(shape.start.c, shape.inflection.c, shape.end.c),
+        top: Math.min(...points.map((p) => p.r)),
+        bottom: Math.max(...points.map((p) => p.r)),
+        left: Math.min(...points.map((p) => p.c)),
+        right: Math.max(...points.map((p) => p.c)),
       };
     }
   }

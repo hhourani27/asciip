@@ -1,15 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
-  Coords,
-  Line,
-  Rectangle,
-  Shape,
-  getInflectionPoint,
-} from "../models/shapes";
+import { Coords, Shape, isShapeLegal } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
+import { createLineSegment, createZeroWidthSegment } from "../models/create";
 
 export type Tool = "SELECT" | "RECTANGLE" | "LINE";
 
@@ -24,8 +19,15 @@ export type AppState = {
 
   shapes: ShapeObject[];
 
+  ctrlPressed: boolean;
+
   selectedTool: Tool;
-  creationProgress: null | { start: Coords; curr: Coords; shape: Shape };
+  creationProgress: null | {
+    start: Coords;
+    curr: Coords;
+    checkpoint: Shape | null;
+    shape: Shape;
+  };
 
   // Properties set when selectedTool === SELECT
   selectedShapeId: null | string;
@@ -47,6 +49,7 @@ export const initState = (opt?: StateInitOptions): AppState => {
     shapes: opt?.shapes ?? [],
 
     selectedTool: "SELECT",
+    ctrlPressed: false,
     creationProgress: null,
     selectedShapeId: null,
     nextActionOnClick: null,
@@ -65,6 +68,9 @@ export const appSlice = createSlice({
         state.selectedShapeId = null;
         state.nextActionOnClick = null;
       }
+    },
+    onCtrlKey: (state, action: PayloadAction<boolean>) => {
+      state.ctrlPressed = action.payload;
     },
     onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
@@ -104,6 +110,7 @@ export const appSlice = createSlice({
         state.creationProgress = {
           start: action.payload,
           curr: action.payload,
+          checkpoint: null,
           shape: {
             type: "RECTANGLE",
             tl: action.payload,
@@ -111,16 +118,27 @@ export const appSlice = createSlice({
           },
         };
       } else if (state.selectedTool === "LINE") {
-        state.creationProgress = {
-          start: action.payload,
-          curr: action.payload,
-          shape: {
-            type: "LINE",
+        // Case 1: Create a new line
+        if (state.creationProgress == null) {
+          state.creationProgress = {
             start: action.payload,
-            inflection: action.payload,
-            end: action.payload,
-          },
-        };
+            curr: action.payload,
+            checkpoint: null,
+            shape: {
+              type: "LINE",
+              segments: [createZeroWidthSegment(action.payload)],
+            },
+          };
+        }
+        // Case 2: There's currently a line being created, add a new segment
+        else if (
+          state.creationProgress.shape.type === "LINE" &&
+          state.ctrlPressed
+        ) {
+          state.creationProgress.shape.segments.push(
+            createLineSegment(state.creationProgress.start, action.payload)
+          );
+        }
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
@@ -128,13 +146,31 @@ export const appSlice = createSlice({
         state.moveProgress = null;
       } else if (state.resizeProgress) {
         state.resizeProgress = null;
-      } else if (state.creationProgress != null) {
-        const newShape: ShapeObject = {
-          id: uuidv4(),
-          shape: state.creationProgress.shape,
-        };
-        state.shapes.push(newShape);
-        state.creationProgress = null;
+      } else if (state.creationProgress) {
+        if (state.creationProgress.shape.type === "LINE" && state.ctrlPressed) {
+          // Case : I'm creating a line, but since I'm pressing Ctrl, I want to continue adding a segment
+          if (isShapeLegal(state.creationProgress.shape)) {
+            state.creationProgress.checkpoint = state.creationProgress.shape;
+            state.creationProgress.start = action.payload;
+          }
+        } else {
+          // Else, I finished creating a shape
+
+          const newShape: Shape | null = isShapeLegal(
+            state.creationProgress.shape
+          )
+            ? state.creationProgress.shape
+            : state.creationProgress.checkpoint;
+
+          if (newShape) {
+            const newShapeObj: ShapeObject = {
+              id: uuidv4(),
+              shape: newShape,
+            };
+            state.shapes.push(newShapeObj);
+          }
+          state.creationProgress = null;
+        }
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
@@ -197,7 +233,7 @@ export const appSlice = createSlice({
       ) {
         if (!_.isEqual(state.creationProgress.curr, action.payload)) {
           const curr = action.payload;
-          switch (state.selectedTool) {
+          switch (state.creationProgress.shape.type) {
             case "RECTANGLE": {
               const tl: Coords = {
                 r: Math.min(state.creationProgress.start.r, curr.r),
@@ -209,10 +245,10 @@ export const appSlice = createSlice({
                 c: Math.max(state.creationProgress.start.c, curr.c),
               };
               state.creationProgress = {
-                start: state.creationProgress.start,
+                ...state.creationProgress,
                 curr,
                 shape: {
-                  ...(state.creationProgress.shape as Rectangle),
+                  ...state.creationProgress.shape,
                   tl,
                   br,
                 },
@@ -220,19 +256,12 @@ export const appSlice = createSlice({
               break;
             }
             case "LINE": {
-              state.creationProgress = {
-                start: state.creationProgress.start,
-                curr,
-                shape: {
-                  ...(state.creationProgress.shape as Line),
-                  start: state.creationProgress.start,
-                  end: curr,
-                  inflection: getInflectionPoint(
-                    state.creationProgress.start,
-                    curr
-                  ),
-                },
-              };
+              const newSegment = createLineSegment(
+                state.creationProgress.start,
+                curr
+              );
+              state.creationProgress.shape.segments.pop();
+              state.creationProgress.shape.segments.push(newSegment);
               break;
             }
           }
