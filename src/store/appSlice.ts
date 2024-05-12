@@ -1,5 +1,11 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Coords, Shape, isShapeLegal } from "../models/shapes";
+import {
+  Coords,
+  Line,
+  Shape,
+  isShapeLegal,
+  normalizeLine,
+} from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
@@ -74,16 +80,14 @@ export const appSlice = createSlice({
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
       if (state.creationProgress?.shape.type === "LINE") {
-        const newShape: Shape | null = isShapeLegal(
-          state.creationProgress.shape
-        )
+        const newShape: Line | null = isShapeLegal(state.creationProgress.shape)
           ? state.creationProgress.shape
-          : state.creationProgress.checkpoint;
+          : (state.creationProgress.checkpoint as Line);
 
         if (newShape) {
           const newShapeObj: ShapeObject = {
             id: uuidv4(),
-            shape: newShape,
+            shape: normalizeLine(newShape),
           };
           state.shapes.push(newShapeObj);
         }
@@ -113,6 +117,9 @@ export const appSlice = createSlice({
           };
         } else if (state.creationProgress.shape.type === "LINE") {
           if (isShapeLegal(state.creationProgress.shape)) {
+            state.creationProgress.shape = normalizeLine(
+              state.creationProgress.shape
+            );
             state.creationProgress.checkpoint = _.cloneDeep(
               state.creationProgress.shape
             );

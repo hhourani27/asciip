@@ -79,19 +79,36 @@ export function isShapeLegal(shape: Shape): boolean {
   }
 }
 
-// /* Line functions */
-// export function endPoint(segment: Segment): Coords {
-//   const end: Coords =
-//     segment.direction === "UP"
-//       ? { r: segment.start.r - segment.length, c: segment.start.c }
-//       : segment.direction === "DOWN"
-//       ? { r: segment.start.r + segment.length, c: segment.start.c }
-//       : segment.direction === "LEFT_TO_RIGHT"
-//       ? { r: segment.start.r, c: segment.start.c + segment.length }
-//       : { r: segment.start.r, c: segment.start.c - segment.length };
+/**
+ * merge consecutive segments if they have the same axis and direction
+ */
+export function normalizeLine(line: Line): Line {
+  const normalizedSegments: Segment[] = [];
 
-//   return end;
-// }
+  normalizedSegments.push(line.segments[0]);
+  for (let i = 1; i < line.segments.length; i++) {
+    const [seg1, seg2]: [Segment, Segment] = [
+      normalizedSegments[normalizedSegments.length - 1],
+      line.segments[i],
+    ];
+    if (seg1.axis === seg2.axis && seg1.direction === seg2.direction) {
+      normalizedSegments.pop();
+
+      const newSegment: Segment = {
+        ...seg1,
+        end: seg2.end,
+      };
+      normalizedSegments.push(newSegment);
+    } else {
+      normalizedSegments.push(seg2);
+    }
+  }
+
+  return {
+    ...line,
+    segments: normalizedSegments,
+  };
+}
 
 /**
  * Like lodash's range, but
