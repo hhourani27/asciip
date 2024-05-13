@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { CanvasSize } from "../store/appSlice";
-import { Coords, Shape, normalizeLine } from "./shapes";
+import { Coords, Shape, normalizeMultiSegmentLine } from "./shapes";
 import { createLineSegment } from "./create";
 
 export function translate(
@@ -20,7 +20,7 @@ export function translate(
         br: { r: shape.br.r + cappedDelta.r, c: shape.br.c + cappedDelta.c },
       };
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       return {
         ...shape,
         segments: shape.segments.map((segment) => ({
@@ -100,7 +100,7 @@ export function resize(
       if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
       else return shape;
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       const resizedShape = _.cloneDeep(shape);
 
       if (resizePointName === "START") {
@@ -163,7 +163,7 @@ export function resize(
         }
       }
 
-      const correctedLine = normalizeLine(resizedShape);
+      const correctedLine = normalizeMultiSegmentLine(resizedShape);
       if (isShapeLegal(correctedLine, canvasSize)) return correctedLine;
       else return shape;
     }
@@ -181,7 +181,7 @@ export function getResizePoints(shape: Shape): ResizePoint[] {
         { name: "BL", coords: { r: br.r, c: tl.c } },
       ];
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       const resizePoints: ResizePoint[] = [];
 
       resizePoints.push({ name: "START", coords: shape.segments[0].start });
@@ -232,7 +232,7 @@ export function getBoundingBox(shape: Shape): BoundingBox {
         right: shape.br.c,
       };
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       const points = [
         ...shape.segments.map((s) => s.start),
         ...shape.segments.map((s) => s.end),

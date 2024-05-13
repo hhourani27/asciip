@@ -27,12 +27,12 @@ export type VerticalSegment = {
 
 export type Segment = HorizontalSegment | VerticalSegment;
 
-export type Line = {
-  type: "LINE";
+export type MultiSegment = {
+  type: "MULTI_SEGMENT_LINE";
   segments: Segment[];
 };
 
-export type Shape = Rectangle | Line;
+export type Shape = Rectangle | MultiSegment;
 
 export function isShapeLegal(shape: Shape): boolean {
   switch (shape.type) {
@@ -40,7 +40,7 @@ export function isShapeLegal(shape: Shape): boolean {
       const { tl, br } = shape;
       return tl.r !== br.r && tl.c !== br.c;
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       for (let i = 0; i < shape.segments.length; i++) {
         const segment = shape.segments[i];
         // If there's a zero-length segment
@@ -96,7 +96,7 @@ export function isShapeLegal(shape: Shape): boolean {
  * - Correct segment direction
  * - Merge consecutive segments if they have the same axis and direction
  */
-export function normalizeLine(line: Line): Line {
+export function normalizeMultiSegmentLine(line: MultiSegment): MultiSegment {
   // - Remove 0-length segments
   // - Correct segment direction
   const correctedSegments: Segment[] = line.segments

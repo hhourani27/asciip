@@ -17,7 +17,7 @@ export function createLineSegment(start: Coords, end: Coords): Segment {
 
   const [deltaR, deltaC] = [end.r - start.r, end.c - start.c];
   if (Math.abs(deltaC) >= Math.abs(deltaR)) {
-    // Create horizontal line
+    // Create horizontal segment
     return {
       axis: "HORIZONTAL",
       start,
@@ -25,7 +25,7 @@ export function createLineSegment(start: Coords, end: Coords): Segment {
       direction: deltaC >= 0 ? "LEFT_TO_RIGHT" : "RIGHT_TO_LEFT",
     };
   } else {
-    //Create Vertical line
+    //Create Vertical segment
     return {
       axis: "VERTICAL",
       start,

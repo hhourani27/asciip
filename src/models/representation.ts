@@ -69,7 +69,7 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
 
       return repr;
     }
-    case "LINE": {
+    case "MULTI_SEGMENT_LINE": {
       // Prepare the objects in the repr
       const bb = getBoundingBox(shape);
       for (let x = bb.top; x <= bb.bottom; x++) {

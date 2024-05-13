@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   Coords,
-  Line,
+  MultiSegment,
   Shape,
   isShapeLegal,
-  normalizeLine,
+  normalizeMultiSegmentLine,
 } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
@@ -12,7 +12,7 @@ import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 
-export type Tool = "SELECT" | "RECTANGLE" | "LINE";
+export type Tool = "SELECT" | "RECTANGLE" | "MULTI_SEGMENT_LINE";
 
 export type ShapeObject = { id: string; shape: Shape };
 export type CanvasSize = {
@@ -82,15 +82,17 @@ export const appSlice = createSlice({
       state.ctrlPressed = action.payload;
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
-      if (state.creationProgress?.shape.type === "LINE") {
-        const newShape: Line | null = isShapeLegal(state.creationProgress.shape)
+      if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
+        const newShape: MultiSegment | null = isShapeLegal(
+          state.creationProgress.shape
+        )
           ? state.creationProgress.shape
-          : (state.creationProgress.checkpoint as Line);
+          : (state.creationProgress.checkpoint as MultiSegment);
 
         if (newShape) {
           const newShapeObj: ShapeObject = {
             id: uuidv4(),
-            shape: normalizeLine(newShape),
+            shape: normalizeMultiSegmentLine(newShape),
           };
           state.shapes.push(newShapeObj);
         }
@@ -107,20 +109,20 @@ export const appSlice = createSlice({
           state.selectedShapeId = null;
           state.nextActionOnClick = "SELECT";
         }
-      } else if (state.selectedTool === "LINE") {
+      } else if (state.selectedTool === "MULTI_SEGMENT_LINE") {
         if (state.creationProgress == null) {
           state.creationProgress = {
             start: action.payload,
             curr: action.payload,
             checkpoint: null,
             shape: {
-              type: "LINE",
+              type: "MULTI_SEGMENT_LINE",
               segments: [createZeroWidthSegment(action.payload)],
             },
           };
-        } else if (state.creationProgress.shape.type === "LINE") {
+        } else if (state.creationProgress.shape.type === "MULTI_SEGMENT_LINE") {
           if (isShapeLegal(state.creationProgress.shape)) {
-            state.creationProgress.shape = normalizeLine(
+            state.creationProgress.shape = normalizeMultiSegmentLine(
               state.creationProgress.shape
             );
             state.creationProgress.checkpoint = _.cloneDeep(
@@ -259,7 +261,8 @@ export const appSlice = createSlice({
           }
         }
       } else if (
-        (state.selectedTool === "RECTANGLE" || state.selectedTool === "LINE") &&
+        (state.selectedTool === "RECTANGLE" ||
+          state.selectedTool === "MULTI_SEGMENT_LINE") &&
         state.creationProgress != null
       ) {
         if (!_.isEqual(state.creationProgress.curr, action.payload)) {
@@ -286,7 +289,7 @@ export const appSlice = createSlice({
               };
               break;
             }
-            case "LINE": {
+            case "MULTI_SEGMENT_LINE": {
               const newSegment = createLineSegment(
                 state.creationProgress.start,
                 curr
