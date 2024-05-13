@@ -39,7 +39,10 @@ export type AppState = {
   selectedShapeId: null | string;
   nextActionOnClick: null | "SELECT" | "MOVE" | "RESIZE";
   moveProgress: null | { start: Coords; startShape: Shape };
-  resizeProgress: null | { resizePoint: Coords; startShape: Shape };
+  resizeProgress: null | {
+    resizePoint: Coords;
+    startShape: Shape;
+  };
 };
 
 export type StateInitOptions = {
@@ -230,8 +233,10 @@ export const appSlice = createSlice({
             delta,
             state.canvasSize
           );
-          // Replace resized shape
-          state.shapes[selectedShapeIdx].shape = resizedShape;
+          if (isShapeLegal(resizedShape)) {
+            // Replace resized shape
+            state.shapes[selectedShapeIdx].shape = resizedShape;
+          }
         } else if (!state.moveProgress && !state.resizeProgress) {
           const shapeObj = getShapeAtCoords(
             state.shapes,

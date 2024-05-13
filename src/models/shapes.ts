@@ -43,10 +43,10 @@ export function isShapeLegal(shape: Shape): boolean {
     case "LINE": {
       for (let i = 0; i < shape.segments.length; i++) {
         const segment = shape.segments[i];
-        // If there's a zero-lenght segment
+        // If there's a zero-length segment
         if (_.isEqual(segment.start, segment.end)) return false;
 
-        // If the segment has uncoherent properties
+        // If the segment has uncoherent properties (wrong direction, wrong axis)
         if (segment.axis === "HORIZONTAL") {
           if (segment.start.r !== segment.end.r) return false;
           if (
@@ -72,6 +72,16 @@ export function isShapeLegal(shape: Shape): boolean {
           if (!_.isEqual(segment.start, shape.segments[i - 1].end))
             return false;
         }
+
+        // If there's a consecutive U-turn
+        if (i > 0) {
+          if (
+            segment.axis === shape.segments[i - 1].axis &&
+            segment.direction !== shape.segments[i - 1].direction
+          ) {
+            return false;
+          }
+        }
       }
 
       return true;
@@ -80,34 +90,73 @@ export function isShapeLegal(shape: Shape): boolean {
 }
 
 /**
- * merge consecutive segments if they have the same axis and direction
+ *
+ * Correct the segment in Line
+ * - Remove 0-length segments
+ * - Correct segment direction
+ * - Merge consecutive segments if they have the same axis and direction
  */
 export function normalizeLine(line: Line): Line {
-  const normalizedSegments: Segment[] = [];
+  // - Remove 0-length segments
+  // - Correct segment direction
+  const correctedSegments: Segment[] = line.segments
+    .filter((seg) => !_.isEqual(seg.start, seg.end))
+    .map((seg) => {
+      switch (seg.axis) {
+        case "HORIZONTAL":
+          return {
+            ...seg,
+            direction:
+              seg.start.c <= seg.end.c ? "LEFT_TO_RIGHT" : "RIGHT_TO_LEFT",
+          };
+        case "VERTICAL":
+          return {
+            ...seg,
+            direction: seg.start.r <= seg.end.r ? "DOWN" : "UP",
+          };
+      }
+    });
 
-  normalizedSegments.push(line.segments[0]);
-  for (let i = 1; i < line.segments.length; i++) {
+  //Merge consecutive segments if they have the same axis and direction
+  const mergedSegments: Segment[] = [];
+
+  mergedSegments.push(correctedSegments[0]);
+  for (let i = 1; i < correctedSegments.length; i++) {
     const [seg1, seg2]: [Segment, Segment] = [
-      normalizedSegments[normalizedSegments.length - 1],
-      line.segments[i],
+      mergedSegments[mergedSegments.length - 1],
+      correctedSegments[i],
     ];
     if (seg1.axis === seg2.axis && seg1.direction === seg2.direction) {
-      normalizedSegments.pop();
+      mergedSegments.pop();
 
       const newSegment: Segment = {
         ...seg1,
         end: seg2.end,
       };
-      normalizedSegments.push(newSegment);
+      mergedSegments.push(newSegment);
     } else {
-      normalizedSegments.push(seg2);
+      mergedSegments.push(seg2);
     }
   }
 
   return {
     ...line,
-    segments: normalizedSegments,
+    segments: mergedSegments,
   };
+}
+
+export function getHorizontalDirection(
+  start_c: number,
+  end_c: number
+): "LEFT_TO_RIGHT" | "RIGHT_TO_LEFT" {
+  return start_c <= end_c ? "LEFT_TO_RIGHT" : "RIGHT_TO_LEFT";
+}
+
+export function getVerticalDirection(
+  start_r: number,
+  end_r: number
+): "DOWN" | "UP" {
+  return start_r <= end_r ? "DOWN" : "UP";
 }
 
 /**

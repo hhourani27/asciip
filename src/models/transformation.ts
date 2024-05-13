@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { CanvasSize } from "../store/appSlice";
-import { Coords, Shape } from "./shapes";
+import { Coords, Shape, normalizeLine } from "./shapes";
 
 export function translate(
   shape: Shape,
@@ -100,7 +100,42 @@ export function resize(
       else return shape;
     }
     case "LINE": {
-      return shape;
+      const resizedShape = _.cloneDeep(shape);
+
+      if (resizePointName === "START") {
+      } else if (resizePointName === "END") {
+      } else if (resizePointName.startsWith("SEGMENT_")) {
+        const segIdx = parseInt(resizePointName.split("_")[1]);
+
+        switch (resizedShape.segments[segIdx].axis) {
+          case "HORIZONTAL": {
+            resizedShape.segments[segIdx].start.r += cappedDelta.r;
+            resizedShape.segments[segIdx].end.r += cappedDelta.r;
+            if (segIdx > 0) {
+              resizedShape.segments[segIdx - 1].end.r += cappedDelta.r;
+            }
+            if (segIdx < resizedShape.segments.length - 1) {
+              resizedShape.segments[segIdx + 1].start.r += cappedDelta.r;
+            }
+            break;
+          }
+          case "VERTICAL": {
+            resizedShape.segments[segIdx].start.c += cappedDelta.c;
+            resizedShape.segments[segIdx].end.c += cappedDelta.c;
+            if (segIdx > 0) {
+              resizedShape.segments[segIdx - 1].end.c += cappedDelta.c;
+            }
+            if (segIdx < resizedShape.segments.length - 1) {
+              resizedShape.segments[segIdx + 1].start.c += cappedDelta.c;
+            }
+            break;
+          }
+        }
+      }
+
+      const correctedLine = normalizeLine(resizedShape);
+      if (isShapeLegal(correctedLine, canvasSize)) return correctedLine;
+      else return shape;
     }
   }
 }
@@ -117,7 +152,23 @@ export function getResizePoints(shape: Shape): ResizePoint[] {
       ];
     }
     case "LINE": {
-      return [];
+      const resizePoints: ResizePoint[] = [];
+
+      resizePoints.push({ name: "START", coords: shape.segments[0].start });
+      shape.segments.forEach((seg, idx) => {
+        resizePoints.push({
+          name: `SEGMENT_${idx}`,
+          coords: {
+            r: Math.floor((seg.start.r + seg.end.r) / 2),
+            c: Math.floor((seg.start.c + seg.end.c) / 2),
+          },
+        });
+      });
+      resizePoints.push({
+        name: "END",
+        coords: shape.segments[shape.segments.length - 1].end,
+      });
+      return resizePoints;
     }
   }
 }

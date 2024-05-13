@@ -22,7 +22,7 @@ export function createLineSegment(start: Coords, end: Coords): Segment {
       axis: "HORIZONTAL",
       start,
       end: { r: start.r, c: end.c },
-      direction: deltaC > 0 ? "LEFT_TO_RIGHT" : "RIGHT_TO_LEFT",
+      direction: deltaC >= 0 ? "LEFT_TO_RIGHT" : "RIGHT_TO_LEFT",
     };
   } else {
     //Create Vertical line
@@ -30,7 +30,7 @@ export function createLineSegment(start: Coords, end: Coords): Segment {
       axis: "VERTICAL",
       start,
       end: { r: end.r, c: start.c },
-      direction: deltaR > 0 ? "DOWN" : "UP",
+      direction: deltaR >= 0 ? "DOWN" : "UP",
     };
   }
 }
