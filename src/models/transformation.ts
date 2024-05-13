@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { CanvasSize } from "../store/appSlice";
 import { Coords, Shape, normalizeLine } from "./shapes";
+import { createLineSegment } from "./create";
 
 export function translate(
   shape: Shape,
@@ -103,7 +104,36 @@ export function resize(
       const resizedShape = _.cloneDeep(shape);
 
       if (resizePointName === "START") {
+        const firstSegment = resizedShape.segments[0];
+        const newSegment = createLineSegment(
+          {
+            r: firstSegment.start.r + cappedDelta.r,
+            c: firstSegment.start.c + cappedDelta.c,
+          },
+          firstSegment.start
+        );
+
+        if (newSegment.axis === firstSegment.axis) {
+          // In this case, we're modifying the length of first segment
+          resizedShape.segments[0].start = newSegment.start;
+        } else {
+          resizedShape.segments = [newSegment, ...resizedShape.segments];
+        }
       } else if (resizePointName === "END") {
+        const lastSegment =
+          resizedShape.segments[resizedShape.segments.length - 1];
+        const newSegment = createLineSegment(lastSegment.end, {
+          r: lastSegment.end.r + cappedDelta.r,
+          c: lastSegment.end.c + cappedDelta.c,
+        });
+
+        if (newSegment.axis === lastSegment.axis) {
+          // In this case, we're modifying the length of last segment
+          resizedShape.segments[resizedShape.segments.length - 1].end =
+            newSegment.end;
+        } else {
+          resizedShape.segments.push(newSegment);
+        }
       } else if (resizePointName.startsWith("SEGMENT_")) {
         const segIdx = parseInt(resizePointName.split("_")[1]);
 
