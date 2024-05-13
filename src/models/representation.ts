@@ -102,6 +102,10 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
         }
       });
 
+      const firstSegment = shape.segments[0];
+      repr[firstSegment.start.r][firstSegment.start.c] =
+        firstSegment.axis === "HORIZONTAL" ? "-" : "|";
+
       const lastSegment = shape.segments[shape.segments.length - 1];
       repr[lastSegment.end.r][lastSegment.end.c] =
         lastSegment.axis === "HORIZONTAL" &&
