@@ -1,4 +1,4 @@
-import { Rectangle } from "./shapes";
+import { Line, Rectangle } from "./shapes";
 import { resize, translate } from "./transformation";
 
 describe("translate()", () => {
@@ -235,5 +235,32 @@ describe("resize()", () => {
 
     expect(resizedRectangle.tl).toEqual(rectangle.br);
     expect(resizedRectangle.br).toEqual({ r: 7, c: 7 });
+  });
+
+  test("Extend a horizontal line by dragging start", () => {
+    const canvasSize = { rows: 10, cols: 10 };
+
+    const line: Line = {
+      type: "LINE",
+      axis: "HORIZONTAL",
+      direction: "LEFT_TO_RIGHT",
+      start: { r: 0, c: 1 },
+      end: { r: 0, c: 3 },
+    };
+
+    const resizedLine = resize(
+      line,
+      { r: 0, c: 1 },
+      { r: 0, c: -1 },
+      canvasSize
+    );
+
+    expect(resizedLine).toEqual({
+      type: "LINE",
+      axis: "HORIZONTAL",
+      direction: "LEFT_TO_RIGHT",
+      start: { r: 0, c: 0 },
+      end: { r: 0, c: 3 },
+    });
   });
 });

@@ -12,7 +12,7 @@ import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 
-export type Tool = "SELECT" | "RECTANGLE" | "MULTI_SEGMENT_LINE";
+export type Tool = "SELECT" | "RECTANGLE" | "LINE" | "MULTI_SEGMENT_LINE";
 
 export type ShapeObject = { id: string; shape: Shape };
 export type CanvasSize = {
@@ -78,6 +78,7 @@ export const appSlice = createSlice({
         state.nextActionOnClick = null;
       }
     },
+    // TODO: For now I no longer use CTRL. Keep, as maybe I'll need it for a multi-select
     onCtrlKey: (state, action: PayloadAction<boolean>) => {
       state.ctrlPressed = action.payload;
     },
@@ -174,6 +175,13 @@ export const appSlice = createSlice({
             br: action.payload,
           },
         };
+      } else if (state.selectedTool === "LINE") {
+        state.creationProgress = {
+          start: action.payload,
+          curr: action.payload,
+          checkpoint: null,
+          shape: { type: "LINE", ...createZeroWidthSegment(action.payload) },
+        };
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
@@ -182,7 +190,10 @@ export const appSlice = createSlice({
       } else if (state.resizeProgress) {
         state.resizeProgress = null;
       } else if (state.creationProgress) {
-        if (state.creationProgress.shape.type === "RECTANGLE") {
+        if (
+          state.creationProgress.shape.type === "RECTANGLE" ||
+          state.creationProgress.shape.type === "LINE"
+        ) {
           // Else, I finished creating a shape
 
           const newShape: Shape | null = isShapeLegal(
@@ -262,6 +273,7 @@ export const appSlice = createSlice({
         }
       } else if (
         (state.selectedTool === "RECTANGLE" ||
+          state.selectedTool === "LINE" ||
           state.selectedTool === "MULTI_SEGMENT_LINE") &&
         state.creationProgress != null
       ) {
@@ -285,6 +297,17 @@ export const appSlice = createSlice({
                   ...state.creationProgress.shape,
                   tl,
                   br,
+                },
+              };
+              break;
+            }
+            case "LINE": {
+              state.creationProgress = {
+                ...state.creationProgress,
+                curr,
+                shape: {
+                  type: "LINE",
+                  ...createLineSegment(state.creationProgress.start, curr),
                 },
               };
               break;

@@ -27,12 +27,14 @@ export type VerticalSegment = {
 
 export type Segment = HorizontalSegment | VerticalSegment;
 
+export type Line = Segment & { type: "LINE" };
+
 export type MultiSegment = {
   type: "MULTI_SEGMENT_LINE";
   segments: Segment[];
 };
 
-export type Shape = Rectangle | MultiSegment;
+export type Shape = Rectangle | Line | MultiSegment;
 
 export function isShapeLegal(shape: Shape): boolean {
   switch (shape.type) {
@@ -40,32 +42,14 @@ export function isShapeLegal(shape: Shape): boolean {
       const { tl, br } = shape;
       return tl.r !== br.r && tl.c !== br.c;
     }
+    case "LINE": {
+      if (!isSegmentLegal(shape)) return false;
+      return true;
+    }
     case "MULTI_SEGMENT_LINE": {
       for (let i = 0; i < shape.segments.length; i++) {
         const segment = shape.segments[i];
-        // If there's a zero-length segment
-        if (_.isEqual(segment.start, segment.end)) return false;
-
-        // If the segment has uncoherent properties (wrong direction, wrong axis)
-        if (segment.axis === "HORIZONTAL") {
-          if (segment.start.r !== segment.end.r) return false;
-          if (
-            segment.direction === "LEFT_TO_RIGHT" &&
-            segment.start.c > segment.end.c
-          )
-            return false;
-          if (
-            segment.direction === "RIGHT_TO_LEFT" &&
-            segment.start.c < segment.end.c
-          )
-            return false;
-        } else if (segment.axis === "VERTICAL") {
-          if (segment.start.c !== segment.end.c) return false;
-          if (segment.direction === "DOWN" && segment.start.r > segment.end.r)
-            return false;
-          if (segment.direction === "UP" && segment.start.r < segment.end.r)
-            return false;
-        }
+        if (!isSegmentLegal(segment)) return false;
 
         // If segment is not connected to the previous one
         if (i > 0) {
@@ -87,6 +71,34 @@ export function isShapeLegal(shape: Shape): boolean {
       return true;
     }
   }
+}
+
+function isSegmentLegal(segment: Segment): boolean {
+  // If it's a zero-length segment
+  if (_.isEqual(segment.start, segment.end)) return false;
+
+  // If the segment has uncoherent properties (wrong direction, wrong axis)
+  if (segment.axis === "HORIZONTAL") {
+    if (segment.start.r !== segment.end.r) return false;
+    if (
+      segment.direction === "LEFT_TO_RIGHT" &&
+      segment.start.c > segment.end.c
+    )
+      return false;
+    if (
+      segment.direction === "RIGHT_TO_LEFT" &&
+      segment.start.c < segment.end.c
+    )
+      return false;
+  } else if (segment.axis === "VERTICAL") {
+    if (segment.start.c !== segment.end.c) return false;
+    if (segment.direction === "DOWN" && segment.start.r > segment.end.r)
+      return false;
+    if (segment.direction === "UP" && segment.start.r < segment.end.r)
+      return false;
+  }
+
+  return true;
 }
 
 /**

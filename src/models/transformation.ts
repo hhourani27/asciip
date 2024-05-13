@@ -20,6 +20,19 @@ export function translate(
         br: { r: shape.br.r + cappedDelta.r, c: shape.br.c + cappedDelta.c },
       };
     }
+    case "LINE": {
+      return {
+        ...shape,
+        start: {
+          r: shape.start.r + cappedDelta.r,
+          c: shape.start.c + cappedDelta.c,
+        },
+        end: {
+          r: shape.end.r + cappedDelta.r,
+          c: shape.end.c + cappedDelta.c,
+        },
+      };
+    }
     case "MULTI_SEGMENT_LINE": {
       return {
         ...shape,
@@ -97,6 +110,37 @@ export function resize(
       const resizedShape = { ...shape, tl: corrected_tl, br: corrected_br };
 
       // If we resized outside the canvas bounds, then return the original shape
+      if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
+      else return shape;
+    }
+    case "LINE": {
+      let resizedShape = _.cloneDeep(shape);
+      if (resizePointName === "START") {
+        resizedShape = {
+          type: "LINE",
+          ...createLineSegment(
+            {
+              r: shape.start.r + cappedDelta.r,
+              c: shape.start.c + cappedDelta.c,
+            },
+            shape.end,
+            "END"
+          ),
+        };
+      } else if (resizePointName === "END") {
+        resizedShape = {
+          type: "LINE",
+          ...createLineSegment(
+            shape.start,
+            {
+              r: shape.end.r + cappedDelta.r,
+              c: shape.end.c + cappedDelta.c,
+            },
+            "START"
+          ),
+        };
+      }
+
       if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
       else return shape;
     }
@@ -181,6 +225,12 @@ export function getResizePoints(shape: Shape): ResizePoint[] {
         { name: "BL", coords: { r: br.r, c: tl.c } },
       ];
     }
+    case "LINE": {
+      return [
+        { name: "START", coords: shape.start },
+        { name: "END", coords: shape.end },
+      ];
+    }
     case "MULTI_SEGMENT_LINE": {
       const resizePoints: ResizePoint[] = [];
 
@@ -230,6 +280,14 @@ export function getBoundingBox(shape: Shape): BoundingBox {
         bottom: shape.br.r,
         left: shape.tl.c,
         right: shape.br.c,
+      };
+    }
+    case "LINE": {
+      return {
+        top: Math.min(shape.start.r, shape.end.r),
+        bottom: Math.max(shape.start.r, shape.end.r),
+        left: Math.min(shape.start.c, shape.end.c),
+        right: Math.max(shape.start.c, shape.end.c),
       };
     }
     case "MULTI_SEGMENT_LINE": {

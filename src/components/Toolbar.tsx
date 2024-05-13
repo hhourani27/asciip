@@ -7,6 +7,7 @@ import {
 import Crop54Icon from "@mui/icons-material/Crop54";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import TimelineIcon from "@mui/icons-material/Timeline";
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { Tool, appActions } from "../store/appSlice";
@@ -41,7 +42,13 @@ export default function Toolbar() {
           <ToggleButton value="RECTANGLE" aria-label="Create Rectangle">
             <Crop54Icon />
           </ToggleButton>
-          <ToggleButton value="MULTI_SEGMENT_LINE" aria-label="Create Line">
+          <ToggleButton value="LINE" aria-label="Create Simple Line">
+            <HorizontalRuleIcon />
+          </ToggleButton>
+          <ToggleButton
+            value="MULTI_SEGMENT_LINE"
+            aria-label="Create Multi-segment Line"
+          >
             <TimelineIcon />
           </ToggleButton>
         </ToggleButtonGroup>

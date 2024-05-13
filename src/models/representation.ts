@@ -69,6 +69,41 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
 
       return repr;
     }
+    case "LINE": {
+      // Prepare the objects in the repr
+      const bb = getBoundingBox(shape);
+      for (let x = bb.top; x <= bb.bottom; x++) {
+        repr[x] = {};
+      }
+
+      switch (shape.axis) {
+        case "HORIZONTAL": {
+          _.merge(
+            repr,
+            drawHorizontalLine(shape.start.r, shape.start.c, shape.end.c)
+          );
+          break;
+        }
+        case "VERTICAL": {
+          _.merge(
+            repr,
+            drawVerticalLine(shape.start.c, shape.start.r, shape.end.r)
+          );
+          break;
+        }
+      }
+
+      repr[shape.end.r][shape.end.c] =
+        shape.axis === "HORIZONTAL" && shape.direction === "LEFT_TO_RIGHT"
+          ? ">"
+          : shape.axis === "HORIZONTAL" && shape.direction === "RIGHT_TO_LEFT"
+          ? "<"
+          : shape.axis === "VERTICAL" && shape.direction === "DOWN"
+          ? "v"
+          : "^";
+
+      return repr;
+    }
     case "MULTI_SEGMENT_LINE": {
       // Prepare the objects in the repr
       const bb = getBoundingBox(shape);
