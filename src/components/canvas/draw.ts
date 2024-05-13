@@ -1,10 +1,10 @@
 import _ from "lodash";
-import { Coords, Shape } from "../../models/shapes";
+import { Shape } from "../../models/shapes";
 import {
   CellValueMap,
   getCanvasRepresentation,
 } from "../../models/representation";
-import { getResizePoints } from "../../models/transformation";
+import { ResizePoint, getResizePoints } from "../../models/transformation";
 
 const FONT_SIZE = 16;
 const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
@@ -80,8 +80,8 @@ export function drawShapes(
 export function drawSelectedShape(ctx: CanvasRenderingContext2D, shape: Shape) {
   drawShapes(ctx, [shape], "blue");
 
-  const resizePoints: Coords[] = getResizePoints(shape);
-  resizePoints.forEach(({ r, c }) => {
+  const resizePoints: ResizePoint[] = getResizePoints(shape);
+  resizePoints.forEach(({ coords: { r, c } }) => {
     ctx.beginPath(); // Start a new path
     ctx.arc(
       c * CELL_WIDTH + 0.5 * CELL_WIDTH,
