@@ -21,10 +21,22 @@ export function generateMouseMoveActions(
   const curr: Coords = { r: from.r, c: from.c };
 
   actions.push(appActions.onCellHover(curr));
+
+  let nextMove: "HORIZONTAL" | "VERTICAL" = "HORIZONTAL";
   while (!_.isEqual(curr, to)) {
-    curr.r = curr.r < to.r ? curr.r + 1 : curr.r > to.r ? curr.r - 1 : curr.r;
-    curr.c = curr.c < to.c ? curr.c + 1 : curr.c > to.c ? curr.c - 1 : curr.c;
-    actions.push(appActions.onCellHover(curr));
+    if (nextMove === "VERTICAL") {
+      if (curr.r !== to.r) {
+        curr.r = curr.r < to.r ? curr.r + 1 : curr.r - 1;
+        actions.push(appActions.onCellHover({ ...curr }));
+      }
+      nextMove = "HORIZONTAL";
+    } else {
+      if (curr.c !== to.c) {
+        curr.c = curr.c < to.c ? curr.c + 1 : curr.c - 1;
+        actions.push(appActions.onCellHover({ ...curr }));
+      }
+      nextMove = "VERTICAL";
+    }
   }
 
   return actions;
