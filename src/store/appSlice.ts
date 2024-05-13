@@ -241,7 +241,9 @@ export const appSlice = createSlice({
           if (shapeObj) {
             if (shapeObj.id === state.selectedShapeId) {
               const resizePoints = getResizePoints(shapeObj.shape);
-              if (resizePoints.find((rp) => _.isEqual(rp, action.payload)))
+              if (
+                resizePoints.find((rp) => _.isEqual(rp.coords, action.payload))
+              )
                 state.nextActionOnClick = "RESIZE";
               else state.nextActionOnClick = "MOVE";
             } else {

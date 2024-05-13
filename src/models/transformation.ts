@@ -38,47 +38,48 @@ export function translate(
   }
 }
 
+export type ResizePoint = {
+  name: string;
+  coords: Coords;
+};
+
 export function resize(
   shape: Shape,
-  resizePoint: Coords,
+  resizePointCoords: Coords,
   delta: Coords,
   canvasSize: CanvasSize
 ): Shape {
   // If the resize point is not legal for this shape, then return the same shape
   const resizePoints = getResizePoints(shape);
-  if (!resizePoints.find((rp) => _.isEqual(rp, resizePoint))) return shape;
+  const resizePointName = resizePoints.find((rp) =>
+    _.isEqual(rp.coords, resizePointCoords)
+  )?.name;
 
-  const cappedDelta = capDelta(delta, resizePoint, canvasSize);
+  if (!resizePointName) {
+    return shape;
+  }
+
+  const cappedDelta = capDelta(delta, resizePointCoords, canvasSize);
 
   switch (shape.type) {
     case "RECTANGLE": {
       const { tl, br } = shape;
-      const resizePointType: "TL" | "TR" | "BR" | "BL" = _.isEqual(
-        resizePoint,
-        { r: tl.r, c: tl.c }
-      )
-        ? "TL"
-        : _.isEqual(resizePoint, { r: tl.r, c: br.c })
-        ? "TR"
-        : _.isEqual(resizePoint, { r: br.r, c: br.c })
-        ? "BR"
-        : "BL";
 
       const new_tl =
-        resizePointType === "TL"
+        resizePointName === "TL"
           ? { r: tl.r + cappedDelta.r, c: tl.c + cappedDelta.c }
-          : resizePointType === "TR"
+          : resizePointName === "TR"
           ? { r: tl.r + cappedDelta.r, c: tl.c }
-          : resizePointType === "BR"
+          : resizePointName === "BR"
           ? { r: tl.r, c: tl.c }
           : { r: tl.r, c: tl.c + cappedDelta.c };
 
       const new_br =
-        resizePointType === "TL"
+        resizePointName === "TL"
           ? { r: br.r, c: br.c }
-          : resizePointType === "TR"
+          : resizePointName === "TR"
           ? { r: br.r, c: br.c + cappedDelta.c }
-          : resizePointType === "BR"
+          : resizePointName === "BR"
           ? { r: br.r + cappedDelta.r, c: br.c + cappedDelta.c }
           : { r: br.r + cappedDelta.r, c: br.c };
 
@@ -104,15 +105,15 @@ export function resize(
   }
 }
 
-export function getResizePoints(shape: Shape): Coords[] {
+export function getResizePoints(shape: Shape): ResizePoint[] {
   switch (shape.type) {
     case "RECTANGLE": {
       const { tl, br } = shape;
       return [
-        { r: tl.r, c: tl.c },
-        { r: tl.r, c: br.c },
-        { r: br.r, c: br.c },
-        { r: br.r, c: tl.c },
+        { name: "TL", coords: { r: tl.r, c: tl.c } },
+        { name: "TR", coords: { r: tl.r, c: br.c } },
+        { name: "BR", coords: { r: br.r, c: br.c } },
+        { name: "BL", coords: { r: br.r, c: tl.c } },
       ];
     }
     case "LINE": {
