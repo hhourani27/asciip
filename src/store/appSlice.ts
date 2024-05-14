@@ -97,11 +97,7 @@ export const appSlice = createSlice({
           : (state.creationProgress.checkpoint as MultiSegment);
 
         if (newShape) {
-          const newShapeObj: ShapeObject = {
-            id: uuidv4(),
-            shape: normalizeMultiSegmentLine(newShape),
-          };
-          state.shapes.push(newShapeObj);
+          addNewShape(state, normalizeMultiSegmentLine(newShape));
         }
         state.creationProgress = null;
       }
@@ -155,10 +151,7 @@ export const appSlice = createSlice({
             shape: { type: "TEXT", start: action.payload, lines: [] },
           };
         } else if (state.creationProgress) {
-          state.shapes.push({
-            id: uuidv4(),
-            shape: state.creationProgress.shape,
-          });
+          addNewShape(state, state.creationProgress.shape);
           state.creationProgress = {
             start: action.payload,
             curr: action.payload,
@@ -229,11 +222,7 @@ export const appSlice = createSlice({
             : null;
 
           if (newShape) {
-            const newShapeObj: ShapeObject = {
-              id: uuidv4(),
-              shape: newShape,
-            };
-            state.shapes.push(newShapeObj);
+            addNewShape(state, newShape);
           }
           state.creationProgress = null;
         }
@@ -351,6 +340,12 @@ export const appSlice = createSlice({
         }
       }
     },
+    onCtrlEnterPress: (state) => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        addNewShape(state, state.creationProgress.shape);
+        state.creationProgress = null;
+      }
+    },
     updateText: (state, action: PayloadAction<string>) => {
       if (state.creationProgress?.shape.type === "TEXT") {
         state.creationProgress.shape.lines = getLines(action.payload);
@@ -370,6 +365,16 @@ export const appSlice = createSlice({
     },
   },
 });
+
+//#region Utility state function that mutate directly the state
+function addNewShape(state: AppState, shape: Shape) {
+  if (state.creationProgress) {
+    state.shapes.push({
+      id: uuidv4(),
+      shape: shape,
+    });
+  }
+}
 
 export const appReducer = appSlice.reducer;
 export const appActions = appSlice.actions;

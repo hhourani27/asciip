@@ -3,12 +3,17 @@ import { Box } from "@mui/material";
 import Toolbar from "./components/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch } from "./store/hooks";
+import { appActions } from "./store/appSlice";
 
 function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {};
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && event.ctrlKey) {
+        dispatch(appActions.onCtrlEnterPress());
+      }
+    };
 
     const handleKeyUp = (event: KeyboardEvent) => {};
 
