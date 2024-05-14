@@ -155,6 +155,26 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
 
       return repr;
     }
+    case "TEXT": {
+      // Prepare the objects in the repr
+      shape.lines.forEach((line, lineIdx) => {
+        if (line.length > 0) {
+          repr[shape.start.r + lineIdx] = {};
+        }
+      });
+
+      shape.lines.forEach((line, lineIdx) => {
+        if (line.length > 0) {
+          const chars = Array.from(line);
+
+          chars.forEach((c, charIdx) => {
+            repr[shape.start.r + lineIdx][shape.start.c + charIdx] = c;
+          });
+        }
+      });
+
+      return repr;
+    }
   }
 }
 

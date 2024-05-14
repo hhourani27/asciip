@@ -3,6 +3,7 @@ import {
   Coords,
   MultiSegment,
   Shape,
+  TextShape,
   isShapeLegal,
   normalizeMultiSegmentLine,
 } from "../models/shapes";
@@ -11,8 +12,14 @@ import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
+import { getLines } from "../models/text";
 
-export type Tool = "SELECT" | "RECTANGLE" | "LINE" | "MULTI_SEGMENT_LINE";
+export type Tool =
+  | "SELECT"
+  | "RECTANGLE"
+  | "LINE"
+  | "MULTI_SEGMENT_LINE"
+  | "TEXT";
 
 export type ShapeObject = { id: string; shape: Shape };
 export type CanvasSize = {
@@ -24,8 +31,6 @@ export type AppState = {
   canvasSize: CanvasSize;
 
   shapes: ShapeObject[];
-
-  ctrlPressed: boolean;
 
   selectedTool: Tool;
   creationProgress: null | {
@@ -58,7 +63,6 @@ export const initState = (opt?: StateInitOptions): AppState => {
     shapes: opt?.shapes ?? [],
 
     selectedTool: "SELECT",
-    ctrlPressed: false,
     creationProgress: null,
     selectedShapeId: null,
     nextActionOnClick: null,
@@ -72,15 +76,17 @@ export const appSlice = createSlice({
   initialState: initState(),
   reducers: {
     setTool: (state, action: PayloadAction<Tool>) => {
+      if (state.selectedTool !== action.payload) {
+        state.creationProgress = null;
+        state.moveProgress = null;
+        state.resizeProgress = null;
+      }
+
       state.selectedTool = action.payload;
       if (action.payload !== "SELECT") {
         state.selectedShapeId = null;
         state.nextActionOnClick = null;
       }
-    },
-    // TODO: For now I no longer use CTRL. Keep, as maybe I'll need it for a multi-select
-    onCtrlKey: (state, action: PayloadAction<boolean>) => {
-      state.ctrlPressed = action.payload;
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
       if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
@@ -139,6 +145,26 @@ export const appSlice = createSlice({
               createZeroWidthSegment(lastPoint)
             );
           }
+        }
+      } else if (state.selectedTool === "TEXT") {
+        if (state.creationProgress == null) {
+          state.creationProgress = {
+            start: action.payload,
+            curr: action.payload,
+            checkpoint: null,
+            shape: { type: "TEXT", start: action.payload, lines: [] },
+          };
+        } else if (state.creationProgress) {
+          state.shapes.push({
+            id: uuidv4(),
+            shape: state.creationProgress.shape,
+          });
+          state.creationProgress = {
+            start: action.payload,
+            curr: action.payload,
+            checkpoint: null,
+            shape: { type: "TEXT", start: action.payload, lines: [] },
+          };
         }
       }
     },
@@ -325,10 +351,22 @@ export const appSlice = createSlice({
         }
       }
     },
+    updateText: (state, action: PayloadAction<string>) => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        state.creationProgress.shape.lines = getLines(action.payload);
+      }
+    },
   },
   selectors: {
     selectedShapeObj: (state) => {
       return state.shapes.find((shape) => shape.id === state.selectedShapeId);
+    },
+    currentEditedText: (state): TextShape | null => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        return state.creationProgress.shape;
+      } else {
+        return null;
+      }
     },
   },
 });

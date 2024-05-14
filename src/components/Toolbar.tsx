@@ -8,6 +8,7 @@ import Crop54Icon from "@mui/icons-material/Crop54";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import TextFieldsIcon from "@mui/icons-material/TextFields";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { Tool, appActions } from "../store/appSlice";
@@ -50,6 +51,9 @@ export default function Toolbar() {
             aria-label="Create Multi-segment Line"
           >
             <TimelineIcon />
+          </ToggleButton>
+          <ToggleButton value="TEXT" aria-label="Add Text">
+            <TextFieldsIcon />
           </ToggleButton>
         </ToggleButtonGroup>
       </MuiToolbar>

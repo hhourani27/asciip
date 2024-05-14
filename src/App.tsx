@@ -3,23 +3,14 @@ import { Box } from "@mui/material";
 import Toolbar from "./components/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch } from "./store/hooks";
-import { appActions } from "./store/appSlice";
 
 function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Control" && event.repeat === false) {
-        dispatch(appActions.onCtrlKey(true));
-      }
-    };
+    const handleKeyDown = (event: KeyboardEvent) => {};
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Control") {
-        dispatch(appActions.onCtrlKey(false));
-      }
-    };
+    const handleKeyUp = (event: KeyboardEvent) => {};
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);

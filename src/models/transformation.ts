@@ -49,6 +49,15 @@ export function translate(
         })),
       };
     }
+    case "TEXT": {
+      return {
+        ...shape,
+        start: {
+          r: shape.start.r + cappedDelta.r,
+          c: shape.start.c + cappedDelta.c,
+        },
+      };
+    }
   }
 }
 
@@ -211,6 +220,9 @@ export function resize(
       if (isShapeLegal(correctedLine, canvasSize)) return correctedLine;
       else return shape;
     }
+    case "TEXT": {
+      return shape;
+    }
   }
 }
 
@@ -249,6 +261,9 @@ export function getResizePoints(shape: Shape): ResizePoint[] {
         coords: shape.segments[shape.segments.length - 1].end,
       });
       return resizePoints;
+    }
+    case "TEXT": {
+      return [];
     }
   }
 }
@@ -301,6 +316,19 @@ export function getBoundingBox(shape: Shape): BoundingBox {
         bottom: Math.max(...points.map((p) => p.r)),
         left: Math.min(...points.map((p) => p.c)),
         right: Math.max(...points.map((p) => p.c)),
+      };
+    }
+    case "TEXT": {
+      const lineCount = shape.lines.length;
+      const longestLineLength = Math.max(
+        ...shape.lines.map((line) => line.length)
+      );
+
+      return {
+        top: shape.start.r,
+        bottom: shape.start.r + lineCount,
+        left: shape.start.c,
+        right: shape.start.c + longestLineLength,
       };
     }
   }
