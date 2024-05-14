@@ -1,5 +1,5 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import { applyActions } from "./utils";
 
 test("Edit text", () => {
   const initialState = initState({

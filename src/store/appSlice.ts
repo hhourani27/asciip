@@ -367,6 +367,23 @@ export const appSlice = createSlice({
         state.textEditProgress = null;
       }
     },
+    onDeletePress: (state) => {
+      if (
+        state.selectedTool === "SELECT" &&
+        state.selectedShapeId != null &&
+        !state.moveProgress &&
+        !state.resizeProgress &&
+        !state.textEditProgress
+      ) {
+        //* I selected shape, I'm not currently editing it, I press delete => Delete shape
+        const shapeObjIdx = state.shapes.findIndex(
+          (s) => s.id === state.selectedShapeId
+        );
+        state.shapes.splice(shapeObjIdx, 1);
+        state.selectedShapeId = null;
+        state.nextActionOnClick = null;
+      }
+    },
     updateText: (state, action: PayloadAction<string>) => {
       if (state.creationProgress?.shape.type === "TEXT") {
         state.creationProgress.shape.lines = getLines(action.payload);
