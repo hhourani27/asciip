@@ -1,6 +1,7 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
 import {
   applyActions,
+  generateMouseClickAction,
   generateMouseMoveActions,
   generateMouseUpAction,
 } from "./utils";
@@ -18,7 +19,7 @@ test("Resize a rectangle", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellClick({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
@@ -52,7 +53,7 @@ test("Resize a rectangle by inverting it", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellClick({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 8, c: 8 }),
@@ -86,7 +87,7 @@ test("Cannot resize a rectangle to a single point", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellClick({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 4 }),
@@ -120,7 +121,7 @@ test("Cannot resize a rectangle to a vertical line", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellClick({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 0 }),
@@ -154,7 +155,7 @@ test("Cannot resize a rectangle to a horizontal line", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellClick({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 4 }),
@@ -192,7 +193,7 @@ test("Fix: If a shape has another shape that overlaps it on top, even if I selec
   const actions = [
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 2 }),
-    appActions.onCellClick({ r: 2, c: 2 }),
+    ...generateMouseClickAction({ r: 2, c: 2 }),
     appActions.onCellHover({ r: 2, c: 3 }),
   ];
 

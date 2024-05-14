@@ -1,5 +1,5 @@
 import { appActions, appReducer, initState } from "../appSlice";
-import { applyActions } from "./utils";
+import { applyActions, generateMouseClickAction } from "./utils";
 
 test("Delete a shape", () => {
   const initialState = initState({
@@ -14,7 +14,7 @@ test("Delete a shape", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     appActions.onDeletePress(),
   ];
 
@@ -40,11 +40,9 @@ test("Delete 2 shapes on top of each other", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    // I added onCellMouseDown as in real usage, a click is always accompanied by a mousdown event. and in this case, it caused a bug
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     appActions.onDeletePress(),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     appActions.onDeletePress(),
   ];
 

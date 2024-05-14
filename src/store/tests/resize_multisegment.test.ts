@@ -1,6 +1,7 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
 import {
   applyActions,
+  generateMouseClickAction,
   generateMouseMoveActions,
   generateMouseUpAction,
 } from "./utils";
@@ -41,7 +42,7 @@ test("Resize all segments", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     // Drag first segment
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
@@ -123,7 +124,7 @@ test("Extend start point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
@@ -186,7 +187,7 @@ test("Shrink first segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
@@ -249,7 +250,7 @@ test("Add segment at start", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
@@ -318,7 +319,7 @@ test("Extend end point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
@@ -382,7 +383,7 @@ test("Shrink end point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
@@ -446,7 +447,7 @@ test("Add segment at end", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
@@ -522,7 +523,7 @@ test("Merge 3 segments by dragging the middle segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
@@ -587,7 +588,7 @@ test("Cannot have a u-turn when dragging a segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 2 }),

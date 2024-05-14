@@ -1,6 +1,7 @@
 import { appReducer, appActions, initState } from "../appSlice";
 import {
   applyActions,
+  generateMouseClickAction,
   generateMouseMoveActions,
   generateMouseUpAction,
 } from "./utils";
@@ -18,7 +19,7 @@ test("Translate a rectangle 1 row up", () => {
   const actions = [
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 4 }),
-    appActions.onCellClick({ r: 2, c: 4 }),
+    ...generateMouseClickAction({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     appActions.onCellHover({ r: 1, c: 4 }),
     ...generateMouseUpAction({ r: 1, c: 4 }),
@@ -50,7 +51,7 @@ test("Translate a rectangle 2 rows up", () => {
   const actions = [
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 10, c: 12 }),
-    appActions.onCellClick({ r: 10, c: 12 }),
+    ...generateMouseClickAction({ r: 10, c: 12 }),
     appActions.onCellMouseDown({ r: 10, c: 12 }),
     appActions.onCellHover({ r: 9, c: 12 }),
     appActions.onCellHover({ r: 8, c: 12 }),
@@ -79,7 +80,7 @@ test("Fix: If I grab a rectangle from the bottom border, and move it up to the c
   const actions = [
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 6 }, { r: 2, c: 6 }),
-    appActions.onCellClick({ r: 2, c: 6 }),
+    ...generateMouseClickAction({ r: 2, c: 6 }),
     appActions.onCellMouseDown({ r: 2, c: 6 }),
     appActions.onCellHover({ r: 2, c: 5 }),
     appActions.onCellHover({ r: 2, c: 4 }),
@@ -110,7 +111,7 @@ test("Fix: Rectangle could be translated beyond the right canvas border if it wa
   const actions = [
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 6 }, { r: 3, c: 6 }),
-    appActions.onCellClick({ r: 3, c: 6 }),
+    ...generateMouseClickAction({ r: 3, c: 6 }),
     appActions.onCellMouseDown({ r: 3, c: 6 }),
     appActions.onCellHover({ r: 3, c: 7 }),
     appActions.onCellHover({ r: 3, c: 8 }),

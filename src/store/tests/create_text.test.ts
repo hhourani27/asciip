@@ -2,6 +2,7 @@ import { TextShape } from "../../models/shapes";
 import { CanvasSize, appActions, appReducer, initState } from "../appSlice";
 import {
   applyActions,
+  generateMouseClickAction,
   generateMouseMoveActions,
   generateUpdateText,
 } from "./utils";
@@ -12,7 +13,7 @@ test("Create text", () => {
   const actions = [
     appActions.setTool("TEXT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText("Hello\nWorld"),
     appActions.onCtrlEnterPress(),
   ];
@@ -38,7 +39,7 @@ test("Text cannot exceed canvas", () => {
   const actions = [
     appActions.setTool("TEXT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText(
       "Lorem ipsum dolor sit amet\nconsectetur adipiscing elits"
     ),
@@ -65,11 +66,11 @@ test("Create 2 texts", () => {
   const actions = [
     appActions.setTool("TEXT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText("Hello"),
     appActions.onCtrlEnterPress(),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 0 }),
-    appActions.onCellClick({ r: 2, c: 0 }),
+    ...generateMouseClickAction({ r: 2, c: 0 }),
     ...generateUpdateText("World"),
     appActions.onCtrlEnterPress(),
   ];

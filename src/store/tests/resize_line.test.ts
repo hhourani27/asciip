@@ -1,6 +1,7 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
 import {
   applyActions,
+  generateMouseClickAction,
   generateMouseMoveActions,
   generateMouseUpAction,
 } from "./utils";
@@ -25,7 +26,7 @@ test("Extend horizontal line by dragging on start", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag start point
     appActions.onCellHover({ r: 2, c: 2 }),
     appActions.onCellMouseDown({ r: 2, c: 2 }),
@@ -69,7 +70,7 @@ test("Shrink horizontal line by dragging on start", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag start point
     appActions.onCellHover({ r: 2, c: 2 }),
     appActions.onCellMouseDown({ r: 2, c: 2 }),
@@ -113,7 +114,7 @@ test("Extend horizontal line by dragging on end", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
@@ -157,7 +158,7 @@ test("Shrink horizontal line by dragging on end", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
@@ -201,7 +202,7 @@ test("Turn horizontal line 180 degrees by dragging on End", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
@@ -245,7 +246,7 @@ test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
@@ -289,7 +290,7 @@ test("Cannot shrink horizontal line to a zero-length line", () => {
     // Select line
     appActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    appActions.onCellClick({ r: 2, c: 3 }),
+    ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
