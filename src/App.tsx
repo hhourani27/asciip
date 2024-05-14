@@ -12,6 +12,8 @@ function App() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter" && event.ctrlKey) {
         dispatch(appActions.onCtrlEnterPress());
+      } else if (event.key === "Delete") {
+        dispatch(appActions.onDeletePress());
       }
     };
 

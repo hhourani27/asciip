@@ -1,5 +1,9 @@
 import { appReducer, appActions, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import {
+  applyActions,
+  generateMouseClickAction,
+  generateMouseMoveActions,
+} from "./utils";
 
 test("When clicking on empty cell, selection should be cleared", () => {
   const initialState = initState({
@@ -14,9 +18,9 @@ test("When clicking on empty cell, selection should be cleared", () => {
   const actions = [
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 0, c: 6 }),
-    appActions.onCellClick({ r: 0, c: 6 }),
+    ...generateMouseClickAction({ r: 0, c: 6 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);

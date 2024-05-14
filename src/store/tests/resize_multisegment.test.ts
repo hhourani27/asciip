@@ -1,5 +1,10 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import {
+  applyActions,
+  generateMouseClickAction,
+  generateMouseMoveActions,
+  generateMouseUpAction,
+} from "./utils";
 
 test("Resize all segments", () => {
   const initialState = initState({
@@ -37,24 +42,24 @@ test("Resize all segments", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     // Drag first segment
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 1, c: 1 }),
-    appActions.onCellMouseUp({ r: 1, c: 1 }),
+    ...generateMouseUpAction({ r: 1, c: 1 }),
 
     // Drag second segment
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 2, c: 3 }),
     appActions.onCellMouseDown({ r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 2 }),
-    appActions.onCellMouseUp({ r: 2, c: 2 }),
+    ...generateMouseUpAction({ r: 2, c: 2 }),
 
     // Drag third segment
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 3, c: 4 }),
     appActions.onCellMouseDown({ r: 3, c: 4 }),
     appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseUp({ r: 2, c: 4 }),
+    ...generateMouseUpAction({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -119,12 +124,12 @@ test("Extend start point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseUp({ r: 0, c: 0 }),
+    ...generateMouseUpAction({ r: 0, c: 0 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -182,12 +187,12 @@ test("Shrink first segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellMouseUp({ r: 0, c: 2 }),
+    ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -245,12 +250,12 @@ test("Add segment at start", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
     appActions.onCellHover({ r: 0, c: 1 }),
     appActions.onCellMouseDown({ r: 0, c: 1 }),
     appActions.onCellHover({ r: 1, c: 1 }),
-    appActions.onCellMouseUp({ r: 1, c: 1 }),
+    ...generateMouseUpAction({ r: 1, c: 1 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -314,13 +319,13 @@ test("Extend end point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
     appActions.onCellMouseDown({ r: 2, c: 3 }),
     appActions.onCellHover({ r: 3, c: 3 }),
-    appActions.onCellMouseUp({ r: 3, c: 3 }),
+    ...generateMouseUpAction({ r: 3, c: 3 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -378,13 +383,13 @@ test("Shrink end point", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
     appActions.onCellMouseDown({ r: 2, c: 3 }),
     appActions.onCellHover({ r: 1, c: 3 }),
-    appActions.onCellMouseUp({ r: 1, c: 3 }),
+    ...generateMouseUpAction({ r: 1, c: 3 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -442,13 +447,13 @@ test("Add segment at end", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 2 }),
-    appActions.onCellClick({ r: 0, c: 2 }),
+    ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 3 }),
     appActions.onCellMouseDown({ r: 2, c: 3 }),
     appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseUp({ r: 2, c: 4 }),
+    ...generateMouseUpAction({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -518,13 +523,13 @@ test("Merge 3 segments by dragging the middle segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     appActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 0, c: 2 }),
-    appActions.onCellMouseUp({ r: 0, c: 2 }),
+    ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -583,13 +588,13 @@ test("Cannot have a u-turn when dragging a segment", () => {
     // Select shape
     appActions.setTool("SELECT"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 2 }),
     appActions.onCellMouseDown({ r: 1, c: 2 }),
     ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 1, c: 0 }),
-    appActions.onCellMouseUp({ r: 0, c: 2 }),
+    ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
