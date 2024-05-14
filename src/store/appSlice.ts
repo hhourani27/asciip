@@ -42,7 +42,7 @@ export type AppState = {
 
   // Properties set when selectedTool === SELECT
   selectedShapeId: null | string;
-  nextActionOnClick: null | "SELECT" | "MOVE" | "RESIZE";
+  nextActionOnClick: null | "CREATE" | "SELECT" | "MOVE" | "RESIZE";
   moveProgress: null | { start: Coords; startShape: Shape };
   resizeProgress: null | {
     resizePoint: Coords;
@@ -66,7 +66,7 @@ export const initState = (opt?: StateInitOptions): AppState => {
     selectedTool: "SELECT",
     creationProgress: null,
     selectedShapeId: null,
-    nextActionOnClick: null,
+    nextActionOnClick: "SELECT",
     moveProgress: null,
     resizeProgress: null,
     textEditProgress: null,
@@ -82,17 +82,18 @@ export const appSlice = createSlice({
         state.creationProgress = null;
         state.moveProgress = null;
         state.resizeProgress = null;
+        state.textEditProgress = null;
       }
 
       state.selectedTool = action.payload;
       if (action.payload !== "SELECT") {
         state.selectedShapeId = null;
-        state.nextActionOnClick = null;
+        state.nextActionOnClick = "CREATE";
       }
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        // I select the SELECT tool, I double-click on a Text => Start editing Text
+        //* I select the SELECT tool, I double-click on a Text => Start editing Text
         const shapeObj = getShapeObjAtCoords(state.shapes, action.payload);
         if (shapeObj?.shape.type === "TEXT") {
           state.selectedShapeId = shapeObj.id;
@@ -122,7 +123,7 @@ export const appSlice = createSlice({
           state.nextActionOnClick = "SELECT";
         }
 
-        // I am editing a text, and I click on the canvas =>  I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        //* I am editing a text, and I click on the canvas =>  I complete editing text (since editing a text is progressively saved, I don't need to save it here)
         state.textEditProgress = null;
       } else if (state.selectedTool === "MULTI_SEGMENT_LINE") {
         if (state.creationProgress == null) {
@@ -243,6 +244,7 @@ export const appSlice = createSlice({
     onCellHover: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
         if (state.moveProgress) {
+          //* I'm currently moving a Shape and I change mouse position => Update shape position
           // Get selected shape
           const selectedShapeIdx: number = state.shapes.findIndex(
             (s) => s.id === state.selectedShapeId
@@ -259,6 +261,8 @@ export const appSlice = createSlice({
           // Replace translated shape
           state.shapes[selectedShapeIdx].shape = translatedShape;
         } else if (state.resizeProgress) {
+          //* I'm currently resizing a Shape and I change mouse position => Update shape
+
           // Get selected shape
           const selectedShapeIdx: number = state.shapes.findIndex(
             (s) => s.id === state.selectedShapeId
@@ -284,6 +288,7 @@ export const appSlice = createSlice({
             state.selectedShapeId ?? undefined
           );
           if (shapeObj) {
+            //* I'm hovering above a shape
             if (shapeObj.id === state.selectedShapeId) {
               const resizePoints = getResizePoints(shapeObj.shape);
               if (
@@ -295,6 +300,7 @@ export const appSlice = createSlice({
               state.nextActionOnClick = "SELECT";
             }
           } else {
+            //* I'm not hovering above a shape
             state.nextActionOnClick = null;
           }
         }
@@ -357,7 +363,7 @@ export const appSlice = createSlice({
         addNewShape(state, state.creationProgress.shape);
         state.creationProgress = null;
       } else if (state.textEditProgress) {
-        // I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
         state.textEditProgress = null;
       }
     },

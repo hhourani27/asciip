@@ -66,6 +66,8 @@ export default function Canvas(): JSX.Element {
         ? "move"
         : nextActionOnClick === "RESIZE"
         ? "grabbing"
+        : nextActionOnClick === "CREATE"
+        ? "copy"
         : "default";
 
     // Draw the grid
