@@ -156,22 +156,31 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
       return repr;
     }
     case "TEXT": {
-      // Prepare the objects in the repr
-      shape.lines.forEach((line, lineIdx) => {
-        if (line.length > 0) {
-          repr[shape.start.r + lineIdx] = {};
-        }
-      });
+      // If text is empty, then display the empty symbol
+      if (
+        shape.lines.length === 0 ||
+        shape.lines.every((line) => line.length === 0)
+      ) {
+        repr[shape.start.r] = {};
+        repr[shape.start.r][shape.start.c] = "▯";
+      } else {
+        // Prepare the objects in the repr
+        shape.lines.forEach((line, lineIdx) => {
+          if (line.length > 0) {
+            repr[shape.start.r + lineIdx] = {};
+          }
+        });
 
-      shape.lines.forEach((line, lineIdx) => {
-        if (line.length > 0) {
-          const chars = Array.from(line);
+        shape.lines.forEach((line, lineIdx) => {
+          if (line.length > 0) {
+            const chars = Array.from(line);
 
-          chars.forEach((c, charIdx) => {
-            repr[shape.start.r + lineIdx][shape.start.c + charIdx] = c;
-          });
-        }
-      });
+            chars.forEach((c, charIdx) => {
+              repr[shape.start.r + lineIdx][shape.start.c + charIdx] = c;
+            });
+          }
+        });
+      }
 
       return repr;
     }
