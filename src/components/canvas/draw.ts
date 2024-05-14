@@ -11,6 +11,9 @@ export const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471
 export const CELL_WIDTH = FONT_WIDTH;
 export const CELL_HEIGHT = FONT_SIZE;
 
+export const FONT_FAMILY = "Courier New";
+export const FONT = `${FONT_SIZE}px ${FONT_FAMILY}`;
+
 function drawVerticalGridLine(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -74,7 +77,7 @@ export function drawShapes(
   const repr: CellValueMap = getCanvasRepresentation(shapes);
 
   ctx.fillStyle = color;
-  ctx.font = `${FONT_SIZE}px Courier New`;
+  ctx.font = FONT;
   ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
   for (const row in repr) {
     for (const col in repr[row]) {

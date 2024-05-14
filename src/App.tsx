@@ -4,6 +4,7 @@ import Toolbar from "./components/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch } from "./store/hooks";
 import { appActions } from "./store/appSlice";
+import { ExportModal } from "./components/ExportModal";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -40,6 +41,7 @@ function App() {
       }}
     >
       <Toolbar />
+      <ExportModal />
       <Canvas />
     </Box>
   );

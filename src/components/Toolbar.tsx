@@ -3,12 +3,15 @@ import {
   ToggleButtonGroup,
   Toolbar as MuiToolbar,
   ToggleButton,
+  ButtonGroup,
+  IconButton,
 } from "@mui/material";
 import Crop54Icon from "@mui/icons-material/Crop54";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 import { useAppSelector, useAppDispatch } from "../store/hooks";
 import { Tool, appActions } from "../store/appSlice";
@@ -31,7 +34,7 @@ export default function Toolbar() {
       position="static"
       sx={{ flexGrow: 0, flexShrink: 0, flexBasis: "auto" }}
     >
-      <MuiToolbar>
+      <MuiToolbar sx={{ justifyContent: "space-between" }}>
         <ToggleButtonGroup
           value={selectedTool}
           exclusive
@@ -56,6 +59,14 @@ export default function Toolbar() {
             <TextFieldsIcon />
           </ToggleButton>
         </ToggleButtonGroup>
+        <ButtonGroup>
+          <IconButton
+            onClick={() => dispatch(appActions.openExport())}
+            aria-label="Export"
+          >
+            <FileDownloadIcon />
+          </IconButton>
+        </ButtonGroup>
       </MuiToolbar>
     </AppBar>
   );

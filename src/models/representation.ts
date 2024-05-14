@@ -1,45 +1,13 @@
 import { ShapeObject } from "../store/appSlice";
 import { Coords, Shape } from "./shapes";
 import _ from "lodash";
-import { getBoundingBox } from "./transformation";
+import { getBoundingBox, mergeBoundingBoxes } from "./transformation";
 
 export type CellValueMap = {
   [key: number]: { [key: number]: string };
 };
 
 export type Grid = string[][];
-
-// TODO: This is not used right now, it may be used for the export feature
-export function getCanvasGridRepresentation(
-  rows: number,
-  cols: number,
-  shapes: Shape[]
-): Grid {
-  const grid: Grid = _.times(rows, () => _.fill(Array(cols), "\u00A0"));
-
-  let repr: CellValueMap = {};
-  shapes.forEach((shape) => {
-    repr = _.merge(repr, getShapeRepresentation(shape));
-  });
-
-  for (const x in repr) {
-    for (const y in repr[x]) {
-      grid[x][y] = repr[x][y];
-    }
-  }
-
-  return grid;
-}
-
-export function getCanvasRepresentation(shapes: Shape[]): CellValueMap {
-  let repr: CellValueMap = {};
-
-  shapes.forEach((shape) => {
-    repr = _.merge(repr, getShapeRepresentation(shape));
-  });
-
-  return repr;
-}
 
 export function getShapeRepresentation(shape: Shape): CellValueMap {
   const repr: CellValueMap = {};
@@ -185,6 +153,63 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
       return repr;
     }
   }
+}
+
+export function getCanvasRepresentation(shapes: Shape[]): CellValueMap {
+  let repr: CellValueMap = {};
+
+  shapes.forEach((shape) => {
+    repr = _.merge(repr, getShapeRepresentation(shape));
+  });
+
+  return repr;
+}
+
+export function getCanvasGridRepresentation(
+  rows: number,
+  cols: number,
+  shapes: Shape[]
+): Grid {
+  const grid: Grid = _.times(rows, () => _.fill(Array(cols), " "));
+
+  let repr: CellValueMap = {};
+  shapes.forEach((shape) => {
+    repr = _.merge(repr, getShapeRepresentation(shape));
+  });
+
+  for (const x in repr) {
+    for (const y in repr[x]) {
+      grid[x][y] = repr[x][y];
+    }
+  }
+
+  return grid;
+}
+
+export function getTextExportRepresentation(
+  rows: number,
+  cols: number,
+  shapes: Shape[]
+): string {
+  if (shapes.length === 0) return "";
+
+  const grid = getCanvasGridRepresentation(rows, cols, shapes);
+  const bb = mergeBoundingBoxes(shapes)!;
+
+  const grid1 = grid.filter(
+    (row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom
+  );
+  const grid2 = grid1.map((row) => row.join("").slice(bb.left, bb.right + 1));
+  const grid3 = grid2.map((line) => `// ${line}`);
+  const grid4 = grid3.join("\n");
+
+  const exportText = grid
+    .filter((row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom)
+    .map((row) => row.join("").slice(bb.left, bb.right + 1))
+    .map((line) => `// ${line}`)
+    .join("\n");
+
+  return exportText;
 }
 
 function drawHorizontalLine(

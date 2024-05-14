@@ -28,10 +28,11 @@ export type CanvasSize = {
 };
 
 export type AppState = {
+  /* Data representing a diagram */
   canvasSize: CanvasSize;
-
   shapes: ShapeObject[];
 
+  /* Edition & Navigation State of the canvas */
   currentHoveredCell: Coords | null;
 
   selectedTool: Tool;
@@ -51,6 +52,9 @@ export type AppState = {
     startShape: Shape;
   };
   textEditProgress: null | { startShape: TextShape };
+
+  /* Other state of the app */
+  exportInProgress: boolean;
 };
 
 export type StateInitOptions = {
@@ -74,6 +78,8 @@ export const initState = (opt?: StateInitOptions): AppState => {
     moveProgress: null,
     resizeProgress: null,
     textEditProgress: null,
+
+    exportInProgress: false,
   };
 };
 
@@ -81,6 +87,7 @@ export const appSlice = createSlice({
   name: "app",
   initialState: initState(),
   reducers: {
+    //#region Canvas actions
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
         state.creationProgress = null;
@@ -420,6 +427,14 @@ export const appSlice = createSlice({
         }
       }
     },
+    //#endregion
+    //#region Other App actions
+    openExport: (state) => {
+      state.exportInProgress = true;
+    },
+    closeExport: (state) => {
+      state.exportInProgress = false;
+    }, //#endregion
   },
   selectors: {
     selectedShapeObj: (state) => {

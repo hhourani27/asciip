@@ -334,6 +334,20 @@ export function getBoundingBox(shape: Shape): BoundingBox {
   }
 }
 
+export function mergeBoundingBoxes(shapes: Shape[]): BoundingBox | null {
+  if (shapes.length === 0) return null;
+
+  const bb = getBoundingBox(shapes[0]);
+  shapes.slice(1).forEach((shape) => {
+    const sbb = getBoundingBox(shape);
+    bb.top = Math.min(bb.top, sbb.top);
+    bb.bottom = Math.max(bb.bottom, sbb.bottom);
+    bb.left = Math.min(bb.left, sbb.left);
+    bb.right = Math.max(bb.right, sbb.right);
+  });
+  return bb;
+}
+
 /**
  * Cap the delta coords so that the bounding box doesn't go outside of the canvas
  */

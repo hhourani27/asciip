@@ -1,6 +1,7 @@
 import {
   getCanvasGridRepresentation,
   getShapeRepresentation,
+  getTextExportRepresentation,
 } from "./representation";
 import { Rectangle } from "./shapes";
 
@@ -82,13 +83,42 @@ describe("getCanvasGridRepresentation()", () => {
 
     expect(grid).toEqual([
       ["+", "-", "-", "+"],
-      ["|", "\u00A0", "\u00A0", "|"],
-      ["|", "\u00A0", "\u00A0", "|"],
+      ["|", " ", " ", "|"],
+      ["|", " ", " ", "|"],
       ["+", "-", "-", "+"],
     ]);
   });
 
-  test("Grid with 2 rectangles", () => {
+  test("Grid with 2 adjacent rectangles", () => {
+    const rectangle1: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 0, c: 0 },
+      br: { r: 3, c: 3 },
+    };
+
+    const rectangle2: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 4, c: 4 },
+      br: { r: 7, c: 7 },
+    };
+
+    const grid = getCanvasGridRepresentation(10, 10, [rectangle1, rectangle2]);
+
+    expect(grid).toEqual([
+      ["+", "-", "-", "+", " ", " ", " ", " ", " ", " "],
+      ["|", " ", " ", "|", " ", " ", " ", " ", " ", " "],
+      ["|", " ", " ", "|", " ", " ", " ", " ", " ", " "],
+      ["+", "-", "-", "+", " ", " ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", "+", "-", "-", "+", " ", " "],
+      [" ", " ", " ", " ", "|", " ", " ", "|", " ", " "],
+      [" ", " ", " ", " ", "|", " ", " ", "|", " ", " "],
+      [" ", " ", " ", " ", "+", "-", "-", "+", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " ", " ", " "],
+    ]);
+  });
+
+  test("Grid with 2 overlapping rectangles", () => {
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -106,8 +136,45 @@ describe("getCanvasGridRepresentation()", () => {
     expect(grid).toEqual([
       ["+", "-", "-", "+"],
       ["|", "+", "-", "+"],
-      ["|", "|", "\u00A0", "|"],
+      ["|", "|", " ", "|"],
       ["+", "+", "-", "+"],
     ]);
+  });
+});
+
+describe("getTextExportRepresentation()", () => {
+  test("Export a single rectangle at the center of the canvas", () => {
+    const rectangle: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 3, c: 3 },
+      br: { r: 6, c: 6 },
+    };
+
+    const exportText = getTextExportRepresentation(10, 10, [rectangle]);
+
+    expect(exportText).toBe("// +--+\n// |  |\n// |  |\n// +--+");
+  });
+
+  test("Export 2 adjacent rectangles", () => {
+    const rectangle1: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 0, c: 0 },
+      br: { r: 3, c: 3 },
+    };
+
+    const rectangle2: Rectangle = {
+      type: "RECTANGLE",
+      tl: { r: 4, c: 4 },
+      br: { r: 7, c: 7 },
+    };
+
+    const exportText = getTextExportRepresentation(10, 10, [
+      rectangle1,
+      rectangle2,
+    ]);
+
+    expect(exportText).toBe(
+      "// +--+    \n// |  |    \n// |  |    \n// +--+    \n//     +--+\n//     |  |\n//     |  |\n//     +--+"
+    );
   });
 });

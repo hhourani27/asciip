@@ -1,5 +1,5 @@
 import { Line, Rectangle } from "./shapes";
-import { resize, translate } from "./transformation";
+import { mergeBoundingBoxes, resize, translate } from "./transformation";
 
 describe("translate()", () => {
   test("Translate rectangle dr,dc = 1,1", () => {
@@ -263,4 +263,22 @@ describe("resize()", () => {
       end: { r: 0, c: 3 },
     });
   });
+});
+
+describe("mergeBoundingBoxes()", () => {
+  const rectangle1: Rectangle = {
+    type: "RECTANGLE",
+    tl: { r: 0, c: 0 },
+    br: { r: 3, c: 3 },
+  };
+
+  const rectangle2: Rectangle = {
+    type: "RECTANGLE",
+    tl: { r: 4, c: 4 },
+    br: { r: 7, c: 7 },
+  };
+
+  const bb = mergeBoundingBoxes([rectangle1, rectangle2]);
+
+  expect(bb).toEqual({ top: 0, bottom: 7, left: 0, right: 7 });
 });
