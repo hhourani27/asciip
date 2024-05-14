@@ -34,7 +34,13 @@ export type MultiSegment = {
   segments: Segment[];
 };
 
-export type Shape = Rectangle | Line | MultiSegment;
+export type TextShape = {
+  type: "TEXT";
+  start: Coords;
+  lines: string[];
+};
+
+export type Shape = Rectangle | Line | MultiSegment | TextShape;
 
 export function isShapeLegal(shape: Shape): boolean {
   switch (shape.type) {
@@ -68,6 +74,9 @@ export function isShapeLegal(shape: Shape): boolean {
         }
       }
 
+      return true;
+    }
+    case "TEXT": {
       return true;
     }
   }
@@ -177,6 +186,7 @@ export function getVerticalDirection(
  * - if to < from then it generates decreasing number array
  *
  */
+// TODO: Remove if no longer used
 export function range(from: number, to: number): number[] {
   if (from === to) return [from];
   if (from < to) return _.range(from, to + 1);

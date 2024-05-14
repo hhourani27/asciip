@@ -10,16 +10,12 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Control" && event.repeat === false) {
-        dispatch(appActions.onCtrlKey(true));
+      if (event.key === "Enter" && event.ctrlKey) {
+        dispatch(appActions.onCtrlEnterPress());
       }
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === "Control") {
-        dispatch(appActions.onCtrlKey(false));
-      }
-    };
+    const handleKeyUp = (event: KeyboardEvent) => {};
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);

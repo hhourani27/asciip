@@ -3,13 +3,15 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
 import { Coords } from "../../models/shapes";
 import { appActions, appSelectors } from "../../store/appSlice";
-import { drawGrid, drawSelectedShape, drawShapes } from "./draw";
+import {
+  CELL_HEIGHT,
+  CELL_WIDTH,
+  drawGrid,
+  drawSelectedShape,
+  drawShapes,
+} from "./draw";
 import _ from "lodash";
-
-const FONT_SIZE = 16;
-const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
-const CELL_WIDTH = FONT_WIDTH;
-const CELL_HEIGHT = FONT_SIZE;
+import { TextShapeInput } from "./TextShapeInput";
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -28,7 +30,9 @@ export default function Canvas(): JSX.Element {
     appSelectors.selectedShapeObj(state)
   );
   const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
-
+  const currentEditedText = useAppSelector((state) =>
+    appSelectors.currentEditedText(state)
+  );
   const nextActionOnClick = useAppSelector(
     (state) => state.app.nextActionOnClick
   );
@@ -62,6 +66,8 @@ export default function Canvas(): JSX.Element {
         ? "move"
         : nextActionOnClick === "RESIZE"
         ? "grabbing"
+        : nextActionOnClick === "CREATE"
+        ? "copy"
         : "default";
 
     // Draw the grid
@@ -86,7 +92,7 @@ export default function Canvas(): JSX.Element {
     if (selectedShapeObj) drawSelectedShape(ctx, selectedShapeObj.shape);
 
     // Draw new shape
-    if (newShape) drawShapes(ctx, [newShape], "black");
+    if (newShape) drawShapes(ctx, [newShape], "DodgerBlue");
   }, [
     canvasHeight,
     canvasWidth,
@@ -104,6 +110,7 @@ export default function Canvas(): JSX.Element {
       style={{
         flex: 1,
         overflow: "scroll",
+        position: "relative",
       }}
     >
       <canvas
@@ -136,6 +143,12 @@ export default function Canvas(): JSX.Element {
           )
         }
       ></canvas>
+      {currentEditedText && (
+        <TextShapeInput
+          // Add key, in order to force React to recreate a new instance when edit a new text object
+          key={`textinput_r${currentEditedText.start.r}_c${currentEditedText.start.c}`}
+        />
+      )}
     </div>
   );
 }

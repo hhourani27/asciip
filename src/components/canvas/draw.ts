@@ -6,10 +6,10 @@ import {
 } from "../../models/representation";
 import { ResizePoint, getResizePoints } from "../../models/transformation";
 
-const FONT_SIZE = 16;
-const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
-const CELL_WIDTH = FONT_WIDTH;
-const CELL_HEIGHT = FONT_SIZE;
+export const FONT_SIZE = 16;
+export const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
+export const CELL_WIDTH = FONT_WIDTH;
+export const CELL_HEIGHT = FONT_SIZE;
 
 function drawVerticalGridLine(
   ctx: CanvasRenderingContext2D,

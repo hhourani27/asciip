@@ -3,16 +3,23 @@ import {
   Coords,
   MultiSegment,
   Shape,
+  TextShape,
   isShapeLegal,
   normalizeMultiSegmentLine,
 } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getShapeAtCoords } from "../models/representation";
+import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
+import { capText, getLines } from "../models/text";
 
-export type Tool = "SELECT" | "RECTANGLE" | "LINE" | "MULTI_SEGMENT_LINE";
+export type Tool =
+  | "SELECT"
+  | "RECTANGLE"
+  | "LINE"
+  | "MULTI_SEGMENT_LINE"
+  | "TEXT";
 
 export type ShapeObject = { id: string; shape: Shape };
 export type CanvasSize = {
@@ -25,8 +32,6 @@ export type AppState = {
 
   shapes: ShapeObject[];
 
-  ctrlPressed: boolean;
-
   selectedTool: Tool;
   creationProgress: null | {
     start: Coords;
@@ -37,12 +42,13 @@ export type AppState = {
 
   // Properties set when selectedTool === SELECT
   selectedShapeId: null | string;
-  nextActionOnClick: null | "SELECT" | "MOVE" | "RESIZE";
+  nextActionOnClick: null | "CREATE" | "SELECT" | "MOVE" | "RESIZE";
   moveProgress: null | { start: Coords; startShape: Shape };
   resizeProgress: null | {
     resizePoint: Coords;
     startShape: Shape;
   };
+  textEditProgress: null | { startShape: TextShape };
 };
 
 export type StateInitOptions = {
@@ -58,12 +64,12 @@ export const initState = (opt?: StateInitOptions): AppState => {
     shapes: opt?.shapes ?? [],
 
     selectedTool: "SELECT",
-    ctrlPressed: false,
     creationProgress: null,
     selectedShapeId: null,
-    nextActionOnClick: null,
+    nextActionOnClick: "SELECT",
     moveProgress: null,
     resizeProgress: null,
+    textEditProgress: null,
   };
 };
 
@@ -72,18 +78,28 @@ export const appSlice = createSlice({
   initialState: initState(),
   reducers: {
     setTool: (state, action: PayloadAction<Tool>) => {
+      if (state.selectedTool !== action.payload) {
+        state.creationProgress = null;
+        state.moveProgress = null;
+        state.resizeProgress = null;
+        state.textEditProgress = null;
+      }
+
       state.selectedTool = action.payload;
       if (action.payload !== "SELECT") {
         state.selectedShapeId = null;
-        state.nextActionOnClick = null;
+        state.nextActionOnClick = "CREATE";
       }
     },
-    // TODO: For now I no longer use CTRL. Keep, as maybe I'll need it for a multi-select
-    onCtrlKey: (state, action: PayloadAction<boolean>) => {
-      state.ctrlPressed = action.payload;
-    },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
-      if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
+      if (state.selectedTool === "SELECT") {
+        //* I select the SELECT tool, I double-click on a Text => Start editing Text
+        const shapeObj = getShapeObjAtCoords(state.shapes, action.payload);
+        if (shapeObj?.shape.type === "TEXT") {
+          state.selectedShapeId = shapeObj.id;
+          state.textEditProgress = { startShape: { ...shapeObj.shape } };
+        }
+      } else if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
         const newShape: MultiSegment | null = isShapeLegal(
           state.creationProgress.shape
         )
@@ -91,18 +107,14 @@ export const appSlice = createSlice({
           : (state.creationProgress.checkpoint as MultiSegment);
 
         if (newShape) {
-          const newShapeObj: ShapeObject = {
-            id: uuidv4(),
-            shape: normalizeMultiSegmentLine(newShape),
-          };
-          state.shapes.push(newShapeObj);
+          addNewShape(state, normalizeMultiSegmentLine(newShape));
         }
         state.creationProgress = null;
       }
     },
     onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        const shape = getShapeAtCoords(state.shapes, action.payload);
+        const shape = getShapeObjAtCoords(state.shapes, action.payload);
         if (shape) {
           state.selectedShapeId = shape.id;
           state.nextActionOnClick = "MOVE";
@@ -110,6 +122,9 @@ export const appSlice = createSlice({
           state.selectedShapeId = null;
           state.nextActionOnClick = "SELECT";
         }
+
+        //* I am editing a text, and I click on the canvas =>  I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        state.textEditProgress = null;
       } else if (state.selectedTool === "MULTI_SEGMENT_LINE") {
         if (state.creationProgress == null) {
           state.creationProgress = {
@@ -139,6 +154,23 @@ export const appSlice = createSlice({
               createZeroWidthSegment(lastPoint)
             );
           }
+        }
+      } else if (state.selectedTool === "TEXT") {
+        if (state.creationProgress == null) {
+          state.creationProgress = {
+            start: action.payload,
+            curr: action.payload,
+            checkpoint: null,
+            shape: { type: "TEXT", start: action.payload, lines: [] },
+          };
+        } else if (state.creationProgress) {
+          addNewShape(state, state.creationProgress.shape);
+          state.creationProgress = {
+            start: action.payload,
+            curr: action.payload,
+            checkpoint: null,
+            shape: { type: "TEXT", start: action.payload, lines: [] },
+          };
         }
       }
     },
@@ -203,11 +235,7 @@ export const appSlice = createSlice({
             : null;
 
           if (newShape) {
-            const newShapeObj: ShapeObject = {
-              id: uuidv4(),
-              shape: newShape,
-            };
-            state.shapes.push(newShapeObj);
+            addNewShape(state, newShape);
           }
           state.creationProgress = null;
         }
@@ -216,6 +244,7 @@ export const appSlice = createSlice({
     onCellHover: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
         if (state.moveProgress) {
+          //* I'm currently moving a Shape and I change mouse position => Update shape position
           // Get selected shape
           const selectedShapeIdx: number = state.shapes.findIndex(
             (s) => s.id === state.selectedShapeId
@@ -232,6 +261,8 @@ export const appSlice = createSlice({
           // Replace translated shape
           state.shapes[selectedShapeIdx].shape = translatedShape;
         } else if (state.resizeProgress) {
+          //* I'm currently resizing a Shape and I change mouse position => Update shape
+
           // Get selected shape
           const selectedShapeIdx: number = state.shapes.findIndex(
             (s) => s.id === state.selectedShapeId
@@ -251,12 +282,13 @@ export const appSlice = createSlice({
             state.shapes[selectedShapeIdx].shape = resizedShape;
           }
         } else if (!state.moveProgress && !state.resizeProgress) {
-          const shapeObj = getShapeAtCoords(
+          const shapeObj = getShapeObjAtCoords(
             state.shapes,
             action.payload,
             state.selectedShapeId ?? undefined
           );
           if (shapeObj) {
+            //* I'm hovering above a shape
             if (shapeObj.id === state.selectedShapeId) {
               const resizePoints = getResizePoints(shapeObj.shape);
               if (
@@ -268,6 +300,7 @@ export const appSlice = createSlice({
               state.nextActionOnClick = "SELECT";
             }
           } else {
+            //* I'm not hovering above a shape
             state.nextActionOnClick = null;
           }
         }
@@ -325,13 +358,74 @@ export const appSlice = createSlice({
         }
       }
     },
+    onCtrlEnterPress: (state) => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        addNewShape(state, state.creationProgress.shape);
+        state.creationProgress = null;
+      } else if (state.textEditProgress) {
+        //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        state.textEditProgress = null;
+      }
+    },
+    updateText: (state, action: PayloadAction<string>) => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        state.creationProgress.shape.lines = getLines(action.payload);
+        state.creationProgress.shape.lines = capText(
+          state.creationProgress.shape.start,
+          state.creationProgress.shape.lines,
+          state.canvasSize
+        );
+      } else if (state.textEditProgress) {
+        const selectedTextShapeObjIdx = state.shapes.findIndex(
+          (s) => s.id === state.selectedShapeId
+        );
+        if (
+          selectedTextShapeObjIdx >= 0 &&
+          state.shapes[selectedTextShapeObjIdx].shape.type === "TEXT"
+        ) {
+          const selectTextShape = state.shapes[selectedTextShapeObjIdx]
+            .shape as TextShape;
+
+          selectTextShape.lines = capText(
+            selectTextShape.start,
+            getLines(action.payload),
+            state.canvasSize
+          );
+        }
+      }
+    },
   },
   selectors: {
     selectedShapeObj: (state) => {
       return state.shapes.find((shape) => shape.id === state.selectedShapeId);
     },
+    currentEditedText: (state): TextShape | null => {
+      if (state.creationProgress?.shape.type === "TEXT") {
+        return state.creationProgress.shape;
+      } else if (state.textEditProgress) {
+        const selectedTextShapeObj = state.shapes.find(
+          (s) => s.id === state.selectedShapeId
+        );
+
+        return selectedTextShapeObj
+          ? (selectedTextShapeObj.shape as TextShape)
+          : null;
+      } else {
+        return null;
+      }
+    },
   },
 });
+
+//#region Utility state function that mutate directly the state
+function addNewShape(state: AppState, shape: Shape) {
+  if (state.creationProgress) {
+    state.shapes.push({
+      id: uuidv4(),
+      shape: shape,
+    });
+  }
+}
 
 export const appReducer = appSlice.reducer;
 export const appActions = appSlice.actions;
