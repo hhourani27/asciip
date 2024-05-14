@@ -1,5 +1,9 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import {
+  applyActions,
+  generateMouseMoveActions,
+  generateMouseUpAction,
+} from "./utils";
 
 test("Resize a rectangle", () => {
   const initialState = initState({
@@ -18,7 +22,7 @@ test("Resize a rectangle", () => {
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    appActions.onCellMouseUp({ r: 1, c: 1 }),
+    ...generateMouseUpAction({ r: 1, c: 1 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -52,7 +56,7 @@ test("Resize a rectangle by inverting it", () => {
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 8, c: 8 }),
-    appActions.onCellMouseUp({ r: 8, c: 8 }),
+    ...generateMouseUpAction({ r: 8, c: 8 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -86,7 +90,7 @@ test("Cannot resize a rectangle to a single point", () => {
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 4 }),
-    appActions.onCellMouseUp({ r: 4, c: 4 }),
+    ...generateMouseUpAction({ r: 4, c: 4 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -120,7 +124,7 @@ test("Cannot resize a rectangle to a vertical line", () => {
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 0 }),
-    appActions.onCellMouseUp({ r: 4, c: 0 }),
+    ...generateMouseUpAction({ r: 4, c: 0 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -154,7 +158,7 @@ test("Cannot resize a rectangle to a horizontal line", () => {
     appActions.onCellHover({ r: 0, c: 0 }),
     appActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 4 }),
-    appActions.onCellMouseUp({ r: 0, c: 4 }),
+    ...generateMouseUpAction({ r: 0, c: 4 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);

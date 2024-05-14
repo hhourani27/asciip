@@ -1,5 +1,9 @@
 import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import {
+  applyActions,
+  generateMouseMoveActions,
+  generateMouseUpAction,
+} from "./utils";
 
 test("Extend horizontal line by dragging on start", () => {
   const initialState = initState({
@@ -26,7 +30,7 @@ test("Extend horizontal line by dragging on start", () => {
     appActions.onCellHover({ r: 2, c: 2 }),
     appActions.onCellMouseDown({ r: 2, c: 2 }),
     appActions.onCellHover({ r: 2, c: 1 }),
-    appActions.onCellMouseUp({ r: 2, c: 1 }),
+    ...generateMouseUpAction({ r: 2, c: 1 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -70,7 +74,7 @@ test("Shrink horizontal line by dragging on start", () => {
     appActions.onCellHover({ r: 2, c: 2 }),
     appActions.onCellMouseDown({ r: 2, c: 2 }),
     appActions.onCellHover({ r: 2, c: 3 }),
-    appActions.onCellMouseUp({ r: 2, c: 3 }),
+    ...generateMouseUpAction({ r: 2, c: 3 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -114,7 +118,7 @@ test("Extend horizontal line by dragging on end", () => {
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     appActions.onCellHover({ r: 2, c: 5 }),
-    appActions.onCellMouseUp({ r: 2, c: 5 }),
+    ...generateMouseUpAction({ r: 2, c: 5 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -158,7 +162,7 @@ test("Shrink horizontal line by dragging on end", () => {
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     appActions.onCellHover({ r: 2, c: 3 }),
-    appActions.onCellMouseUp({ r: 2, c: 3 }),
+    ...generateMouseUpAction({ r: 2, c: 3 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -202,7 +206,7 @@ test("Turn horizontal line 180 degrees by dragging on End", () => {
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 0 }),
-    appActions.onCellMouseUp({ r: 2, c: 0 }),
+    ...generateMouseUpAction({ r: 2, c: 0 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -246,7 +250,7 @@ test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 0, c: 3 }),
-    appActions.onCellMouseUp({ r: 0, c: 1 }),
+    ...generateMouseUpAction({ r: 0, c: 1 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);
@@ -290,7 +294,7 @@ test("Cannot shrink horizontal line to a zero-length line", () => {
     appActions.onCellHover({ r: 2, c: 4 }),
     appActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 2 }),
-    appActions.onCellMouseUp({ r: 2, c: 2 }),
+    ...generateMouseUpAction({ r: 2, c: 2 }),
   ];
 
   const finalState = applyActions(appReducer, initialState, actions);

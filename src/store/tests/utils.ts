@@ -51,3 +51,18 @@ export function generateUpdateText(text: string): UnknownAction[] {
 
   return actions;
 }
+
+/**
+ * When simulating a cell click, in real usage, it is always accompanied by a mouseDown and mouseUp event
+ */
+export function generateMouseClickAction(cell: Coords): UnknownAction[] {
+  return [
+    appActions.onCellMouseDown(cell),
+    appActions.onCellMouseUp(cell),
+    appActions.onCellClick(cell),
+  ];
+}
+
+export function generateMouseUpAction(cell: Coords): UnknownAction[] {
+  return [appActions.onCellMouseUp(cell), appActions.onCellClick(cell)];
+}

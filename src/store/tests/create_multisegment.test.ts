@@ -1,12 +1,16 @@
 import { MultiSegment } from "../../models/shapes";
 import { appActions, appReducer, initState } from "../appSlice";
-import { applyActions, generateMouseMoveActions } from "./utils";
+import {
+  applyActions,
+  generateMouseClickAction,
+  generateMouseMoveActions,
+} from "./utils";
 
 test("Create multi-line segment with all segment types", () => {
   const actions = [
     appActions.setTool("MULTI_SEGMENT_LINE"),
     appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellClick({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
     appActions.onCellClick({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 2, c: 2 }),
