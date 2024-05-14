@@ -7,6 +7,7 @@ import {
   CELL_HEIGHT,
   CELL_WIDTH,
   drawGrid,
+  drawHoveredCell,
   drawSelectedShape,
   drawShapes,
 } from "./draw";
@@ -18,12 +19,17 @@ export default function Canvas(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const theme = useTheme();
 
-  const hoveredCell = useRef<Coords | null>(null);
+  // This ref is used to prevent firing unnecessary cell hover events if the hovered cell didn't change.
+  const hoveredCellRef = useRef<Coords | null>(null);
 
   const rowCount = useAppSelector((state) => state.app.canvasSize.rows);
   const colCount = useAppSelector((state) => state.app.canvasSize.cols);
   const canvasWidth = colCount * CELL_WIDTH;
   const canvasHeight = rowCount * CELL_HEIGHT;
+
+  const currentHoveredCell = useAppSelector(
+    (state) => state.app.currentHoveredCell
+  );
 
   const shapes = useAppSelector((state) => state.app.shapes);
   const selectedShapeObj = useAppSelector((state) =>
@@ -80,6 +86,11 @@ export default function Canvas(): JSX.Element {
       theme.palette.grey["200"]
     );
 
+    // Draw hovered cell
+    if (currentHoveredCell && nextActionOnClick === "CREATE") {
+      drawHoveredCell(ctx, currentHoveredCell);
+    }
+
     // Draw shapes
 
     // Draw unselected shapes
@@ -97,6 +108,7 @@ export default function Canvas(): JSX.Element {
     canvasHeight,
     canvasWidth,
     colCount,
+    currentHoveredCell,
     newShape,
     nextActionOnClick,
     rowCount,
@@ -127,12 +139,15 @@ export default function Canvas(): JSX.Element {
         }
         onMouseMove={(e) => {
           const newCoords = getCellCoords(e.clientX, e.clientY);
-          if (!_.isEqual(hoveredCell.current, newCoords)) {
-            hoveredCell.current = newCoords;
+          if (!_.isEqual(hoveredCellRef.current, newCoords)) {
+            hoveredCellRef.current = newCoords;
             dispatch(
               appActions.onCellHover(getCellCoords(e.clientX, e.clientY))
             );
           }
+        }}
+        onMouseLeave={(e) => {
+          dispatch(appActions.onCanvasMouseLeave());
         }}
         onClick={(e) =>
           dispatch(appActions.onCellClick(getCellCoords(e.clientX, e.clientY)))

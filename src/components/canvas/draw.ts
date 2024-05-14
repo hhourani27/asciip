@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { Shape } from "../../models/shapes";
+import { Coords, Shape } from "../../models/shapes";
 import {
   CellValueMap,
   getCanvasRepresentation,
@@ -54,6 +54,16 @@ export function drawGrid(
   _.forEach(_.range(0, rowCount), (row) => {
     drawHorizontalGridLine(ctx, row * CELL_HEIGHT, canvasWidth, color);
   });
+}
+
+export function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
+  ctx.fillStyle = "LightBlue";
+  ctx.fillRect(
+    cell.c * CELL_WIDTH,
+    cell.r * CELL_HEIGHT,
+    CELL_WIDTH,
+    CELL_HEIGHT
+  );
 }
 
 export function drawShapes(

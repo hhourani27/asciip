@@ -32,6 +32,8 @@ export type AppState = {
 
   shapes: ShapeObject[];
 
+  currentHoveredCell: Coords | null;
+
   selectedTool: Tool;
   creationProgress: null | {
     start: Coords;
@@ -62,6 +64,8 @@ export const initState = (opt?: StateInitOptions): AppState => {
       cols: 150,
     },
     shapes: opt?.shapes ?? [],
+
+    currentHoveredCell: null,
 
     selectedTool: "SELECT",
     creationProgress: null,
@@ -242,6 +246,8 @@ export const appSlice = createSlice({
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
+      state.currentHoveredCell = action.payload;
+
       if (state.selectedTool === "SELECT") {
         if (state.moveProgress) {
           //* I'm currently moving a Shape and I change mouse position => Update shape position
@@ -357,6 +363,9 @@ export const appSlice = createSlice({
           }
         }
       }
+    },
+    onCanvasMouseLeave: (state) => {
+      state.currentHoveredCell = null;
     },
     onCtrlEnterPress: (state) => {
       if (state.creationProgress?.shape.type === "TEXT") {
