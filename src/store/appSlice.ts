@@ -9,10 +9,10 @@ import {
 } from "../models/shapes";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getShapeAtCoords } from "../models/representation";
+import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
-import { capTextShape, getLines } from "../models/text";
+import { capText, getLines } from "../models/text";
 
 export type Tool =
   | "SELECT"
@@ -48,6 +48,7 @@ export type AppState = {
     resizePoint: Coords;
     startShape: Shape;
   };
+  textEditProgress: null | { startShape: TextShape };
 };
 
 export type StateInitOptions = {
@@ -68,6 +69,7 @@ export const initState = (opt?: StateInitOptions): AppState => {
     nextActionOnClick: null,
     moveProgress: null,
     resizeProgress: null,
+    textEditProgress: null,
   };
 };
 
@@ -89,7 +91,14 @@ export const appSlice = createSlice({
       }
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
-      if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
+      if (state.selectedTool === "SELECT") {
+        // I select the SELECT tool, I double-click on a Text => Start editing Text
+        const shapeObj = getShapeObjAtCoords(state.shapes, action.payload);
+        if (shapeObj?.shape.type === "TEXT") {
+          state.selectedShapeId = shapeObj.id;
+          state.textEditProgress = { startShape: { ...shapeObj.shape } };
+        }
+      } else if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
         const newShape: MultiSegment | null = isShapeLegal(
           state.creationProgress.shape
         )
@@ -104,7 +113,7 @@ export const appSlice = createSlice({
     },
     onCellClick: (state, action: PayloadAction<Coords>) => {
       if (state.selectedTool === "SELECT") {
-        const shape = getShapeAtCoords(state.shapes, action.payload);
+        const shape = getShapeObjAtCoords(state.shapes, action.payload);
         if (shape) {
           state.selectedShapeId = shape.id;
           state.nextActionOnClick = "MOVE";
@@ -112,6 +121,9 @@ export const appSlice = createSlice({
           state.selectedShapeId = null;
           state.nextActionOnClick = "SELECT";
         }
+
+        // I am editing a text, and I click on the canvas =>  I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        state.textEditProgress = null;
       } else if (state.selectedTool === "MULTI_SEGMENT_LINE") {
         if (state.creationProgress == null) {
           state.creationProgress = {
@@ -266,7 +278,7 @@ export const appSlice = createSlice({
             state.shapes[selectedShapeIdx].shape = resizedShape;
           }
         } else if (!state.moveProgress && !state.resizeProgress) {
-          const shapeObj = getShapeAtCoords(
+          const shapeObj = getShapeObjAtCoords(
             state.shapes,
             action.payload,
             state.selectedShapeId ?? undefined
@@ -344,15 +356,36 @@ export const appSlice = createSlice({
       if (state.creationProgress?.shape.type === "TEXT") {
         addNewShape(state, state.creationProgress.shape);
         state.creationProgress = null;
+      } else if (state.textEditProgress) {
+        // I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        state.textEditProgress = null;
       }
     },
     updateText: (state, action: PayloadAction<string>) => {
       if (state.creationProgress?.shape.type === "TEXT") {
         state.creationProgress.shape.lines = getLines(action.payload);
-        state.creationProgress.shape = capTextShape(
-          state.creationProgress.shape,
+        state.creationProgress.shape.lines = capText(
+          state.creationProgress.shape.start,
+          state.creationProgress.shape.lines,
           state.canvasSize
         );
+      } else if (state.textEditProgress) {
+        const selectedTextShapeObjIdx = state.shapes.findIndex(
+          (s) => s.id === state.selectedShapeId
+        );
+        if (
+          selectedTextShapeObjIdx >= 0 &&
+          state.shapes[selectedTextShapeObjIdx].shape.type === "TEXT"
+        ) {
+          const selectTextShape = state.shapes[selectedTextShapeObjIdx]
+            .shape as TextShape;
+
+          selectTextShape.lines = capText(
+            selectTextShape.start,
+            getLines(action.payload),
+            state.canvasSize
+          );
+        }
       }
     },
   },
@@ -363,6 +396,14 @@ export const appSlice = createSlice({
     currentEditedText: (state): TextShape | null => {
       if (state.creationProgress?.shape.type === "TEXT") {
         return state.creationProgress.shape;
+      } else if (state.textEditProgress) {
+        const selectedTextShapeObj = state.shapes.find(
+          (s) => s.id === state.selectedShapeId
+        );
+
+        return selectedTextShapeObj
+          ? (selectedTextShapeObj.shape as TextShape)
+          : null;
       } else {
         return null;
       }

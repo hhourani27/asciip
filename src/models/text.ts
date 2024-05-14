@@ -1,5 +1,5 @@
 import { CanvasSize } from "../store/appSlice";
-import { TextShape } from "./shapes";
+import { Coords, TextShape } from "./shapes";
 
 export function getStringFromShape(textShape: TextShape): string {
   return textShape.lines.join("\n");
@@ -9,14 +9,12 @@ export function getLines(text: string): string[] {
   return text.split("\n");
 }
 
-export function capTextShape(
-  textShape: TextShape,
+export function capText(
+  start: Coords,
+  lines: string[],
   canvasSize: CanvasSize
-): TextShape {
-  return {
-    ...textShape,
-    lines: textShape.lines
-      .filter((_line, idx) => textShape.start.r + idx < canvasSize.rows)
-      .map((line) => line.slice(0, canvasSize.cols - textShape.start.c)),
-  };
+): string[] {
+  return lines
+    .filter((_line, idx) => start.r + idx < canvasSize.rows)
+    .map((line) => line.slice(0, canvasSize.cols - start.c));
 }
