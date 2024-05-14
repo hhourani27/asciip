@@ -141,7 +141,12 @@ export default function Canvas(): JSX.Element {
           )
         }
       ></canvas>
-      {currentEditedText && <TextShapeInput />}
+      {currentEditedText && (
+        <TextShapeInput
+          // Add key, in order to force React to recreate a new instance when edit a new text object
+          key={`textinput_r${currentEditedText.start.r}_c${currentEditedText.start.c}`}
+        />
+      )}
     </div>
   );
 }
