@@ -41,3 +41,13 @@ export function generateMouseMoveActions(
 
   return actions;
 }
+
+export function generateUpdateText(text: string): UnknownAction[] {
+  const actions: UnknownAction[] = [];
+
+  for (let i = 1; i <= text.length; i++) {
+    actions.push(appActions.updateText(text.slice(0, i)));
+  }
+
+  return actions;
+}
