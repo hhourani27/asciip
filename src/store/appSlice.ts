@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords } from "../models/representation";
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
-import { getLines } from "../models/text";
+import { capTextShape, getLines } from "../models/text";
 
 export type Tool =
   | "SELECT"
@@ -349,6 +349,10 @@ export const appSlice = createSlice({
     updateText: (state, action: PayloadAction<string>) => {
       if (state.creationProgress?.shape.type === "TEXT") {
         state.creationProgress.shape.lines = getLines(action.payload);
+        state.creationProgress.shape = capTextShape(
+          state.creationProgress.shape,
+          state.canvasSize
+        );
       }
     },
   },
