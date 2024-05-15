@@ -1,4 +1,9 @@
-import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
+import {
+  ShapeObject,
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -7,7 +12,7 @@ import {
 } from "./utils";
 
 test("Resize a rectangle", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -17,16 +22,16 @@ test("Resize a rectangle", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
     ...generateMouseClickAction({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
     ...generateMouseUpAction({ r: 1, c: 1 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -41,7 +46,7 @@ test("Resize a rectangle", () => {
 });
 
 test("Resize a rectangle by inverting it", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -51,16 +56,16 @@ test("Resize a rectangle by inverting it", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
     ...generateMouseClickAction({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 8, c: 8 }),
     ...generateMouseUpAction({ r: 8, c: 8 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -75,7 +80,7 @@ test("Resize a rectangle by inverting it", () => {
 });
 
 test("Cannot resize a rectangle to a single point", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -85,16 +90,16 @@ test("Cannot resize a rectangle to a single point", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
     ...generateMouseClickAction({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 4 }),
     ...generateMouseUpAction({ r: 4, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -109,7 +114,7 @@ test("Cannot resize a rectangle to a single point", () => {
 });
 
 test("Cannot resize a rectangle to a vertical line", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -119,16 +124,16 @@ test("Cannot resize a rectangle to a vertical line", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
     ...generateMouseClickAction({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 0 }),
     ...generateMouseUpAction({ r: 4, c: 0 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -143,7 +148,7 @@ test("Cannot resize a rectangle to a vertical line", () => {
 });
 
 test("Cannot resize a rectangle to a horizontal line", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -153,16 +158,16 @@ test("Cannot resize a rectangle to a horizontal line", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
     ...generateMouseClickAction({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 4 }),
     ...generateMouseUpAction({ r: 0, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -177,7 +182,7 @@ test("Cannot resize a rectangle to a horizontal line", () => {
 });
 
 test("Fix: If a shape has another shape that overlaps it on top, even if I select it, I couldn't grab all resize points", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -191,13 +196,13 @@ test("Fix: If a shape has another shape that overlaps it on top, even if I selec
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 2 }),
     ...generateMouseClickAction({ r: 2, c: 2 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.nextActionOnClick).toBe("RESIZE");
 });

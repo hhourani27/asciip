@@ -10,7 +10,7 @@ import { ToolbarTools } from "./ToolbarTools";
 import { ToolbarStyleMode } from "./ToolbarStyleMode";
 
 import { useAppDispatch } from "../../store/hooks";
-import { appActions } from "../../store/appSlice";
+import { diagramActions } from "../../store/diagramSlice";
 import { ToolbarStyles } from "./ToolbarStyles";
 
 export default function Toolbar() {
@@ -29,7 +29,7 @@ export default function Toolbar() {
         </Box>
         <ButtonGroup>
           <IconButton
-            onClick={() => dispatch(appActions.openExport())}
+            onClick={() => dispatch(diagramActions.openExport())}
             aria-label="Export"
           >
             <FileDownloadIcon />

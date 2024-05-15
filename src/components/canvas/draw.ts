@@ -6,7 +6,7 @@ import {
 } from "../../models/representation";
 import { ResizePoint, getResizePoints } from "../../models/transformation";
 import { Style, StyleMode } from "../../models/style";
-import { ShapeObject } from "../../store/appSlice";
+import { ShapeObject } from "../../store/diagramSlice";
 
 export const FONT_SIZE = 16;
 export const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461

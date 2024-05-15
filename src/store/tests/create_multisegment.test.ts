@@ -1,5 +1,9 @@
 import { MultiSegment } from "../../models/shapes";
-import { appActions, appReducer, initState } from "../appSlice";
+import {
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -8,20 +12,20 @@ import {
 
 test("Create multi-line segment with all segment types", () => {
   const actions = [
-    appActions.setTool("MULTI_SEGMENT_LINE"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 2, c: 2 }),
     ...generateMouseClickAction({ r: 2, c: 2 }),
-    appActions.onCellHover({ r: 2, c: 1 }),
+    diagramActions.onCellHover({ r: 2, c: 1 }),
     ...generateMouseClickAction({ r: 2, c: 1 }),
-    appActions.onCellHover({ r: 1, c: 1 }),
-    appActions.onCellDoubleClick({ r: 1, c: 1 }),
+    diagramActions.onCellHover({ r: 1, c: 1 }),
+    diagramActions.onCellDoubleClick({ r: 1, c: 1 }),
   ];
 
-  const finalState = applyActions(appReducer, initState(), actions);
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
 
   const expectedShape: MultiSegment = {
     type: "MULTI_SEGMENT_LINE",
@@ -60,16 +64,16 @@ test("Create multi-line segment with all segment types", () => {
 
 test("Two consecutive segments with the same direction are merged", () => {
   const actions = [
-    appActions.setTool("MULTI_SEGMENT_LINE"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 0, c: 3 }, { r: 0, c: 4 }),
-    appActions.onCellDoubleClick({ r: 0, c: 4 }),
+    diagramActions.onCellDoubleClick({ r: 0, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initState(), actions);
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
 
   const expectedShape: MultiSegment = {
     type: "MULTI_SEGMENT_LINE",
@@ -90,17 +94,17 @@ test("Two consecutive segments with the same direction are merged", () => {
 
 test("0-length segments are ignored", () => {
   const actions = [
-    appActions.setTool("MULTI_SEGMENT_LINE"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
-    appActions.onCellDoubleClick({ r: 0, c: 2 }),
+    diagramActions.onCellDoubleClick({ r: 0, c: 2 }),
   ];
 
-  const finalState = applyActions(appReducer, initState(), actions);
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
 
   const expectedShape: MultiSegment = {
     type: "MULTI_SEGMENT_LINE",

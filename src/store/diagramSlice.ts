@@ -28,13 +28,14 @@ export type CanvasSize = {
   cols: number;
 };
 
-export type AppState = {
-  /* Data representing a diagram */
+export type DiagramData = {
   canvasSize: CanvasSize;
   shapes: ShapeObject[];
   styleMode: StyleMode;
   globalStyle: Style;
+};
 
+export type DiagramState = DiagramData & {
   /* Edition & Navigation State of the canvas */
   currentHoveredCell: Coords | null;
 
@@ -64,7 +65,7 @@ export type StateInitOptions = {
   shapes?: ShapeObject[];
   canvasSize?: CanvasSize;
 };
-export const initState = (opt?: StateInitOptions): AppState => {
+export const initDiagramState = (opt?: StateInitOptions): DiagramState => {
   return {
     canvasSize: opt?.canvasSize ?? {
       rows: 100,
@@ -88,9 +89,9 @@ export const initState = (opt?: StateInitOptions): AppState => {
   };
 };
 
-export const appSlice = createSlice({
-  name: "app",
-  initialState: initState(),
+export const diagramSlice = createSlice({
+  name: "diagram",
+  initialState: initDiagramState(),
   reducers: {
     //#region Canvas actions
     setTool: (state, action: PayloadAction<Tool>) => {
@@ -498,7 +499,7 @@ export const appSlice = createSlice({
 });
 
 //#region Utility state function that mutate directly the state
-function addNewShape(state: AppState, shape: Shape) {
+function addNewShape(state: DiagramState, shape: Shape) {
   if (state.creationProgress) {
     state.shapes.push({
       id: uuidv4(),
@@ -508,6 +509,6 @@ function addNewShape(state: AppState, shape: Shape) {
   }
 }
 
-export const appReducer = appSlice.reducer;
-export const appActions = appSlice.actions;
-export const appSelectors = appSlice.selectors;
+export const diagramReducer = diagramSlice.reducer;
+export const diagramActions = diagramSlice.actions;
+export const diagramSelectors = diagramSlice.selectors;

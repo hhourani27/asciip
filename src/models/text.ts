@@ -1,4 +1,4 @@
-import { CanvasSize } from "../store/appSlice";
+import { CanvasSize } from "../store/diagramSlice";
 import { Coords, TextShape } from "./shapes";
 
 export function getStringFromShape(textShape: TextShape): string {

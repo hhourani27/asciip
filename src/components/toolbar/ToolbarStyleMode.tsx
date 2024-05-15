@@ -1,20 +1,20 @@
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { appActions } from "../../store/appSlice";
+import { diagramActions } from "../../store/diagramSlice";
 import { StyleMode } from "../../models/style";
 
 export function ToolbarStyleMode(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const styleMode = useAppSelector((state) => state.app.styleMode);
+  const styleMode = useAppSelector((state) => state.diagram.styleMode);
 
   const handleStyleModeChange = (
     event: React.MouseEvent<HTMLElement>,
     newStyleMode: StyleMode | null
   ) => {
     if (newStyleMode != null && newStyleMode !== styleMode) {
-      dispatch(appActions.setStyleMode(newStyleMode));
+      dispatch(diagramActions.setStyleMode(newStyleMode));
     }
   };
 

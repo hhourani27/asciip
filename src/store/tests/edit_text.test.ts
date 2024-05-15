@@ -1,8 +1,13 @@
-import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
+import {
+  ShapeObject,
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import { applyActions } from "./utils";
 
 test("Edit text", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -16,14 +21,14 @@ test("Edit text", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
-    appActions.onCellDoubleClick({ r: 0, c: 0 }),
-    appActions.updateText("Hello\nWorld1"),
-    appActions.onCtrlEnterPress(),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellDoubleClick({ r: 0, c: 0 }),
+    diagramActions.updateText("Hello\nWorld1"),
+    diagramActions.onCtrlEnterPress(),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",

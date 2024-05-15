@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { appReducer } from "./appSlice";
+import { diagramReducer } from "./diagramSlice";
 
 export const store = configureStore({
   reducer: {
-    app: appReducer,
+    diagram: diagramReducer,
   },
   devTools: { maxAge: 1000 },
 });

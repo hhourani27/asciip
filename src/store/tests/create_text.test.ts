@@ -1,5 +1,10 @@
 import { TextShape } from "../../models/shapes";
-import { CanvasSize, appActions, appReducer, initState } from "../appSlice";
+import {
+  CanvasSize,
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -11,16 +16,16 @@ const canvasSize: CanvasSize = { rows: 10, cols: 10 };
 
 test("Create text", () => {
   const actions = [
-    appActions.setTool("TEXT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("TEXT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText("Hello\nWorld"),
-    appActions.onCtrlEnterPress(),
+    diagramActions.onCtrlEnterPress(),
   ];
 
   const finalState = applyActions(
-    appReducer,
-    initState({ canvasSize }),
+    diagramReducer,
+    initDiagramState({ canvasSize }),
     actions
   );
 
@@ -37,18 +42,18 @@ test("Create text", () => {
 
 test("Text cannot exceed canvas", () => {
   const actions = [
-    appActions.setTool("TEXT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("TEXT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText(
       "Lorem ipsum dolor sit amet\nconsectetur adipiscing elits"
     ),
-    appActions.onCtrlEnterPress(),
+    diagramActions.onCtrlEnterPress(),
   ];
 
   const finalState = applyActions(
-    appReducer,
-    initState({ canvasSize }),
+    diagramReducer,
+    initDiagramState({ canvasSize }),
     actions
   );
 
@@ -64,20 +69,20 @@ test("Text cannot exceed canvas", () => {
 
 test("Create 2 texts", () => {
   const actions = [
-    appActions.setTool("TEXT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("TEXT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     ...generateUpdateText("Hello"),
-    appActions.onCtrlEnterPress(),
+    diagramActions.onCtrlEnterPress(),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 0 }),
     ...generateMouseClickAction({ r: 2, c: 0 }),
     ...generateUpdateText("World"),
-    appActions.onCtrlEnterPress(),
+    diagramActions.onCtrlEnterPress(),
   ];
 
   const finalState = applyActions(
-    appReducer,
-    initState({ canvasSize }),
+    diagramReducer,
+    initDiagramState({ canvasSize }),
     actions
   );
 

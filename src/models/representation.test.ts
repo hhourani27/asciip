@@ -1,4 +1,4 @@
-import { CanvasSize } from "../store/appSlice";
+import { CanvasSize } from "../store/diagramSlice";
 import {
   getStyledCanvasGrid,
   getAbstractShapeRepresentation,

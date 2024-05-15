@@ -1,4 +1,9 @@
-import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
+import {
+  ShapeObject,
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -7,7 +12,7 @@ import {
 } from "./utils";
 
 test("Resize all segments", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -40,29 +45,29 @@ test("Resize all segments", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
     // Drag first segment
-    appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellMouseDown({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 1, c: 1 }),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 1 }),
+    diagramActions.onCellHover({ r: 1, c: 1 }),
     ...generateMouseUpAction({ r: 1, c: 1 }),
 
     // Drag second segment
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 2, c: 3 }),
-    appActions.onCellMouseDown({ r: 2, c: 3 }),
-    appActions.onCellHover({ r: 2, c: 2 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 2 }),
     ...generateMouseUpAction({ r: 2, c: 2 }),
 
     // Drag third segment
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 3, c: 4 }),
-    appActions.onCellMouseDown({ r: 3, c: 4 }),
-    appActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 3, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
     ...generateMouseUpAction({ r: 2, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -95,7 +100,7 @@ test("Resize all segments", () => {
 });
 
 test("Extend start point", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -122,17 +127,17 @@ test("Extend start point", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
-    appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellMouseDown({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 1 }),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseUpAction({ r: 0, c: 0 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -158,7 +163,7 @@ test("Extend start point", () => {
 });
 
 test("Shrink first segment", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -185,17 +190,17 @@ test("Shrink first segment", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
-    appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellMouseDown({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 1 }),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -221,7 +226,7 @@ test("Shrink first segment", () => {
 });
 
 test("Add segment at start", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -248,17 +253,17 @@ test("Add segment at start", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag start point
-    appActions.onCellHover({ r: 0, c: 1 }),
-    appActions.onCellMouseDown({ r: 0, c: 1 }),
-    appActions.onCellHover({ r: 1, c: 1 }),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 1 }),
+    diagramActions.onCellHover({ r: 1, c: 1 }),
     ...generateMouseUpAction({ r: 1, c: 1 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -290,7 +295,7 @@ test("Add segment at start", () => {
 });
 
 test("Extend end point", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -317,18 +322,18 @@ test("Extend end point", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
-    appActions.onCellMouseDown({ r: 2, c: 3 }),
-    appActions.onCellHover({ r: 3, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 3, c: 3 }),
     ...generateMouseUpAction({ r: 3, c: 3 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -354,7 +359,7 @@ test("Extend end point", () => {
 });
 
 test("Shrink end point", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -381,18 +386,18 @@ test("Shrink end point", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
-    appActions.onCellMouseDown({ r: 2, c: 3 }),
-    appActions.onCellHover({ r: 1, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 1, c: 3 }),
     ...generateMouseUpAction({ r: 1, c: 3 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -418,7 +423,7 @@ test("Shrink end point", () => {
 });
 
 test("Add segment at end", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -445,18 +450,18 @@ test("Add segment at end", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
-    appActions.onCellMouseDown({ r: 2, c: 3 }),
-    appActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
     ...generateMouseUpAction({ r: 2, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -488,7 +493,7 @@ test("Add segment at end", () => {
 });
 
 test("Merge 3 segments by dragging the middle segment", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -521,18 +526,18 @@ test("Merge 3 segments by dragging the middle segment", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
-    appActions.onCellMouseDown({ r: 2, c: 2 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 0, c: 2 }),
     ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -553,7 +558,7 @@ test("Merge 3 segments by dragging the middle segment", () => {
 });
 
 test("Cannot have a u-turn when dragging a segment", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -586,18 +591,18 @@ test("Cannot have a u-turn when dragging a segment", () => {
 
   const actions = [
     // Select shape
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 2 }),
-    appActions.onCellMouseDown({ r: 1, c: 2 }),
+    diagramActions.onCellMouseDown({ r: 1, c: 2 }),
     ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 1, c: 0 }),
     ...generateMouseUpAction({ r: 0, c: 2 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",

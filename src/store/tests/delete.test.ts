@@ -1,8 +1,12 @@
-import { appActions, appReducer, initState } from "../appSlice";
+import {
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import { applyActions, generateMouseClickAction } from "./utils";
 
 test("Delete a shape", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -12,19 +16,19 @@ test("Delete a shape", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
-    appActions.onDeletePress(),
+    diagramActions.onDeletePress(),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes).toHaveLength(0);
 });
 
 test("Delete 2 shapes on top of each other", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -38,15 +42,15 @@ test("Delete 2 shapes on top of each other", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
     ...generateMouseClickAction({ r: 0, c: 0 }),
-    appActions.onDeletePress(),
+    diagramActions.onDeletePress(),
     ...generateMouseClickAction({ r: 0, c: 0 }),
-    appActions.onDeletePress(),
+    diagramActions.onDeletePress(),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes).toHaveLength(0);
 });

@@ -1,4 +1,8 @@
-import { appReducer, appActions, initState } from "../appSlice";
+import {
+  diagramReducer,
+  diagramActions,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -7,7 +11,7 @@ import {
 } from "./utils";
 
 test("Translate a rectangle 1 row up", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -17,15 +21,15 @@ test("Translate a rectangle 1 row up", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 4 }),
     ...generateMouseClickAction({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
-    appActions.onCellHover({ r: 1, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 1, c: 4 }),
     ...generateMouseUpAction({ r: 1, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes[0].shape).toEqual({
     type: "RECTANGLE",
@@ -35,7 +39,7 @@ test("Translate a rectangle 1 row up", () => {
 });
 
 test("Translate a rectangle 2 rows up", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -49,16 +53,16 @@ test("Translate a rectangle 2 rows up", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 10, c: 12 }),
     ...generateMouseClickAction({ r: 10, c: 12 }),
-    appActions.onCellMouseDown({ r: 10, c: 12 }),
-    appActions.onCellHover({ r: 9, c: 12 }),
-    appActions.onCellHover({ r: 8, c: 12 }),
+    diagramActions.onCellMouseDown({ r: 10, c: 12 }),
+    diagramActions.onCellHover({ r: 9, c: 12 }),
+    diagramActions.onCellHover({ r: 8, c: 12 }),
     ...generateMouseUpAction({ r: 8, c: 12 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes[0].shape).toEqual({
     type: "RECTANGLE",
@@ -68,7 +72,7 @@ test("Translate a rectangle 2 rows up", () => {
 });
 
 test("Fix: If I grab a rectangle from the bottom border, and move it up to the canvas top border, it returned to its original position", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -78,17 +82,17 @@ test("Fix: If I grab a rectangle from the bottom border, and move it up to the c
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 6 }, { r: 2, c: 6 }),
     ...generateMouseClickAction({ r: 2, c: 6 }),
-    appActions.onCellMouseDown({ r: 2, c: 6 }),
-    appActions.onCellHover({ r: 2, c: 5 }),
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 6 }),
+    diagramActions.onCellHover({ r: 2, c: 5 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
     ...generateMouseUpAction({ r: 2, c: 4 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes[0].shape).toEqual({
     type: "RECTANGLE",
@@ -98,7 +102,7 @@ test("Fix: If I grab a rectangle from the bottom border, and move it up to the c
 });
 
 test("Fix: Rectangle could be translated beyond the right canvas border if it was grabbed by the right border", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     canvasSize: { rows: 10, cols: 10 },
     shapes: [
       {
@@ -109,17 +113,17 @@ test("Fix: Rectangle could be translated beyond the right canvas border if it wa
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 6 }, { r: 3, c: 6 }),
     ...generateMouseClickAction({ r: 3, c: 6 }),
-    appActions.onCellMouseDown({ r: 3, c: 6 }),
-    appActions.onCellHover({ r: 3, c: 7 }),
-    appActions.onCellHover({ r: 3, c: 8 }),
-    appActions.onCellHover({ r: 3, c: 9 }),
+    diagramActions.onCellMouseDown({ r: 3, c: 6 }),
+    diagramActions.onCellHover({ r: 3, c: 7 }),
+    diagramActions.onCellHover({ r: 3, c: 8 }),
+    diagramActions.onCellHover({ r: 3, c: 9 }),
     ...generateMouseUpAction({ r: 3, c: 9 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.shapes[0].shape).toEqual({
     type: "RECTANGLE",

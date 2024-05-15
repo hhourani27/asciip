@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { appActions, appSelectors } from "../../store/appSlice";
+import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import { CELL_HEIGHT, FONT_SIZE } from "./draw";
 import { getStringFromShape } from "../../models/text";
 import { ChangeEvent } from "react";
@@ -9,11 +9,11 @@ export function TextShapeInput(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const currentEditedText = useAppSelector((state) =>
-    appSelectors.currentEditedText(state)
+    diagramSelectors.currentEditedText(state)
   )!;
 
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch(appActions.updateText(event.target.value));
+    dispatch(diagramActions.updateText(event.target.value));
   };
 
   return (
