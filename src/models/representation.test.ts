@@ -4,10 +4,10 @@ import {
   getAbstractShapeRepresentation,
   getTextExport,
 } from "./representation";
-import { MultiSegment, Rectangle } from "./shapes";
+import { Line, MultiSegment, Rectangle } from "./shapes";
 
 describe("getAbstractShapeRepresentation()", () => {
-  test("Representation of 6x6 rectangle", () => {
+  test("Abstract Representation of 6x6 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -40,7 +40,7 @@ describe("getAbstractShapeRepresentation()", () => {
     });
   });
 
-  test("Representation of 3x3 rectangle", () => {
+  test("Abstract Representation of 3x3 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -56,7 +56,7 @@ describe("getAbstractShapeRepresentation()", () => {
     });
   });
 
-  test("Representation of 2x2 rectangle", () => {
+  test("Abstract Representation of 2x2 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -71,7 +71,7 @@ describe("getAbstractShapeRepresentation()", () => {
     });
   });
 
-  test("Representation of 1x1 rectangle", () => {
+  test("Abstract Representation of 1x1 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -82,6 +82,27 @@ describe("getAbstractShapeRepresentation()", () => {
 
     expect(repr).toEqual({
       0: { 0: "CORNER_TL" },
+    });
+  });
+
+  test("Abstract Representation of a horizontal line", () => {
+    const line: Line = {
+      type: "LINE",
+      axis: "HORIZONTAL",
+      direction: "LEFT_TO_RIGHT",
+      start: { r: 0, c: 0 },
+      end: { r: 0, c: 3 },
+    };
+
+    const repr = getAbstractShapeRepresentation(line);
+
+    expect(repr).toEqual({
+      0: {
+        0: "LINEHEAD_START_LEFT",
+        1: "LINE_HORIZONTAL",
+        2: "LINE_HORIZONTAL",
+        3: "LINEHEAD_END_RIGHT",
+      },
     });
   });
 

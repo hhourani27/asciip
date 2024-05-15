@@ -8,8 +8,11 @@ import {
   Select,
   SelectChangeEvent,
 } from "@mui/material";
-import { ARROW_STYLE, LINE_STYLE } from "../../models/style";
+import { ARROW_STYLE, LINE_STYLE, Style } from "../../models/style";
 
+import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
+import WestIcon from "@mui/icons-material/West";
+import EastIcon from "@mui/icons-material/East";
 export function ToolbarStyles(): JSX.Element {
   const dispatch = useAppDispatch();
 
@@ -34,6 +37,41 @@ export function ToolbarStyles(): JSX.Element {
           style: { arrowStyle: event.target.value as ARROW_STYLE },
         })
       );
+  };
+
+  const handleArrowHeadStyleChange = (event: SelectChangeEvent<string>) => {
+    if (event.target.value === "NONE") {
+      dispatch(
+        appActions.setStyle({
+          style: { arrowStartHead: false, arrowEndHead: false },
+        })
+      );
+    } else if (event.target.value === "END") {
+      dispatch(
+        appActions.setStyle({
+          style: { arrowStartHead: false, arrowEndHead: true },
+        })
+      );
+    } else if (event.target.value === "START") {
+      dispatch(
+        appActions.setStyle({
+          style: { arrowStartHead: true, arrowEndHead: false },
+        })
+      );
+    } else if (event.target.value === "START_END") {
+      dispatch(
+        appActions.setStyle({
+          style: { arrowStartHead: true, arrowEndHead: true },
+        })
+      );
+    }
+  };
+
+  const getArrowHeadSelectValue = (style: Partial<Style>): string => {
+    if (style.arrowEndHead && style.arrowStartHead) return "START_END";
+    else if (style.arrowEndHead && !style.arrowStartHead) return "END";
+    else if (!style.arrowEndHead && style.arrowStartHead) return "START";
+    else return "NONE";
   };
 
   return (
@@ -64,6 +102,33 @@ export function ToolbarStyles(): JSX.Element {
           <MenuItem value={"FILLED"}>Filled</MenuItem>
           <MenuItem value={"ASCII"}>ASCII</MenuItem>
           <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl size="small" sx={{ minWidth: "100px" }}>
+        <InputLabel id="arrow-head-label">Head</InputLabel>
+        <Select
+          labelId="arrow-head-label"
+          id="arrow-head"
+          value={getArrowHeadSelectValue(globalStyle)}
+          label="Arrow head"
+          onChange={handleArrowHeadStyleChange}
+        >
+          <MenuItem value={"NONE"}>
+            <HorizontalRuleIcon fontSize="small" />
+            <HorizontalRuleIcon fontSize="small" />
+          </MenuItem>
+          <MenuItem value={"END"}>
+            <HorizontalRuleIcon fontSize="small" />
+            <EastIcon fontSize="small" />
+          </MenuItem>
+          <MenuItem value={"START"}>
+            <WestIcon fontSize="small" />
+            <HorizontalRuleIcon fontSize="small" />
+          </MenuItem>
+          <MenuItem value={"START_END"}>
+            <WestIcon fontSize="small" />
+            <EastIcon fontSize="small" />
+          </MenuItem>
         </Select>
       </FormControl>
     </Box>

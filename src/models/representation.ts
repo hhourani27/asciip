@@ -91,12 +91,12 @@ export function getAbstractShapeRepresentation(shape: Shape): CellValueMap {
 
       repr[shape.start.r][shape.start.c] =
         shape.axis === "HORIZONTAL" && shape.direction === "LEFT_TO_RIGHT"
-          ? "LINEHEAD_START_RIGHT"
-          : shape.axis === "HORIZONTAL" && shape.direction === "RIGHT_TO_LEFT"
           ? "LINEHEAD_START_LEFT"
+          : shape.axis === "HORIZONTAL" && shape.direction === "RIGHT_TO_LEFT"
+          ? "LINEHEAD_START_RIGHT"
           : shape.axis === "VERTICAL" && shape.direction === "DOWN"
-          ? "LINEHEAD_START_DOWN"
-          : "LINEHEAD_START_UP";
+          ? "LINEHEAD_START_UP"
+          : "LINEHEAD_START_DOWN";
 
       repr[shape.end.r][shape.end.c] =
         shape.axis === "HORIZONTAL" && shape.direction === "LEFT_TO_RIGHT"
