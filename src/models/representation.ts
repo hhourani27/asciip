@@ -259,7 +259,7 @@ export function getStyledShapeRepresentation(
   shape: Shape,
   styleMode: StyleMode,
   globalStyle: Style,
-  shapeStyle?: Style
+  shapeStyle?: Partial<Style>
 ): CellValueMap {
   const repr = getAbstractShapeRepresentation(shape);
 

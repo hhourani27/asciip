@@ -22,7 +22,7 @@ export type Tool =
   | "MULTI_SEGMENT_LINE"
   | "TEXT";
 
-export type ShapeObject = { id: string; shape: Shape; style?: Style };
+export type ShapeObject = { id: string; shape: Shape; style?: Partial<Style> };
 export type CanvasSize = {
   rows: number;
   cols: number;
@@ -445,6 +445,25 @@ export const appSlice = createSlice({
       */
       if (action.payload === "ASCII") {
         state.globalStyle = defaultStyle();
+      }
+    },
+    setStyle: (
+      state,
+      action: PayloadAction<{ style: Partial<Style>; shapeId?: string }>
+    ) => {
+      if (!action.payload.shapeId) {
+        _.merge(state.globalStyle, action.payload.style);
+      } else {
+        const shapeObj = state.shapes.find(
+          (s) => s.id === action.payload.shapeId
+        );
+        if (shapeObj) {
+          if ("style" in shapeObj) {
+            _.merge(shapeObj.style, action.payload.style);
+          } else {
+            shapeObj.style = action.payload.style;
+          }
+        }
       }
     },
     //#endregion

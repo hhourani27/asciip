@@ -38,12 +38,12 @@ const line_repr = {
   CORNER_BR: {
     ASCII: "+",
     LIGHT: "┘",
-    HEAVY: "┗",
+    HEAVY: "┛",
   },
   CORNER_BL: {
     ASCII: "+",
     LIGHT: "└",
-    HEAVY: "┛",
+    HEAVY: "┗",
   },
 };
 
@@ -70,17 +70,12 @@ const arrow_repr = {
   },
 };
 
-export type LineStyle = {
+export type Style = {
   lineStyle: LINE_STYLE;
-};
-
-export type ArrowStyle = {
   arrowStyle: ARROW_STYLE;
   arrowStartHead: boolean;
   arrowEndHead: boolean;
 };
-
-export type Style = LineStyle & ArrowStyle;
 
 export function defaultStyle(): Style {
   return {

@@ -11,6 +11,7 @@ import { ToolbarStyleMode } from "./ToolbarStyleMode";
 
 import { useAppDispatch } from "../../store/hooks";
 import { appActions } from "../../store/appSlice";
+import { ToolbarStyles } from "./ToolbarStyles";
 
 export default function Toolbar() {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ export default function Toolbar() {
       <MuiToolbar sx={{ justifyContent: "space-between" }}>
         <Box id="left-buttons" sx={{ flexGrow: 1, display: "flex", gap: 2 }}>
           <ToolbarTools />
+          <ToolbarStyles />
           <ToolbarStyleMode />
         </Box>
         <ButtonGroup>
