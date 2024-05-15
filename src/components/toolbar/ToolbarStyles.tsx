@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { appActions } from "../../store/appSlice";
+import { appActions, appSelectors } from "../../store/appSlice";
 import {
   Box,
   FormControl,
@@ -19,49 +19,129 @@ export function ToolbarStyles(): JSX.Element {
   const styleMode = useAppSelector((state) => state.app.styleMode);
   const globalStyle = useAppSelector((state) => state.app.globalStyle);
   const selectedTool = useAppSelector((state) => state.app.selectedTool);
-  const selectedShapeId = useAppSelector((state) => state.app.selectedShapeId);
+  const selectedShapeObj = useAppSelector((state) =>
+    appSelectors.selectedShapeObj(state)
+  );
+
+  const isLineStyleSelectEnabled = (): boolean => {
+    if (styleMode === "ASCII") return false;
+
+    if (
+      selectedTool === "RECTANGLE" ||
+      selectedTool === "LINE" ||
+      selectedTool === "MULTI_SEGMENT_LINE"
+    )
+      return true;
+
+    const selectedShape = selectedShapeObj?.shape;
+    if (
+      selectedShape &&
+      selectedTool === "SELECT" &&
+      (selectedShape.type === "RECTANGLE" ||
+        selectedShape.type === "LINE" ||
+        selectedShape.type === "MULTI_SEGMENT_LINE")
+    )
+      return true;
+
+    return false;
+  };
+
+  const isArrowStyleSelectEnabled = (): boolean => {
+    if (styleMode === "ASCII") return false;
+
+    if (selectedTool === "LINE" || selectedTool === "MULTI_SEGMENT_LINE")
+      return true;
+
+    const selectedShape = selectedShapeObj?.shape;
+    if (
+      selectedShape &&
+      selectedTool === "SELECT" &&
+      (selectedShape.type === "LINE" ||
+        selectedShape.type === "MULTI_SEGMENT_LINE")
+    )
+      return true;
+
+    return false;
+  };
+
+  const isArrowHeadSelectEnabled = (): boolean => {
+    if (selectedTool === "LINE" || selectedTool === "MULTI_SEGMENT_LINE")
+      return true;
+
+    const selectedShape = selectedShapeObj?.shape;
+    if (
+      selectedShape &&
+      selectedTool === "SELECT" &&
+      (selectedShape.type === "LINE" ||
+        selectedShape.type === "MULTI_SEGMENT_LINE")
+    )
+      return true;
+
+    return false;
+  };
 
   const handleLineStyleChange = (event: SelectChangeEvent<LINE_STYLE>) => {
+    const selectedShapeId: string | undefined = selectedShapeObj
+      ? selectedShapeObj.id
+      : undefined;
+
     if (event.target.value)
       dispatch(
         appActions.setStyle({
           style: { lineStyle: event.target.value as LINE_STYLE },
+          shapeId: selectedShapeId,
         })
       );
   };
 
   const handleArrowStyleChange = (event: SelectChangeEvent<ARROW_STYLE>) => {
+    const selectedShapeId: string | undefined = selectedShapeObj
+      ? selectedShapeObj.id
+      : undefined;
+
     if (event.target.value)
       dispatch(
         appActions.setStyle({
           style: { arrowStyle: event.target.value as ARROW_STYLE },
+          shapeId: selectedShapeId,
         })
       );
   };
 
   const handleArrowHeadStyleChange = (event: SelectChangeEvent<string>) => {
+    const selectedShapeId: string | undefined = selectedShapeObj
+      ? selectedShapeObj.id
+      : undefined;
+
     if (event.target.value === "NONE") {
       dispatch(
         appActions.setStyle({
-          style: { arrowStartHead: false, arrowEndHead: false },
+          style: {
+            arrowStartHead: false,
+            arrowEndHead: false,
+          },
+          shapeId: selectedShapeId,
         })
       );
     } else if (event.target.value === "END") {
       dispatch(
         appActions.setStyle({
           style: { arrowStartHead: false, arrowEndHead: true },
+          shapeId: selectedShapeId,
         })
       );
     } else if (event.target.value === "START") {
       dispatch(
         appActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: false },
+          shapeId: selectedShapeId,
         })
       );
     } else if (event.target.value === "START_END") {
       dispatch(
         appActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: true },
+          shapeId: selectedShapeId,
         })
       );
     }
@@ -76,7 +156,11 @@ export function ToolbarStyles(): JSX.Element {
 
   return (
     <Box>
-      <FormControl size="small" sx={{ minWidth: "100px" }}>
+      <FormControl
+        size="small"
+        sx={{ minWidth: "100px" }}
+        disabled={!isLineStyleSelectEnabled()}
+      >
         <InputLabel id="line-style-label">Line</InputLabel>
         <Select
           labelId="line-style-label"
@@ -90,7 +174,11 @@ export function ToolbarStyles(): JSX.Element {
           <MenuItem value={"HEAVY"}>Heavy</MenuItem>
         </Select>
       </FormControl>
-      <FormControl size="small" sx={{ minWidth: "100px" }}>
+      <FormControl
+        size="small"
+        sx={{ minWidth: "100px" }}
+        disabled={!isArrowStyleSelectEnabled()}
+      >
         <InputLabel id="arrow-style-label">Arrow</InputLabel>
         <Select
           labelId="arrow-style-label"
@@ -104,7 +192,11 @@ export function ToolbarStyles(): JSX.Element {
           <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
         </Select>
       </FormControl>
-      <FormControl size="small" sx={{ minWidth: "100px" }}>
+      <FormControl
+        size="small"
+        sx={{ minWidth: "100px" }}
+        disabled={!isArrowHeadSelectEnabled()}
+      >
         <InputLabel id="arrow-head-label">Head</InputLabel>
         <Select
           labelId="arrow-head-label"
