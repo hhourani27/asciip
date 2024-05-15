@@ -3,13 +3,13 @@ import { Char, LineChar } from "./representation";
 
 export type StyleMode = "ASCII" | "UNICODE";
 
-export type LINE_STYLE = "LIGHT" | "HEAVY";
+export type LINE_STYLE = "ASCII" | "LIGHT" | "HEAVY";
 //   | "DOUBLE"
 //   | "DOUBLE_DASH"
 //   | "TRIPLE_DASH"
 //   | "QUADRUPLE_DASH";
 
-export type ARROW_STYLE = "OUTLINED" | "FILLED";
+export type ARROW_STYLE = "ASCII" | "OUTLINED" | "FILLED";
 //   | "OUTLINED_SMALL"
 //   | "FILLED_SMALL";
 

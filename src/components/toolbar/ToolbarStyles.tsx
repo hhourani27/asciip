@@ -48,6 +48,7 @@ export function ToolbarStyles(): JSX.Element {
           onChange={handleLineStyleChange}
         >
           <MenuItem value={"LIGHT"}>Light</MenuItem>
+          <MenuItem value={"ASCII"}>ASCII</MenuItem>
           <MenuItem value={"HEAVY"}>Heavy</MenuItem>
         </Select>
       </FormControl>
@@ -61,6 +62,7 @@ export function ToolbarStyles(): JSX.Element {
           onChange={handleArrowStyleChange}
         >
           <MenuItem value={"FILLED"}>Filled</MenuItem>
+          <MenuItem value={"ASCII"}>ASCII</MenuItem>
           <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
         </Select>
       </FormControl>
