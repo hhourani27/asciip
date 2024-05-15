@@ -1,19 +1,47 @@
-import { ShapeObject } from "../store/appSlice";
+import { CanvasSize, ShapeObject } from "../store/appSlice";
 import { Coords, Shape } from "./shapes";
 import _ from "lodash";
 import { getBoundingBox, mergeBoundingBoxes } from "./transformation";
+import { Style, StyleMode, defaultStyle, getCharRepr } from "./style";
+
+export type LineChar =
+  | "LINE_HORIZONTAL"
+  | "LINE_VERTICAL"
+  | "CORNER_TR"
+  | "CORNER_TL"
+  | "CORNER_BR"
+  | "CORNER_BL";
+export type LineHeadChar =
+  | "LINEHEAD_START_UP"
+  | "LINEHEAD_START_DOWN"
+  | "LINEHEAD_START_LEFT"
+  | "LINEHEAD_START_RIGHT"
+  | "LINEHEAD_END_UP"
+  | "LINEHEAD_END_DOWN"
+  | "LINEHEAD_END_LEFT"
+  | "LINEHEAD_END_RIGHT";
+
+export type Char = LineChar | LineHeadChar | string | "EMPTY_CHAR";
 
 export type CellValueMap = {
-  [key: number]: { [key: number]: string };
+  [key: number]: { [key: number]: Char };
 };
 
 export type Grid = string[][];
 
-export function getShapeRepresentation(shape: Shape): CellValueMap {
+export function getAbstractShapeRepresentation(shape: Shape): CellValueMap {
   const repr: CellValueMap = {};
   switch (shape.type) {
     case "RECTANGLE": {
       const { tl, br } = shape;
+
+      // Special case: 1x1 rectangle
+      if (_.isEqual(tl, br)) {
+        repr[tl.r] = {};
+        repr[tl.r][tl.c] = "CORNER_TL";
+        return repr;
+      }
+
       const tr = { x: tl.r, y: br.c };
       const bl = { x: br.r, y: tl.c };
 
@@ -21,18 +49,18 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
         repr[x] = {};
       }
 
-      repr[tl.r][tl.c] = "+";
-      repr[br.r][br.c] = "+";
-      repr[tr.x][tr.y] = "+";
-      repr[bl.x][bl.y] = "+";
+      repr[tl.r][tl.c] = "CORNER_TL";
+      repr[br.r][br.c] = "CORNER_BR";
+      repr[tr.x][tr.y] = "CORNER_TR";
+      repr[bl.x][bl.y] = "CORNER_BL";
 
       for (let y = tl.c + 1; y < tr.y; y++) {
-        repr[tl.r][y] = "-";
-        repr[bl.x][y] = "-";
+        repr[tl.r][y] = "LINE_HORIZONTAL";
+        repr[bl.x][y] = "LINE_HORIZONTAL";
       }
       for (let x = tl.r + 1; x < bl.x; x++) {
-        repr[x][tl.c] = "|";
-        repr[x][tr.y] = "|";
+        repr[x][tl.c] = "LINE_VERTICAL";
+        repr[x][tr.y] = "LINE_VERTICAL";
       }
 
       return repr;
@@ -48,27 +76,36 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
         case "HORIZONTAL": {
           _.merge(
             repr,
-            drawHorizontalLine(shape.start.r, shape.start.c, shape.end.c)
+            reprHorizontalLine(shape.start.r, shape.start.c, shape.end.c)
           );
           break;
         }
         case "VERTICAL": {
           _.merge(
             repr,
-            drawVerticalLine(shape.start.c, shape.start.r, shape.end.r)
+            reprVerticalLine(shape.start.c, shape.start.r, shape.end.r)
           );
           break;
         }
       }
 
+      repr[shape.start.r][shape.start.c] =
+        shape.axis === "HORIZONTAL" && shape.direction === "LEFT_TO_RIGHT"
+          ? "LINEHEAD_START_RIGHT"
+          : shape.axis === "HORIZONTAL" && shape.direction === "RIGHT_TO_LEFT"
+          ? "LINEHEAD_START_LEFT"
+          : shape.axis === "VERTICAL" && shape.direction === "DOWN"
+          ? "LINEHEAD_START_DOWN"
+          : "LINEHEAD_START_UP";
+
       repr[shape.end.r][shape.end.c] =
         shape.axis === "HORIZONTAL" && shape.direction === "LEFT_TO_RIGHT"
-          ? ">"
+          ? "LINEHEAD_END_RIGHT"
           : shape.axis === "HORIZONTAL" && shape.direction === "RIGHT_TO_LEFT"
-          ? "<"
+          ? "LINEHEAD_END_LEFT"
           : shape.axis === "VERTICAL" && shape.direction === "DOWN"
-          ? "v"
-          : "^";
+          ? "LINEHEAD_END_DOWN"
+          : "LINEHEAD_END_UP";
 
       return repr;
     }
@@ -80,46 +117,109 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
       }
 
       shape.segments.forEach((segment) => {
+        // First represent horizontal and vertical segments
         switch (segment.axis) {
           case "HORIZONTAL": {
             _.merge(
               repr,
-              drawHorizontalLine(
+              reprHorizontalLine(
                 segment.start.r,
                 segment.start.c,
                 segment.end.c
               )
             );
-            repr[segment.start.r][segment.start.c] = "+";
-            repr[segment.start.r][segment.end.c] = "+";
             break;
           }
           case "VERTICAL": {
             _.merge(
               repr,
-              drawVerticalLine(segment.start.c, segment.start.r, segment.end.r)
+              reprVerticalLine(segment.start.c, segment.start.r, segment.end.r)
             );
-            repr[segment.start.r][segment.start.c] = "+";
-            repr[segment.start.r][segment.end.c] = "+";
           }
         }
       });
 
+      // Then represent segment joints
+      shape.segments.forEach((segment, segIdx) => {
+        if (segIdx > 0) {
+          const { axis, direction } = segment;
+          const { axis: prevAxis, direction: prevDirection } =
+            shape.segments[segIdx - 1];
+
+          if (axis === "HORIZONTAL" && direction === "LEFT_TO_RIGHT") {
+            if (prevAxis === "VERTICAL" && prevDirection === "DOWN") {
+              repr[segment.start.r][segment.start.c] = "CORNER_BL";
+            } else if (prevAxis === "VERTICAL" && prevDirection === "UP") {
+              repr[segment.start.r][segment.start.c] = "CORNER_TL";
+            }
+          } else if (axis === "HORIZONTAL" && direction === "RIGHT_TO_LEFT") {
+            if (prevAxis === "VERTICAL" && prevDirection === "DOWN") {
+              repr[segment.start.r][segment.start.c] = "CORNER_BR";
+            } else if (prevAxis === "VERTICAL" && prevDirection === "UP") {
+              repr[segment.start.r][segment.start.c] = "CORNER_TR";
+            }
+          } else if (axis === "VERTICAL" && direction === "UP") {
+            if (
+              prevAxis === "HORIZONTAL" &&
+              prevDirection === "LEFT_TO_RIGHT"
+            ) {
+              repr[segment.start.r][segment.start.c] = "CORNER_BR";
+            } else if (
+              prevAxis === "HORIZONTAL" &&
+              prevDirection === "RIGHT_TO_LEFT"
+            ) {
+              repr[segment.start.r][segment.start.c] = "CORNER_BL";
+            }
+          } else if (axis === "VERTICAL" && direction === "DOWN") {
+            if (
+              prevAxis === "HORIZONTAL" &&
+              prevDirection === "LEFT_TO_RIGHT"
+            ) {
+              repr[segment.start.r][segment.start.c] = "CORNER_TR";
+            } else if (
+              prevAxis === "HORIZONTAL" &&
+              prevDirection === "RIGHT_TO_LEFT"
+            ) {
+              repr[segment.start.r][segment.start.c] = "CORNER_TL";
+            }
+          }
+        }
+      });
+
+      // Then represent line heads
       const firstSegment = shape.segments[0];
-      repr[firstSegment.start.r][firstSegment.start.c] =
-        firstSegment.axis === "HORIZONTAL" ? "-" : "|";
+      if (firstSegment.axis === "HORIZONTAL") {
+        if (firstSegment.direction === "LEFT_TO_RIGHT") {
+          repr[firstSegment.start.r][firstSegment.start.c] =
+            "LINEHEAD_START_LEFT";
+        } else if (firstSegment.direction === "RIGHT_TO_LEFT") {
+          repr[firstSegment.start.r][firstSegment.start.c] =
+            "LINEHEAD_START_RIGHT";
+        }
+      } else if (firstSegment.axis === "VERTICAL") {
+        if (firstSegment.direction === "DOWN") {
+          repr[firstSegment.start.r][firstSegment.start.c] =
+            "LINEHEAD_START_UP";
+        } else if (firstSegment.direction === "UP") {
+          repr[firstSegment.start.r][firstSegment.start.c] =
+            "LINEHEAD_START_DOWN";
+        }
+      }
 
       const lastSegment = shape.segments[shape.segments.length - 1];
-      repr[lastSegment.end.r][lastSegment.end.c] =
-        lastSegment.axis === "HORIZONTAL" &&
-        lastSegment.direction === "LEFT_TO_RIGHT"
-          ? ">"
-          : lastSegment.axis === "HORIZONTAL" &&
-            lastSegment.direction === "RIGHT_TO_LEFT"
-          ? "<"
-          : lastSegment.axis === "VERTICAL" && lastSegment.direction === "DOWN"
-          ? "v"
-          : "^";
+      if (lastSegment.axis === "HORIZONTAL") {
+        if (lastSegment.direction === "LEFT_TO_RIGHT") {
+          repr[lastSegment.end.r][lastSegment.end.c] = "LINEHEAD_END_RIGHT";
+        } else if (lastSegment.direction === "RIGHT_TO_LEFT") {
+          repr[lastSegment.end.r][lastSegment.end.c] = "LINEHEAD_END_LEFT";
+        }
+      } else if (lastSegment.axis === "VERTICAL") {
+        if (lastSegment.direction === "DOWN") {
+          repr[lastSegment.end.r][lastSegment.end.c] = "LINEHEAD_END_DOWN";
+        } else if (lastSegment.direction === "UP") {
+          repr[lastSegment.end.r][lastSegment.end.c] = "LINEHEAD_END_UP";
+        }
+      }
 
       return repr;
     }
@@ -130,7 +230,7 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
         shape.lines.every((line) => line.length === 0)
       ) {
         repr[shape.start.r] = {};
-        repr[shape.start.r][shape.start.c] = "▯";
+        repr[shape.start.r][shape.start.c] = "EMPTY_CHAR";
       } else {
         // Prepare the objects in the repr
         shape.lines.forEach((line, lineIdx) => {
@@ -155,27 +255,68 @@ export function getShapeRepresentation(shape: Shape): CellValueMap {
   }
 }
 
-export function getCanvasRepresentation(shapes: Shape[]): CellValueMap {
+export function getStyledShapeRepresentation(
+  shape: Shape,
+  styleMode: StyleMode,
+  globalStyle: Style,
+  shapeStyle?: Style
+): CellValueMap {
+  const repr = getAbstractShapeRepresentation(shape);
+
+  for (const r in repr) {
+    for (const c in repr[r]) {
+      repr[r][c] = getCharRepr(repr[r][c], {
+        styleMode,
+        globalStyle,
+        shapeStyle,
+      });
+    }
+  }
+
+  return repr;
+}
+
+export function getStyledCanvasRepresentation(
+  shapes: ShapeObject[] | Shape[],
+  styleMode: StyleMode,
+  globalStyle: Style
+): CellValueMap {
+  function isShapeObject(shape: ShapeObject | Shape): shape is ShapeObject {
+    return "id" in shapes[0];
+  }
+
   let repr: CellValueMap = {};
 
-  shapes.forEach((shape) => {
-    repr = _.merge(repr, getShapeRepresentation(shape));
+  shapes.forEach((s) => {
+    const shape = isShapeObject(s) ? s.shape : s;
+    const shapeStyle = isShapeObject(s) ? s.style : undefined;
+
+    repr = _.merge(
+      repr,
+      getStyledShapeRepresentation(shape, styleMode, globalStyle, shapeStyle)
+    );
   });
 
   return repr;
 }
 
-export function getCanvasGridRepresentation(
-  rows: number,
-  cols: number,
-  shapes: Shape[]
+export function getStyledCanvasGrid(
+  canvasSize: CanvasSize,
+  shapes: ShapeObject[] | Shape[],
+  styleOpts: { styleMode: StyleMode; globalStyle: Style } = {
+    styleMode: "ASCII",
+    globalStyle: defaultStyle(),
+  }
 ): Grid {
-  const grid: Grid = _.times(rows, () => _.fill(Array(cols), " "));
+  const grid: Grid = _.times(canvasSize.rows, () =>
+    _.fill(Array(canvasSize.cols), " ")
+  );
 
-  let repr: CellValueMap = {};
-  shapes.forEach((shape) => {
-    repr = _.merge(repr, getShapeRepresentation(shape));
-  });
+  let repr: CellValueMap = getStyledCanvasRepresentation(
+    shapes,
+    styleOpts.styleMode,
+    styleOpts.globalStyle
+  );
 
   for (const x in repr) {
     for (const y in repr[x]) {
@@ -186,22 +327,26 @@ export function getCanvasGridRepresentation(
   return grid;
 }
 
-export function getTextExportRepresentation(
-  rows: number,
-  cols: number,
-  shapes: Shape[]
+export function getTextExport(
+  canvasSize: CanvasSize,
+  shapes: ShapeObject[] | Shape[],
+  styleOpts: { styleMode: StyleMode; globalStyle: Style } = {
+    styleMode: "ASCII",
+    globalStyle: defaultStyle(),
+  }
 ): string {
   if (shapes.length === 0) return "";
 
-  const grid = getCanvasGridRepresentation(rows, cols, shapes);
-  const bb = mergeBoundingBoxes(shapes)!;
+  function isShapeObjectArray(
+    shapes: ShapeObject[] | Shape[]
+  ): shapes is ShapeObject[] {
+    return shapes.length > 0 && "id" in shapes[0];
+  }
 
-  const grid1 = grid.filter(
-    (row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom
-  );
-  const grid2 = grid1.map((row) => row.join("").slice(bb.left, bb.right + 1));
-  const grid3 = grid2.map((line) => `// ${line}`);
-  const grid4 = grid3.join("\n");
+  const grid = getStyledCanvasGrid(canvasSize, shapes, styleOpts);
+  const bb = mergeBoundingBoxes(
+    isShapeObjectArray(shapes) ? shapes.map((so) => so.shape) : shapes
+  )!;
 
   const exportText = grid
     .filter((row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom)
@@ -212,7 +357,7 @@ export function getTextExportRepresentation(
   return exportText;
 }
 
-function drawHorizontalLine(
+function reprHorizontalLine(
   r: number,
   from_c: number,
   to_c: number
@@ -224,13 +369,13 @@ function drawHorizontalLine(
   const [start_c, end_c] = [Math.min(from_c, to_c), Math.max(from_c, to_c)];
 
   for (let c = start_c; c <= end_c; c++) {
-    repr[r][c] = "-";
+    repr[r][c] = "LINE_HORIZONTAL";
   }
 
   return repr;
 }
 
-function drawVerticalLine(
+function reprVerticalLine(
   c: number,
   from_r: number,
   to_r: number
@@ -241,7 +386,7 @@ function drawVerticalLine(
 
   for (let r = start_r; r <= end_r; r++) {
     repr[r] = {};
-    repr[r][c] = "|";
+    repr[r][c] = "LINE_VERTICAL";
   }
 
   return repr;
@@ -256,7 +401,7 @@ export function getShapesAtCoords(
   { r, c }: Coords
 ): ShapeObject[] {
   return shapeObjs.filter((obj) => {
-    const repr = getShapeRepresentation(obj.shape);
+    const repr = getAbstractShapeRepresentation(obj.shape);
     return r in repr && c in repr[r];
   });
 }

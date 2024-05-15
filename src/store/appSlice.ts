@@ -13,6 +13,7 @@ import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representatio
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
+import { Style, StyleMode, defaultStyle } from "../models/style";
 
 export type Tool =
   | "SELECT"
@@ -21,7 +22,7 @@ export type Tool =
   | "MULTI_SEGMENT_LINE"
   | "TEXT";
 
-export type ShapeObject = { id: string; shape: Shape };
+export type ShapeObject = { id: string; shape: Shape; style?: Style };
 export type CanvasSize = {
   rows: number;
   cols: number;
@@ -31,6 +32,8 @@ export type AppState = {
   /* Data representing a diagram */
   canvasSize: CanvasSize;
   shapes: ShapeObject[];
+  styleMode: StyleMode;
+  globalStyle: Style;
 
   /* Edition & Navigation State of the canvas */
   currentHoveredCell: Coords | null;
@@ -68,6 +71,8 @@ export const initState = (opt?: StateInitOptions): AppState => {
       cols: 150,
     },
     shapes: opt?.shapes ?? [],
+    styleMode: "UNICODE",
+    globalStyle: defaultStyle(),
 
     currentHoveredCell: null,
 
@@ -464,6 +469,7 @@ function addNewShape(state: AppState, shape: Shape) {
     state.shapes.push({
       id: uuidv4(),
       shape: shape,
+      style: state.globalStyle,
     });
   }
 }
