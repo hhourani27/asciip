@@ -161,7 +161,7 @@ export function ToolbarStyles(): JSX.Element {
         sx={{ minWidth: "100px" }}
         disabled={!isLineStyleSelectEnabled()}
       >
-        <InputLabel id="line-style-label">Line</InputLabel>
+        <InputLabel id="line-style-label">Line style</InputLabel>
         <Select
           labelId="line-style-label"
           id="line-style"
@@ -177,27 +177,9 @@ export function ToolbarStyles(): JSX.Element {
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
-        disabled={!isArrowStyleSelectEnabled()}
-      >
-        <InputLabel id="arrow-style-label">Arrow</InputLabel>
-        <Select
-          labelId="arrow-style-label"
-          id="arrow-style"
-          value={globalStyle.arrowStyle}
-          label="Arrow style"
-          onChange={handleArrowStyleChange}
-        >
-          <MenuItem value={"FILLED"}>Filled</MenuItem>
-          <MenuItem value={"ASCII"}>ASCII</MenuItem>
-          <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
-        </Select>
-      </FormControl>
-      <FormControl
-        size="small"
-        sx={{ minWidth: "100px" }}
         disabled={!isArrowHeadSelectEnabled()}
       >
-        <InputLabel id="arrow-head-label">Head</InputLabel>
+        <InputLabel id="arrow-head-label">Arrow head</InputLabel>
         <Select
           labelId="arrow-head-label"
           id="arrow-head"
@@ -221,6 +203,24 @@ export function ToolbarStyles(): JSX.Element {
             <WestIcon fontSize="small" />
             <EastIcon fontSize="small" />
           </MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl
+        size="small"
+        sx={{ minWidth: "100px" }}
+        disabled={!isArrowStyleSelectEnabled()}
+      >
+        <InputLabel id="arrow-style-label">Head style</InputLabel>
+        <Select
+          labelId="arrow-style-label"
+          id="arrow-style"
+          value={globalStyle.arrowStyle}
+          label="Arrow style"
+          onChange={handleArrowStyleChange}
+        >
+          <MenuItem value={"FILLED"}>Filled</MenuItem>
+          <MenuItem value={"ASCII"}>ASCII</MenuItem>
+          <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
         </Select>
       </FormControl>
     </Box>
