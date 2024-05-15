@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
-import Toolbar from "./components/Toolbar";
+import Toolbar from "./components/toolbar/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch } from "./store/hooks";
 import { appActions } from "./store/appSlice";

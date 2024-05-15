@@ -433,6 +433,21 @@ export const appSlice = createSlice({
       }
     },
     //#endregion
+    //#region Styling actions
+    setStyleMode: (state, action: PayloadAction<StyleMode>) => {
+      state.styleMode = action.payload;
+
+      /*
+        If the user switched to ASCII, styles won't matter anymore, but for simplicity, we will still save
+        style information with each new shape.
+
+        To prevent surprises, if the user goes back to Unicode, in ASCII mode, all new shapes will have default styles
+      */
+      if (action.payload === "ASCII") {
+        state.globalStyle = defaultStyle();
+      }
+    },
+    //#endregion
     //#region Other App actions
     openExport: (state) => {
       state.exportInProgress = true;
