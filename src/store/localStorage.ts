@@ -3,6 +3,8 @@ import { initDiagramState } from "./diagramSlice";
 import { RootState } from "./store";
 
 const saveState = (state: AppState) => {
+  console.log("[LocalStorage] Saving to local storage");
+
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem("appState", serializedState);
