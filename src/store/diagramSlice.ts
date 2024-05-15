@@ -61,19 +61,23 @@ export type DiagramState = DiagramData & {
   exportInProgress: boolean;
 };
 
-export type StateInitOptions = {
-  shapes?: ShapeObject[];
-  canvasSize?: CanvasSize;
-};
-export const initDiagramState = (opt?: StateInitOptions): DiagramState => {
+export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
   return {
-    canvasSize: opt?.canvasSize ?? {
+    canvasSize: {
       rows: 100,
       cols: 150,
     },
-    shapes: opt?.shapes ?? [],
-    styleMode: "UNICODE",
+    shapes: [],
+    styleMode: "ASCII",
     globalStyle: defaultStyle(),
+
+    ...opt,
+  };
+};
+
+export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
+  return {
+    ...initDiagramData(opt),
 
     currentHoveredCell: null,
 
