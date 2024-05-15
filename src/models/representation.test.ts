@@ -1,85 +1,151 @@
+import { CanvasSize } from "../store/appSlice";
 import {
-  getCanvasGridRepresentation,
-  getShapeRepresentation,
-  getTextExportRepresentation,
+  getStyledCanvasGrid,
+  getAbstractShapeRepresentation,
+  getTextExport,
 } from "./representation";
-import { Rectangle } from "./shapes";
+import { Line, MultiSegment, Rectangle } from "./shapes";
 
-describe("getShapeRepresentation()", () => {
-  test("Representation of 6x6 rectangle", () => {
+describe("getAbstractShapeRepresentation()", () => {
+  test("Abstract Representation of 6x6 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
       br: { r: 5, c: 5 },
     };
 
-    const repr = getShapeRepresentation(rectangle);
+    const repr = getAbstractShapeRepresentation(rectangle);
 
     expect(repr).toEqual({
-      0: { 0: "+", 1: "-", 2: "-", 3: "-", 4: "-", 5: "+" },
-      1: { 0: "|", 5: "|" },
-      2: { 0: "|", 5: "|" },
-      3: { 0: "|", 5: "|" },
-      4: { 0: "|", 5: "|" },
-      5: { 0: "+", 1: "-", 2: "-", 3: "-", 4: "-", 5: "+" },
+      0: {
+        0: "CORNER_TL",
+        1: "LINE_HORIZONTAL",
+        2: "LINE_HORIZONTAL",
+        3: "LINE_HORIZONTAL",
+        4: "LINE_HORIZONTAL",
+        5: "CORNER_TR",
+      },
+      1: { 0: "LINE_VERTICAL", 5: "LINE_VERTICAL" },
+      2: { 0: "LINE_VERTICAL", 5: "LINE_VERTICAL" },
+      3: { 0: "LINE_VERTICAL", 5: "LINE_VERTICAL" },
+      4: { 0: "LINE_VERTICAL", 5: "LINE_VERTICAL" },
+      5: {
+        0: "CORNER_BL",
+        1: "LINE_HORIZONTAL",
+        2: "LINE_HORIZONTAL",
+        3: "LINE_HORIZONTAL",
+        4: "LINE_HORIZONTAL",
+        5: "CORNER_BR",
+      },
     });
   });
 
-  test("Representation of 3x3 rectangle", () => {
+  test("Abstract Representation of 3x3 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
       br: { r: 2, c: 2 },
     };
 
-    const repr = getShapeRepresentation(rectangle);
+    const repr = getAbstractShapeRepresentation(rectangle);
 
     expect(repr).toEqual({
-      0: { 0: "+", 1: "-", 2: "+" },
-      1: { 0: "|", 2: "|" },
-      2: { 0: "+", 1: "-", 2: "+" },
+      0: { 0: "CORNER_TL", 1: "LINE_HORIZONTAL", 2: "CORNER_TR" },
+      1: { 0: "LINE_VERTICAL", 2: "LINE_VERTICAL" },
+      2: { 0: "CORNER_BL", 1: "LINE_HORIZONTAL", 2: "CORNER_BR" },
     });
   });
 
-  test("Representation of 2x2 rectangle", () => {
+  test("Abstract Representation of 2x2 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
       br: { r: 1, c: 1 },
     };
 
-    const repr = getShapeRepresentation(rectangle);
+    const repr = getAbstractShapeRepresentation(rectangle);
 
     expect(repr).toEqual({
-      0: { 0: "+", 1: "+" },
-      1: { 0: "+", 1: "+" },
+      0: { 0: "CORNER_TL", 1: "CORNER_TR" },
+      1: { 0: "CORNER_BL", 1: "CORNER_BR" },
     });
   });
 
-  test("Representation of 1x1 rectangle", () => {
+  test("Abstract Representation of 1x1 rectangle", () => {
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
       br: { r: 0, c: 0 },
     };
 
-    const repr = getShapeRepresentation(rectangle);
+    const repr = getAbstractShapeRepresentation(rectangle);
 
     expect(repr).toEqual({
-      0: { 0: "+" },
+      0: { 0: "CORNER_TL" },
+    });
+  });
+
+  test("Abstract Representation of a horizontal line", () => {
+    const line: Line = {
+      type: "LINE",
+      axis: "HORIZONTAL",
+      direction: "LEFT_TO_RIGHT",
+      start: { r: 0, c: 0 },
+      end: { r: 0, c: 3 },
+    };
+
+    const repr = getAbstractShapeRepresentation(line);
+
+    expect(repr).toEqual({
+      0: {
+        0: "LINEHEAD_START_LEFT",
+        1: "LINE_HORIZONTAL",
+        2: "LINE_HORIZONTAL",
+        3: "LINEHEAD_END_RIGHT",
+      },
+    });
+  });
+
+  test("Representation of a 2-segment line : Horizontal L2R + Vertical Up", () => {
+    const line: MultiSegment = {
+      type: "MULTI_SEGMENT_LINE",
+      segments: [
+        {
+          axis: "HORIZONTAL",
+          direction: "LEFT_TO_RIGHT",
+          start: { r: 3, c: 0 },
+          end: { r: 3, c: 2 },
+        },
+        {
+          axis: "VERTICAL",
+          direction: "UP",
+          start: { r: 3, c: 2 },
+          end: { r: 1, c: 2 },
+        },
+      ],
+    };
+
+    const repr = getAbstractShapeRepresentation(line);
+
+    expect(repr).toEqual({
+      1: { 2: "LINEHEAD_END_UP" },
+      2: { 2: "LINE_VERTICAL" },
+      3: { 0: "LINEHEAD_START_LEFT", 1: "LINE_HORIZONTAL", 2: "CORNER_BR" },
     });
   });
 });
 
-describe("getCanvasGridRepresentation()", () => {
-  test("Grid with a single rectangle", () => {
+describe("getStyledCanvasGrid()", () => {
+  test("Grid with a single rectangle (default styles)", () => {
+    const canvasSize: CanvasSize = { rows: 4, cols: 4 };
+
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
       br: { r: 3, c: 3 },
     };
 
-    const grid = getCanvasGridRepresentation(4, 4, [rectangle]);
+    const grid = getStyledCanvasGrid(canvasSize, [rectangle]);
 
     expect(grid).toEqual([
       ["+", "-", "-", "+"],
@@ -89,7 +155,9 @@ describe("getCanvasGridRepresentation()", () => {
     ]);
   });
 
-  test("Grid with 2 adjacent rectangles", () => {
+  test("Grid with 2 adjacent rectangles (default styles)", () => {
+    const canvasSize: CanvasSize = { rows: 10, cols: 10 };
+
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -102,7 +170,7 @@ describe("getCanvasGridRepresentation()", () => {
       br: { r: 7, c: 7 },
     };
 
-    const grid = getCanvasGridRepresentation(10, 10, [rectangle1, rectangle2]);
+    const grid = getStyledCanvasGrid(canvasSize, [rectangle1, rectangle2]);
 
     expect(grid).toEqual([
       ["+", "-", "-", "+", " ", " ", " ", " ", " ", " "],
@@ -118,7 +186,9 @@ describe("getCanvasGridRepresentation()", () => {
     ]);
   });
 
-  test("Grid with 2 overlapping rectangles", () => {
+  test("Grid with 2 overlapping rectangles (default styles)", () => {
+    const canvasSize: CanvasSize = { rows: 4, cols: 4 };
+
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -131,7 +201,7 @@ describe("getCanvasGridRepresentation()", () => {
       br: { r: 3, c: 3 },
     };
 
-    const grid = getCanvasGridRepresentation(4, 4, [rectangle1, rectangle2]);
+    const grid = getStyledCanvasGrid(canvasSize, [rectangle1, rectangle2]);
 
     expect(grid).toEqual([
       ["+", "-", "-", "+"],
@@ -142,20 +212,24 @@ describe("getCanvasGridRepresentation()", () => {
   });
 });
 
-describe("getTextExportRepresentation()", () => {
-  test("Export a single rectangle at the center of the canvas", () => {
+describe("getTextExport()", () => {
+  test("Export a single rectangle at the center of the canvas (default styles)", () => {
+    const canvasSize: CanvasSize = { rows: 10, cols: 10 };
+
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 3, c: 3 },
       br: { r: 6, c: 6 },
     };
 
-    const exportText = getTextExportRepresentation(10, 10, [rectangle]);
+    const exportText = getTextExport(canvasSize, [rectangle]);
 
     expect(exportText).toBe("// +--+\n// |  |\n// |  |\n// +--+");
   });
 
-  test("Export 2 adjacent rectangles", () => {
+  test("Export 2 adjacent rectangles (default styles)", () => {
+    const canvasSize: CanvasSize = { rows: 10, cols: 10 };
+
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -168,10 +242,7 @@ describe("getTextExportRepresentation()", () => {
       br: { r: 7, c: 7 },
     };
 
-    const exportText = getTextExportRepresentation(10, 10, [
-      rectangle1,
-      rectangle2,
-    ]);
+    const exportText = getTextExport(canvasSize, [rectangle1, rectangle2]);
 
     expect(exportText).toBe(
       "// +--+    \n// |  |    \n// |  |    \n// +--+    \n//     +--+\n//     |  |\n//     |  |\n//     +--+"

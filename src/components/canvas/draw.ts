@@ -2,16 +2,18 @@ import _ from "lodash";
 import { Coords, Shape } from "../../models/shapes";
 import {
   CellValueMap,
-  getCanvasRepresentation,
+  getStyledCanvasRepresentation,
 } from "../../models/representation";
 import { ResizePoint, getResizePoints } from "../../models/transformation";
+import { Style, StyleMode } from "../../models/style";
+import { ShapeObject } from "../../store/appSlice";
 
 export const FONT_SIZE = 16;
 export const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
 export const CELL_WIDTH = FONT_WIDTH;
-export const CELL_HEIGHT = FONT_SIZE;
+export const CELL_HEIGHT = FONT_SIZE * 1.1;
 
-export const FONT_FAMILY = "Courier New";
+export const FONT_FAMILY = "monospace";
 export const FONT = `${FONT_SIZE}px ${FONT_FAMILY}`;
 
 function drawVerticalGridLine(
@@ -71,10 +73,18 @@ export function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
 
 export function drawShapes(
   ctx: CanvasRenderingContext2D,
-  shapes: Shape[],
+  shapes: ShapeObject[] | Shape[],
+  styleMode: StyleMode,
+  globalStyle: Style,
   color: string
-) {
-  const repr: CellValueMap = getCanvasRepresentation(shapes);
+): void {
+  if (shapes.length === 0) return;
+
+  const repr: CellValueMap = getStyledCanvasRepresentation(
+    shapes,
+    styleMode,
+    globalStyle
+  );
 
   ctx.fillStyle = color;
   ctx.font = FONT;
@@ -90,10 +100,15 @@ export function drawShapes(
   }
 }
 
-export function drawSelectedShape(ctx: CanvasRenderingContext2D, shape: Shape) {
-  drawShapes(ctx, [shape], "blue");
+export function drawSelectedShape(
+  ctx: CanvasRenderingContext2D,
+  shapeObj: ShapeObject,
+  styleMode: StyleMode,
+  globalStyle: Style
+) {
+  drawShapes(ctx, [shapeObj], styleMode, globalStyle, "blue");
 
-  const resizePoints: ResizePoint[] = getResizePoints(shape);
+  const resizePoints: ResizePoint[] = getResizePoints(shapeObj.shape);
   resizePoints.forEach(({ coords: { r, c } }) => {
     ctx.beginPath(); // Start a new path
     ctx.arc(

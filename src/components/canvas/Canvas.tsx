@@ -31,6 +31,8 @@ export default function Canvas(): JSX.Element {
     (state) => state.app.currentHoveredCell
   );
 
+  const styleMode = useAppSelector((state) => state.app.styleMode);
+  const globalStyle = useAppSelector((state) => state.app.globalStyle);
   const shapes = useAppSelector((state) => state.app.shapes);
   const selectedShapeObj = useAppSelector((state) =>
     appSelectors.selectedShapeObj(state)
@@ -94,26 +96,30 @@ export default function Canvas(): JSX.Element {
     // Draw shapes
 
     // Draw unselected shapes
-    const unselectedShapes = shapes
-      .filter((shape) => shape.id !== selectedShapeObj?.id)
-      .map((obj) => obj.shape);
-    drawShapes(ctx, unselectedShapes, "black");
+    const unselectedShapes = shapes.filter(
+      (shape) => shape.id !== selectedShapeObj?.id
+    );
+    drawShapes(ctx, unselectedShapes, styleMode, globalStyle, "black");
 
     // Draw selected shape
-    if (selectedShapeObj) drawSelectedShape(ctx, selectedShapeObj.shape);
+    if (selectedShapeObj)
+      drawSelectedShape(ctx, selectedShapeObj, styleMode, globalStyle);
 
     // Draw new shape
-    if (newShape) drawShapes(ctx, [newShape], "DodgerBlue");
+    if (newShape)
+      drawShapes(ctx, [newShape], styleMode, globalStyle, "DodgerBlue");
   }, [
     canvasHeight,
     canvasWidth,
     colCount,
     currentHoveredCell,
+    globalStyle,
     newShape,
     nextActionOnClick,
     rowCount,
     selectedShapeObj,
     shapes,
+    styleMode,
     theme.palette.grey,
   ]);
 

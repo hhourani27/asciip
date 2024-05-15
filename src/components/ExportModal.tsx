@@ -9,7 +9,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { appActions } from "../store/appSlice";
 import { FONT_FAMILY } from "./canvas/draw";
-import { getTextExportRepresentation } from "../models/representation";
+import { getTextExport } from "../models/representation";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 export function ExportModal() {
@@ -18,16 +18,16 @@ export function ExportModal() {
     (state) => state.app.exportInProgress
   );
 
-  const shapes = useAppSelector((state) =>
-    state.app.shapes.map((shapeObj) => shapeObj.shape)
-  );
+  const shapeObjs = useAppSelector((state) => state.app.shapes);
+  const styleMode = useAppSelector((state) => state.app.styleMode);
+  const globalStyle = useAppSelector((state) => state.app.globalStyle);
+
   const canvasSize = useAppSelector((state) => state.app.canvasSize);
 
-  const exportText = getTextExportRepresentation(
-    canvasSize.rows,
-    canvasSize.cols,
-    shapes
-  );
+  const exportText = getTextExport(canvasSize, shapeObjs, {
+    styleMode,
+    globalStyle,
+  });
 
   const copyDiagramToClipboard = async () => {
     await navigator.clipboard.writeText(exportText);

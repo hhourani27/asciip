@@ -13,6 +13,7 @@ import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representatio
 import { getResizePoints, resize, translate } from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
+import { Style, StyleMode, defaultStyle } from "../models/style";
 
 export type Tool =
   | "SELECT"
@@ -21,7 +22,7 @@ export type Tool =
   | "MULTI_SEGMENT_LINE"
   | "TEXT";
 
-export type ShapeObject = { id: string; shape: Shape };
+export type ShapeObject = { id: string; shape: Shape; style?: Partial<Style> };
 export type CanvasSize = {
   rows: number;
   cols: number;
@@ -31,6 +32,8 @@ export type AppState = {
   /* Data representing a diagram */
   canvasSize: CanvasSize;
   shapes: ShapeObject[];
+  styleMode: StyleMode;
+  globalStyle: Style;
 
   /* Edition & Navigation State of the canvas */
   currentHoveredCell: Coords | null;
@@ -68,6 +71,8 @@ export const initState = (opt?: StateInitOptions): AppState => {
       cols: 150,
     },
     shapes: opt?.shapes ?? [],
+    styleMode: "UNICODE",
+    globalStyle: defaultStyle(),
 
     currentHoveredCell: null,
 
@@ -428,6 +433,40 @@ export const appSlice = createSlice({
       }
     },
     //#endregion
+    //#region Styling actions
+    setStyleMode: (state, action: PayloadAction<StyleMode>) => {
+      state.styleMode = action.payload;
+
+      /*
+        If the user switched to ASCII, styles won't matter anymore, but for simplicity, we will still save
+        style information with each new shape.
+
+        To prevent surprises, if the user goes back to Unicode, in ASCII mode, all new shapes will have default styles
+      */
+      if (action.payload === "ASCII") {
+        state.globalStyle = defaultStyle();
+      }
+    },
+    setStyle: (
+      state,
+      action: PayloadAction<{ style: Partial<Style>; shapeId?: string }>
+    ) => {
+      if (!action.payload.shapeId) {
+        _.merge(state.globalStyle, action.payload.style);
+      } else {
+        const shapeObj = state.shapes.find(
+          (s) => s.id === action.payload.shapeId
+        );
+        if (shapeObj) {
+          if ("style" in shapeObj) {
+            _.merge(shapeObj.style, action.payload.style);
+          } else {
+            shapeObj.style = action.payload.style;
+          }
+        }
+      }
+    },
+    //#endregion
     //#region Other App actions
     openExport: (state) => {
       state.exportInProgress = true;
@@ -464,6 +503,7 @@ function addNewShape(state: AppState, shape: Shape) {
     state.shapes.push({
       id: uuidv4(),
       shape: shape,
+      style: state.globalStyle,
     });
   }
 }
