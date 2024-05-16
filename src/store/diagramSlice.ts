@@ -506,7 +506,7 @@ export const diagramSlice = createSlice({
   },
 });
 
-//#region Utility state function that mutate directly the state
+//#region Helper state function that mutate directly the state
 function addNewShape(state: DiagramState, shape: Shape) {
   if (state.creationProgress) {
     state.shapes.push({
