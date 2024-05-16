@@ -38,6 +38,16 @@ export const appSlice = createSlice({
     setActiveDiagram: (state, action: PayloadAction<string>) => {
       state.activeDiagramId = action.payload;
     },
+    addDiagram: (state, action: PayloadAction<string>) => {
+      const id = uuidv4();
+      const newDiagram: Diagram = {
+        id,
+        name: action.payload,
+        data: initDiagramData(),
+      };
+      state.diagrams = [...state.diagrams, newDiagram];
+      state.activeDiagramId = id;
+    },
     updateDiagramData: (state, action: PayloadAction<DiagramData>) => {
       const idx = state.diagrams.findIndex(
         (d) => d.id === state.activeDiagramId

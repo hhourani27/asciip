@@ -74,7 +74,11 @@ const debouncedSaveStateToLocalStorage = _.debounce((state: AppState) => {
 }, 500);
 
 startAppListening({
-  matcher: isAnyOf(appActions.updateDiagramData),
+  matcher: isAnyOf(
+    appActions.updateDiagramData,
+    appActions.addDiagram,
+    appActions.setActiveDiagram
+  ),
   effect: (action, listenerApi) => {
     debouncedSaveStateToLocalStorage(listenerApi.getState().app);
   },
