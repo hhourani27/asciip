@@ -1,4 +1,4 @@
-import { ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
 import Crop54Icon from "@mui/icons-material/Crop54";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import TimelineIcon from "@mui/icons-material/Timeline";
@@ -28,24 +28,34 @@ export function ToolbarTools(): JSX.Element {
       exclusive
       onChange={handleToolChange}
     >
-      <ToggleButton value="SELECT" aria-label="Select tool">
-        <TouchAppIcon />
-      </ToggleButton>
-      <ToggleButton value="RECTANGLE" aria-label="Create Rectangle">
-        <Crop54Icon />
-      </ToggleButton>
-      <ToggleButton value="LINE" aria-label="Create Simple Line">
-        <HorizontalRuleIcon />
-      </ToggleButton>
-      <ToggleButton
-        value="MULTI_SEGMENT_LINE"
-        aria-label="Create Multi-segment Line"
-      >
-        <TimelineIcon />
-      </ToggleButton>
-      <ToggleButton value="TEXT" aria-label="Add Text">
-        <TextFieldsIcon />
-      </ToggleButton>
+      <Tooltip title="Select (S)" arrow>
+        <ToggleButton value="SELECT" aria-label="Select tool">
+          <TouchAppIcon />
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip title="Add rectangle (R)" arrow>
+        <ToggleButton value="RECTANGLE" aria-label="Create Rectangle">
+          <Crop54Icon />
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip title="Add line or arrow (A)" arrow>
+        <ToggleButton value="LINE" aria-label="Create Simple Line">
+          <HorizontalRuleIcon />
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip title="Add multi-segment line (W)" arrow>
+        <ToggleButton
+          value="MULTI_SEGMENT_LINE"
+          aria-label="Create Multi-segment Line"
+        >
+          <TimelineIcon />
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip title="Add text (T)" arrow>
+        <ToggleButton value="TEXT" aria-label="Add Text">
+          <TextFieldsIcon />
+        </ToggleButton>
+      </Tooltip>
     </ToggleButtonGroup>
   );
 }
