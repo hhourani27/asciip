@@ -4,7 +4,7 @@ import Toolbar from "./components/toolbar/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { diagramActions } from "./store/diagramSlice";
-import { ExportModal } from "./components/ExportModal";
+import { ExportDialog } from "./components/dialogs/ExportDialog";
 import { isShortcutsEnabled } from "./store/shortcuts";
 import { Footer } from "./components/Footer";
 
@@ -64,7 +64,7 @@ function App() {
       }}
     >
       <Toolbar />
-      <ExportModal />
+      <ExportDialog />
       <Canvas />
       <Footer />
     </Box>

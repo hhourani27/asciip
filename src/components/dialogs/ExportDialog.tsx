@@ -6,13 +6,13 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { diagramActions } from "../store/diagramSlice";
-import { FONT_FAMILY } from "./canvas/draw";
-import { getTextExport } from "../models/representation";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { diagramActions } from "../../store/diagramSlice";
+import { FONT_FAMILY } from "../canvas/draw";
+import { getTextExport } from "../../models/representation";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-export function ExportModal() {
+export function ExportDialog() {
   const dispatch = useAppDispatch();
   const exportInProgress = useAppSelector(
     (state) => state.diagram.exportInProgress

@@ -16,9 +16,9 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import { DeleteDiagramConfirmationDialog } from "./DeleteDiagramConfirmationDialog";
-import { CreateDiagramFormDialog } from "./CreateDiagramFormDialog";
-import { RenameDiagramFormDialog } from "./RenameDiagramFormDialog";
+import { DeleteDiagramConfirmationDialog } from "../dialogs/DeleteDiagramConfirmationDialog";
+import { CreateDiagramFormDialog } from "../dialogs/CreateDiagramFormDialog";
+import { RenameDiagramFormDialog } from "../dialogs/RenameDiagramFormDialog";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
