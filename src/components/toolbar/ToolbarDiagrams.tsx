@@ -128,7 +128,7 @@ export function ToolbarDiagrams(): JSX.Element {
           <ListItemIcon>
             <AddBoxOutlinedIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Add new diagram</ListItemText>
+          <ListItemText>Create new diagram</ListItemText>
         </MenuItem>
       </Menu>
       {createDiagramInProgress && <CreateDiagramFormDialog />}
