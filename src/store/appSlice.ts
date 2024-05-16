@@ -45,8 +45,9 @@ export const appSlice = createSlice({
     setActiveDiagram: (state, action: PayloadAction<string>) => {
       state.activeDiagramId = action.payload;
     },
-    addDiagram: (state, action: PayloadAction<string>) => {
-      addDiagram(state, action.payload);
+    createDiagram: (state, action: PayloadAction<string>) => {
+      createDiagram(state, action.payload);
+      state.createDiagramInProgress = false;
     },
     deleteDiagram: (state, action: PayloadAction<string>) => {
       const deletedId = action.payload;
@@ -59,7 +60,7 @@ export const appSlice = createSlice({
 
       // If we're deleting the last diagram, then create a new default diagram
       if (state.diagrams.length === 0) {
-        addDiagram(state);
+        createDiagram(state);
       } else {
         // If the deleted diagram is the active one, then set the active diagram to the first diagram on the list
         if (deletedId === state.activeDiagramId) {
@@ -68,6 +69,12 @@ export const appSlice = createSlice({
       }
 
       state.deleteDiagramInProgress = null;
+    },
+    startCreateDiagram: (state) => {
+      state.createDiagramInProgress = true;
+    },
+    cancelCreateDiagram: (state) => {
+      state.createDiagramInProgress = false;
     },
     startDeleteDiagram: (state, action: PayloadAction<string>) => {
       state.deleteDiagramInProgress = action.payload;
@@ -91,7 +98,7 @@ export const appSlice = createSlice({
 });
 
 //#region Helper state function that mutate directly the state
-function addDiagram(state: AppState, name: string = "New diagram") {
+function createDiagram(state: AppState, name: string = "New diagram") {
   const id = uuidv4();
   const newDiagram: Diagram = {
     id,

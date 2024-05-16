@@ -1,18 +1,12 @@
 import {
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Divider,
   IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-  TextField,
 } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { appActions, appSelectors } from "../../store/appSlice";
@@ -23,6 +17,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { DeleteDiagramConfirmationDialog } from "./DeleteDiagramConfirmationDialog";
+import { DiagramFormDialog } from "./DiagramFormDialog";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -34,14 +29,18 @@ export function ToolbarDiagrams(): JSX.Element {
   const deleteDiagramInProgress = useAppSelector(
     (state) => state.app.deleteDiagramInProgress
   );
+  const createDiagramInProgress = useAppSelector(
+    (state) => state.app.createDiagramInProgress
+  );
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const menuOpen = Boolean(menuAnchorEl);
 
-  const [diagramFormOpen, setDiagramFormOpen] = useState<boolean>(false);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMenuAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
   };
 
   const handleDiagramClick = (diagramId: string): void => {
@@ -51,20 +50,12 @@ export function ToolbarDiagrams(): JSX.Element {
     setMenuAnchorEl(null);
   };
 
-  const handleNewDiagramClick = () => {
-    setDiagramFormOpen(true);
+  const handleCreateDiagram = () => {
+    dispatch(appActions.startCreateDiagram());
   };
 
-  const handleDiagramFormClose = () => {
-    setDiagramFormOpen(false);
-  };
-
-  const handleDiagramDelete = (diagramId: string) => {
+  const handleDeleteDiagram = (diagramId: string) => {
     dispatch(appActions.startDeleteDiagram(diagramId));
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
   };
 
   return (
@@ -77,7 +68,7 @@ export function ToolbarDiagrams(): JSX.Element {
         variant="text"
         color="inherit"
         sx={{ textTransform: "capitalize" }}
-        onClick={handleClick}
+        onClick={handleMenuOpen}
         endIcon={<ExpandMoreIcon />}
       >
         {activeDiagram.name}
@@ -110,7 +101,7 @@ export function ToolbarDiagrams(): JSX.Element {
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDiagramDelete(diagram.id);
+                    handleDeleteDiagram(diagram.id);
                   }}
                 >
                   <DeleteIcon />
@@ -120,48 +111,14 @@ export function ToolbarDiagrams(): JSX.Element {
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem onClick={handleNewDiagramClick}>
+        <MenuItem onClick={handleCreateDiagram}>
           <ListItemIcon>
             <AddBoxOutlinedIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Add new diagram</ListItemText>
         </MenuItem>
       </Menu>
-      <Dialog
-        open={diagramFormOpen}
-        onClose={handleDiagramFormClose}
-        PaperProps={{
-          component: "form",
-          onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries((formData as any).entries());
-            const name = formJson.name;
-            dispatch(appActions.addDiagram(name));
-            handleDiagramFormClose();
-          },
-        }}
-      >
-        <DialogTitle>New Diagram</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Chose the diagram name.</DialogContentText>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="diagram_name"
-            name="name"
-            label="Diagram name"
-            type="text"
-            fullWidth
-            variant="standard"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDiagramFormClose}>Cancel</Button>
-          <Button type="submit">Subscribe</Button>
-        </DialogActions>
-      </Dialog>
+      {createDiagramInProgress && <DiagramFormDialog />}
       {deleteDiagramInProgress && <DeleteDiagramConfirmationDialog />}
     </div>
   );
