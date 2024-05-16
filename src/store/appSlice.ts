@@ -16,8 +16,9 @@ export type AppState = {
   activeDiagramId: string;
 
   // UI state
-  deleteDiagramInProgress: string | null;
   createDiagramInProgress: boolean;
+  deleteDiagramInProgress: string | null;
+  renameDiagramInProgress: string | null;
 };
 
 export const initAppState = (): AppState => {
@@ -34,6 +35,7 @@ export const initAppState = (): AppState => {
     activeDiagramId: id,
 
     deleteDiagramInProgress: null,
+    renameDiagramInProgress: null,
     createDiagramInProgress: false,
   };
 };
@@ -55,20 +57,31 @@ export const appSlice = createSlice({
         (d) => d.id === deletedId
       );
 
-      // Delete diagram
-      state.diagrams.splice(deletedDiagramIdx, 1);
+      if (deletedDiagramIdx > -1) {
+        // Delete diagram
+        state.diagrams.splice(deletedDiagramIdx, 1);
 
-      // If we're deleting the last diagram, then create a new default diagram
-      if (state.diagrams.length === 0) {
-        createDiagram(state);
-      } else {
-        // If the deleted diagram is the active one, then set the active diagram to the first diagram on the list
-        if (deletedId === state.activeDiagramId) {
-          state.activeDiagramId = state.diagrams[0].id;
+        // If we're deleting the last diagram, then create a new default diagram
+        if (state.diagrams.length === 0) {
+          createDiagram(state);
+        } else {
+          // If the deleted diagram is the active one, then set the active diagram to the first diagram on the list
+          if (deletedId === state.activeDiagramId) {
+            state.activeDiagramId = state.diagrams[0].id;
+          }
         }
       }
-
       state.deleteDiagramInProgress = null;
+    },
+    renameDiagram: (
+      state,
+      action: PayloadAction<{ id: string; newName: string }>
+    ) => {
+      const diagram = state.diagrams.find((d) => d.id === action.payload.id);
+      if (diagram) {
+        diagram.name = action.payload.newName;
+      }
+      state.renameDiagramInProgress = null;
     },
     startCreateDiagram: (state) => {
       state.createDiagramInProgress = true;
@@ -81,6 +94,12 @@ export const appSlice = createSlice({
     },
     cancelDeleteDiagram: (state) => {
       state.deleteDiagramInProgress = null;
+    },
+    startRenameDiagram: (state, action: PayloadAction<string>) => {
+      state.renameDiagramInProgress = action.payload;
+    },
+    cancelRenameDiagram: (state) => {
+      state.renameDiagramInProgress = null;
     },
 
     updateDiagramData: (state, action: PayloadAction<DiagramData>) => {

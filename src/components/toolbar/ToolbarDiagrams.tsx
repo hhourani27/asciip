@@ -17,7 +17,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { DeleteDiagramConfirmationDialog } from "./DeleteDiagramConfirmationDialog";
-import { DiagramFormDialog } from "./DiagramFormDialog";
+import { CreateDiagramFormDialog } from "./CreateDiagramFormDialog";
+import { RenameDiagramFormDialog } from "./RenameDiagramFormDialog";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -28,6 +29,9 @@ export function ToolbarDiagrams(): JSX.Element {
   );
   const deleteDiagramInProgress = useAppSelector(
     (state) => state.app.deleteDiagramInProgress
+  );
+  const renameDiagramInProgress = useAppSelector(
+    (state) => state.app.renameDiagramInProgress
   );
   const createDiagramInProgress = useAppSelector(
     (state) => state.app.createDiagramInProgress
@@ -56,6 +60,10 @@ export function ToolbarDiagrams(): JSX.Element {
 
   const handleDeleteDiagram = (diagramId: string) => {
     dispatch(appActions.startDeleteDiagram(diagramId));
+  };
+
+  const handleRenameDiagram = (diagramId: string) => {
+    dispatch(appActions.startRenameDiagram(diagramId));
   };
 
   return (
@@ -93,7 +101,12 @@ export function ToolbarDiagrams(): JSX.Element {
             <ListItemText> {diagram.name}</ListItemText>
             <Box sx={{ paddingLeft: "20px" }}>
               <ListItemIcon>
-                <IconButton>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRenameDiagram(diagram.id);
+                  }}
+                >
                   <DriveFileRenameOutlineIcon />
                 </IconButton>
               </ListItemIcon>
@@ -118,7 +131,8 @@ export function ToolbarDiagrams(): JSX.Element {
           <ListItemText>Add new diagram</ListItemText>
         </MenuItem>
       </Menu>
-      {createDiagramInProgress && <DiagramFormDialog />}
+      {createDiagramInProgress && <CreateDiagramFormDialog />}
+      {renameDiagramInProgress && <RenameDiagramFormDialog />}
       {deleteDiagramInProgress && <DeleteDiagramConfirmationDialog />}
     </div>
   );
