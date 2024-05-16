@@ -64,8 +64,8 @@ export type DiagramState = DiagramData & {
 export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
   return {
     canvasSize: {
-      rows: 100,
-      cols: 150,
+      rows: 75,
+      cols: 250,
     },
     shapes: [],
     styleMode: "ASCII",
@@ -102,6 +102,13 @@ export const diagramSlice = createSlice({
     },
 
     //#region Canvas actions
+    expandCanvas: (state) => {
+      const { rows, cols } = state.canvasSize;
+      state.canvasSize = {
+        rows: rows + 40,
+        cols: cols + 125,
+      };
+    },
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
         state.creationProgress = null;

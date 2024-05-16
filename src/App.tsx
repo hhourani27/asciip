@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { diagramActions } from "./store/diagramSlice";
 import { ExportModal } from "./components/ExportModal";
 import { isShortcutsEnabled } from "./store/shortcuts";
+import { Footer } from "./components/Footer";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -65,6 +66,7 @@ function App() {
       <Toolbar />
       <ExportModal />
       <Canvas />
+      <Footer />
     </Box>
   );
 }
