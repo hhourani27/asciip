@@ -63,7 +63,7 @@ export function RenameDiagramFormDialog(): JSX.Element {
       </DialogContent>
       <DialogActions>
         <Button onClick={cancelRename}>Cancel</Button>
-        <Button type="submit">Subscribe</Button>
+        <Button type="submit">Rename</Button>
       </DialogActions>
     </Dialog>
   );

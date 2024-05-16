@@ -54,7 +54,7 @@ export function CreateDiagramFormDialog(): JSX.Element {
       </DialogContent>
       <DialogActions>
         <Button onClick={cancelCreate}>Cancel</Button>
-        <Button type="submit">Subscribe</Button>
+        <Button type="submit">Create</Button>
       </DialogActions>
     </Dialog>
   );

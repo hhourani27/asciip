@@ -10,10 +10,20 @@ import {
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representation";
-import { getResizePoints, resize, translate } from "../models/transformation";
+import {
+  getResizePoints,
+  mergeBoundingBoxes,
+  resize,
+  translate,
+} from "../models/transformation";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
 import { Style, StyleMode, defaultStyle } from "../models/style";
+
+const DEFAULT_CANVAS_SIZE: CanvasSize = {
+  rows: 75,
+  cols: 250,
+};
 
 export type Tool =
   | "SELECT"
@@ -63,10 +73,7 @@ export type DiagramState = DiagramData & {
 
 export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
   return {
-    canvasSize: {
-      rows: 100,
-      cols: 150,
-    },
+    canvasSize: { ...DEFAULT_CANVAS_SIZE },
     shapes: [],
     styleMode: "ASCII",
     globalStyle: defaultStyle(),
@@ -102,6 +109,27 @@ export const diagramSlice = createSlice({
     },
 
     //#region Canvas actions
+    expandCanvas: (state) => {
+      const { rows, cols } = state.canvasSize;
+      state.canvasSize = {
+        rows: rows + 40,
+        cols: cols + 125,
+      };
+    },
+    shrinkCanvasToFit: (state) => {
+      if (state.shapes.length === 0) {
+        state.canvasSize = {
+          rows: Math.min(state.canvasSize.rows, DEFAULT_CANVAS_SIZE.rows),
+          cols: Math.min(state.canvasSize.cols, DEFAULT_CANVAS_SIZE.cols),
+        };
+      } else {
+        const bb = mergeBoundingBoxes(state.shapes.map((so) => so.shape))!;
+        state.canvasSize = {
+          rows: bb.bottom + 1,
+          cols: bb.right + 1,
+        };
+      }
+    },
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
         state.creationProgress = null;
