@@ -97,6 +97,10 @@ export const diagramSlice = createSlice({
   name: "diagram",
   initialState: initDiagramState(),
   reducers: {
+    loadDiagram: (state, action: PayloadAction<DiagramData>) => {
+      return initDiagramState(action.payload);
+    },
+
     //#region Canvas actions
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {

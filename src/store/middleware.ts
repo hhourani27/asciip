@@ -4,9 +4,10 @@ import {
   isAnyOf,
 } from "@reduxjs/toolkit";
 import { AppDispatch, RootState } from "./store";
-import { AppState, appActions } from "./appSlice";
+import { AppState, appActions, appSelectors } from "./appSlice";
 import { appLocalStorage } from "./localStorage";
 import _ from "lodash";
+import { diagramActions } from "./diagramSlice";
 
 export const listenerMiddleware = createListenerMiddleware();
 
@@ -18,9 +19,25 @@ const startAppListening = listenerMiddleware.startListening.withTypes<
 export const addAppListener = addListener.withTypes<RootState, AppDispatch>();
 
 /**
+ * appSlice -> diagramSlice
+ * If we selected a new active diagram => load diagram into diagramSlice
+ */
+startAppListening({
+  predicate: (action, currentState, originalState) => {
+    return (
+      currentState.app.activeDiagramId !== originalState.app.activeDiagramId
+    );
+  },
+  effect: (action, listenerApi) => {
+    const activeDiagram = appSelectors.activeDiagram(listenerApi.getState());
+    listenerApi.dispatch(diagramActions.loadDiagram(activeDiagram.data));
+  },
+});
+
+/**
+ * diagramSlice -> appSlice
  * If the active diagram data is modified in diagramSlice => Update the diagram in appSlice
  */
-
 const debouncedUpdateDiagramData = _.debounce((action, listenerApi) => {
   console.log("[Listener] Detected a change in the current diagram");
   const { canvasSize, shapes, styleMode, globalStyle } =
@@ -49,6 +66,7 @@ startAppListening({
 });
 
 /**
+ * appSlice -> local storage
  * If data is modified in appSlice => Save it to local storage
  */
 const debouncedSaveStateToLocalStorage = _.debounce((state: AppState) => {

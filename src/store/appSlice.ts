@@ -2,9 +2,12 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { DiagramData, initDiagramData } from "./diagramSlice";
 import { v4 as uuidv4 } from "uuid";
 
-export type Diagram = {
+export type DiagramMetadata = {
   id: string;
   name: string;
+};
+
+export type Diagram = DiagramMetadata & {
   data: DiagramData;
 };
 
@@ -32,11 +35,19 @@ export const appSlice = createSlice({
   name: "app",
   initialState: initAppState(),
   reducers: {
+    setActiveDiagram: (state, action: PayloadAction<string>) => {
+      state.activeDiagramId = action.payload;
+    },
     updateDiagramData: (state, action: PayloadAction<DiagramData>) => {
       const idx = state.diagrams.findIndex(
         (d) => d.id === state.activeDiagramId
       );
       state.diagrams[idx].data = action.payload;
+    },
+  },
+  selectors: {
+    activeDiagram: (state): Diagram => {
+      return state.diagrams.find((d) => d.id === state.activeDiagramId)!;
     },
   },
 });
