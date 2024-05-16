@@ -2,7 +2,7 @@ import { useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
 import { Coords } from "../../models/shapes";
-import { appActions, appSelectors } from "../../store/appSlice";
+import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import {
   CELL_HEIGHT,
   CELL_WIDTH,
@@ -22,27 +22,29 @@ export default function Canvas(): JSX.Element {
   // This ref is used to prevent firing unnecessary cell hover events if the hovered cell didn't change.
   const hoveredCellRef = useRef<Coords | null>(null);
 
-  const rowCount = useAppSelector((state) => state.app.canvasSize.rows);
-  const colCount = useAppSelector((state) => state.app.canvasSize.cols);
+  const rowCount = useAppSelector((state) => state.diagram.canvasSize.rows);
+  const colCount = useAppSelector((state) => state.diagram.canvasSize.cols);
   const canvasWidth = colCount * CELL_WIDTH;
   const canvasHeight = rowCount * CELL_HEIGHT;
 
   const currentHoveredCell = useAppSelector(
-    (state) => state.app.currentHoveredCell
+    (state) => state.diagram.currentHoveredCell
   );
 
-  const styleMode = useAppSelector((state) => state.app.styleMode);
-  const globalStyle = useAppSelector((state) => state.app.globalStyle);
-  const shapes = useAppSelector((state) => state.app.shapes);
+  const styleMode = useAppSelector((state) => state.diagram.styleMode);
+  const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
+  const shapes = useAppSelector((state) => state.diagram.shapes);
   const selectedShapeObj = useAppSelector((state) =>
-    appSelectors.selectedShapeObj(state)
+    diagramSelectors.selectedShapeObj(state)
   );
-  const newShape = useAppSelector((state) => state.app.creationProgress?.shape);
+  const newShape = useAppSelector(
+    (state) => state.diagram.creationProgress?.shape
+  );
   const currentEditedText = useAppSelector((state) =>
-    appSelectors.currentEditedText(state)
+    diagramSelectors.currentEditedText(state)
   );
   const nextActionOnClick = useAppSelector(
-    (state) => state.app.nextActionOnClick
+    (state) => state.diagram.nextActionOnClick
   );
 
   const getCellCoords = (eventX: number, eventY: number): Coords => {
@@ -135,12 +137,12 @@ export default function Canvas(): JSX.Element {
         ref={canvasRef}
         onMouseDown={(e) =>
           dispatch(
-            appActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
+            diagramActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
           )
         }
         onMouseUp={(e) =>
           dispatch(
-            appActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
+            diagramActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
           )
         }
         onMouseMove={(e) => {
@@ -148,19 +150,23 @@ export default function Canvas(): JSX.Element {
           if (!_.isEqual(hoveredCellRef.current, newCoords)) {
             hoveredCellRef.current = newCoords;
             dispatch(
-              appActions.onCellHover(getCellCoords(e.clientX, e.clientY))
+              diagramActions.onCellHover(getCellCoords(e.clientX, e.clientY))
             );
           }
         }}
         onMouseLeave={(e) => {
-          dispatch(appActions.onCanvasMouseLeave());
+          dispatch(diagramActions.onCanvasMouseLeave());
         }}
         onClick={(e) =>
-          dispatch(appActions.onCellClick(getCellCoords(e.clientX, e.clientY)))
+          dispatch(
+            diagramActions.onCellClick(getCellCoords(e.clientX, e.clientY))
+          )
         }
         onDoubleClick={(e) =>
           dispatch(
-            appActions.onCellDoubleClick(getCellCoords(e.clientX, e.clientY))
+            diagramActions.onCellDoubleClick(
+              getCellCoords(e.clientX, e.clientY)
+            )
           )
         }
       ></canvas>

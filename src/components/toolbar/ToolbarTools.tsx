@@ -6,19 +6,19 @@ import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { Tool, appActions } from "../../store/appSlice";
+import { Tool, diagramActions } from "../../store/diagramSlice";
 
 export function ToolbarTools(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const selectedTool = useAppSelector((state) => state.app.selectedTool);
+  const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
 
   const handleToolChange = (
     event: React.MouseEvent<HTMLElement>,
     newTool: Tool | null
   ) => {
     if (newTool != null && newTool !== selectedTool) {
-      dispatch(appActions.setTool(newTool));
+      dispatch(diagramActions.setTool(newTool));
     }
   };
 

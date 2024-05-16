@@ -1,14 +1,24 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { StateFromReducersMapObject, configureStore } from "@reduxjs/toolkit";
+import { diagramReducer } from "./diagramSlice";
 import { appReducer } from "./appSlice";
+import { listenerMiddleware } from "./middleware";
+import { appLocalStorage } from "./localStorage";
+
+const reducer = {
+  app: appReducer,
+  diagram: diagramReducer,
+};
+
+export type RootState = StateFromReducersMapObject<typeof reducer>;
+
+const preloadedState: RootState = appLocalStorage.loadState();
 
 export const store = configureStore({
-  reducer: {
-    app: appReducer,
-  },
+  reducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(listenerMiddleware.middleware),
+  preloadedState,
   devTools: { maxAge: 1000 },
 });
 
-// Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>;
-// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

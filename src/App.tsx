@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import Toolbar from "./components/toolbar/Toolbar";
 import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch } from "./store/hooks";
-import { appActions } from "./store/appSlice";
+import { diagramActions } from "./store/diagramSlice";
 import { ExportModal } from "./components/ExportModal";
 
 function App() {
@@ -12,9 +12,9 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter" && event.ctrlKey) {
-        dispatch(appActions.onCtrlEnterPress());
+        dispatch(diagramActions.onCtrlEnterPress());
       } else if (event.key === "Delete") {
-        dispatch(appActions.onDeletePress());
+        dispatch(diagramActions.onDeletePress());
       }
     };
 

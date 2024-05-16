@@ -7,7 +7,7 @@ import {
   Box,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { appActions } from "../store/appSlice";
+import { diagramActions } from "../store/diagramSlice";
 import { FONT_FAMILY } from "./canvas/draw";
 import { getTextExport } from "../models/representation";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -15,14 +15,14 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 export function ExportModal() {
   const dispatch = useAppDispatch();
   const exportInProgress = useAppSelector(
-    (state) => state.app.exportInProgress
+    (state) => state.diagram.exportInProgress
   );
 
-  const shapeObjs = useAppSelector((state) => state.app.shapes);
-  const styleMode = useAppSelector((state) => state.app.styleMode);
-  const globalStyle = useAppSelector((state) => state.app.globalStyle);
+  const shapeObjs = useAppSelector((state) => state.diagram.shapes);
+  const styleMode = useAppSelector((state) => state.diagram.styleMode);
+  const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
 
-  const canvasSize = useAppSelector((state) => state.app.canvasSize);
+  const canvasSize = useAppSelector((state) => state.diagram.canvasSize);
 
   const exportText = getTextExport(canvasSize, shapeObjs, {
     styleMode,
@@ -36,7 +36,7 @@ export function ExportModal() {
   return (
     <Dialog
       open={exportInProgress}
-      onClose={() => dispatch(appActions.closeExport())}
+      onClose={() => dispatch(diagramActions.closeExport())}
       maxWidth="lg"
     >
       <DialogTitle>Export diagram</DialogTitle>

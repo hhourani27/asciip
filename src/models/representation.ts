@@ -1,4 +1,4 @@
-import { CanvasSize, ShapeObject } from "../store/appSlice";
+import { CanvasSize, ShapeObject } from "../store/diagramSlice";
 import { Coords, Shape } from "./shapes";
 import _ from "lodash";
 import { getBoundingBox, mergeBoundingBoxes } from "./transformation";

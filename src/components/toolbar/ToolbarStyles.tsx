@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { appActions, appSelectors } from "../../store/appSlice";
+import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import {
   Box,
   FormControl,
@@ -16,11 +16,11 @@ import EastIcon from "@mui/icons-material/East";
 export function ToolbarStyles(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const styleMode = useAppSelector((state) => state.app.styleMode);
-  const globalStyle = useAppSelector((state) => state.app.globalStyle);
-  const selectedTool = useAppSelector((state) => state.app.selectedTool);
+  const styleMode = useAppSelector((state) => state.diagram.styleMode);
+  const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
+  const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
   const selectedShapeObj = useAppSelector((state) =>
-    appSelectors.selectedShapeObj(state)
+    diagramSelectors.selectedShapeObj(state)
   );
 
   const isLineStyleSelectEnabled = (): boolean => {
@@ -87,7 +87,7 @@ export function ToolbarStyles(): JSX.Element {
 
     if (event.target.value)
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: { lineStyle: event.target.value as LINE_STYLE },
           shapeId: selectedShapeId,
         })
@@ -101,7 +101,7 @@ export function ToolbarStyles(): JSX.Element {
 
     if (event.target.value)
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: { arrowStyle: event.target.value as ARROW_STYLE },
           shapeId: selectedShapeId,
         })
@@ -115,7 +115,7 @@ export function ToolbarStyles(): JSX.Element {
 
     if (event.target.value === "NONE") {
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: {
             arrowStartHead: false,
             arrowEndHead: false,
@@ -125,21 +125,21 @@ export function ToolbarStyles(): JSX.Element {
       );
     } else if (event.target.value === "END") {
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: { arrowStartHead: false, arrowEndHead: true },
           shapeId: selectedShapeId,
         })
       );
     } else if (event.target.value === "START") {
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: false },
           shapeId: selectedShapeId,
         })
       );
     } else if (event.target.value === "START_END") {
       dispatch(
-        appActions.setStyle({
+        diagramActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: true },
           shapeId: selectedShapeId,
         })
@@ -156,6 +156,7 @@ export function ToolbarStyles(): JSX.Element {
 
   return (
     <Box>
+      {/* Line style*/}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -165,7 +166,7 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="line-style-label"
           id="line-style"
-          value={globalStyle.lineStyle}
+          value={selectedShapeObj?.style?.lineStyle ?? globalStyle.lineStyle}
           label="Line style"
           onChange={handleLineStyleChange}
         >
@@ -174,6 +175,7 @@ export function ToolbarStyles(): JSX.Element {
           <MenuItem value={"HEAVY"}>Heavy</MenuItem>
         </Select>
       </FormControl>
+      {/* Arrow head presence/absence */}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -183,7 +185,12 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="arrow-head-label"
           id="arrow-head"
-          value={getArrowHeadSelectValue(globalStyle)}
+          value={
+            selectedShapeObj?.style?.arrowStartHead !== undefined &&
+            selectedShapeObj?.style?.arrowEndHead !== undefined
+              ? getArrowHeadSelectValue(selectedShapeObj.style)
+              : getArrowHeadSelectValue(globalStyle)
+          }
           label="Arrow head"
           onChange={handleArrowHeadStyleChange}
         >
@@ -205,6 +212,7 @@ export function ToolbarStyles(): JSX.Element {
           </MenuItem>
         </Select>
       </FormControl>
+      {/* Arrow head style*/}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -214,7 +222,7 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="arrow-style-label"
           id="arrow-style"
-          value={globalStyle.arrowStyle}
+          value={selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle}
           label="Arrow style"
           onChange={handleArrowStyleChange}
         >

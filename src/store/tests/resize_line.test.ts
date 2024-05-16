@@ -1,4 +1,9 @@
-import { ShapeObject, appActions, appReducer, initState } from "../appSlice";
+import {
+  ShapeObject,
+  diagramActions,
+  diagramReducer,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -7,7 +12,7 @@ import {
 } from "./utils";
 
 test("Extend horizontal line by dragging on start", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -24,17 +29,17 @@ test("Extend horizontal line by dragging on start", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag start point
-    appActions.onCellHover({ r: 2, c: 2 }),
-    appActions.onCellMouseDown({ r: 2, c: 2 }),
-    appActions.onCellHover({ r: 2, c: 1 }),
+    diagramActions.onCellHover({ r: 2, c: 2 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 2 }),
+    diagramActions.onCellHover({ r: 2, c: 1 }),
     ...generateMouseUpAction({ r: 2, c: 1 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -51,7 +56,7 @@ test("Extend horizontal line by dragging on start", () => {
 });
 
 test("Shrink horizontal line by dragging on start", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -68,17 +73,17 @@ test("Shrink horizontal line by dragging on start", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag start point
-    appActions.onCellHover({ r: 2, c: 2 }),
-    appActions.onCellMouseDown({ r: 2, c: 2 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 2 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 2 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
     ...generateMouseUpAction({ r: 2, c: 3 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -95,7 +100,7 @@ test("Shrink horizontal line by dragging on start", () => {
 });
 
 test("Extend horizontal line by dragging on end", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -112,17 +117,17 @@ test("Extend horizontal line by dragging on end", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
-    appActions.onCellHover({ r: 2, c: 5 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 5 }),
     ...generateMouseUpAction({ r: 2, c: 5 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -139,7 +144,7 @@ test("Extend horizontal line by dragging on end", () => {
 });
 
 test("Shrink horizontal line by dragging on end", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -156,17 +161,17 @@ test("Shrink horizontal line by dragging on end", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
-    appActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 3 }),
     ...generateMouseUpAction({ r: 2, c: 3 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -183,7 +188,7 @@ test("Shrink horizontal line by dragging on end", () => {
 });
 
 test("Turn horizontal line 180 degrees by dragging on End", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -200,17 +205,17 @@ test("Turn horizontal line 180 degrees by dragging on End", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 0 }),
     ...generateMouseUpAction({ r: 2, c: 0 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -227,7 +232,7 @@ test("Turn horizontal line 180 degrees by dragging on End", () => {
 });
 
 test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -244,17 +249,17 @@ test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 0, c: 3 }),
     ...generateMouseUpAction({ r: 0, c: 1 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",
@@ -271,7 +276,7 @@ test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
 });
 
 test("Cannot shrink horizontal line to a zero-length line", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -288,17 +293,17 @@ test("Cannot shrink horizontal line to a zero-length line", () => {
 
   const actions = [
     // Select line
-    appActions.setTool("SELECT"),
+    diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
     ...generateMouseClickAction({ r: 2, c: 3 }),
     // Drag end point
-    appActions.onCellHover({ r: 2, c: 4 }),
-    appActions.onCellMouseDown({ r: 2, c: 4 }),
+    diagramActions.onCellHover({ r: 2, c: 4 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 2 }),
     ...generateMouseUpAction({ r: 2, c: 2 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   const expected: ShapeObject = {
     id: "1",

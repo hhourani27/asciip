@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { CanvasSize } from "../store/appSlice";
+import { CanvasSize } from "../store/diagramSlice";
 import { Coords, Shape, normalizeMultiSegmentLine } from "./shapes";
 import { createLineSegment } from "./create";
 

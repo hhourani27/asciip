@@ -1,4 +1,8 @@
-import { appReducer, appActions, initState } from "../appSlice";
+import {
+  diagramReducer,
+  diagramActions,
+  initDiagramState,
+} from "../diagramSlice";
 import {
   applyActions,
   generateMouseClickAction,
@@ -6,7 +10,7 @@ import {
 } from "./utils";
 
 test("When clicking on empty cell, selection should be cleared", () => {
-  const initialState = initState({
+  const initialState = initDiagramState({
     shapes: [
       {
         id: "1",
@@ -16,14 +20,14 @@ test("When clicking on empty cell, selection should be cleared", () => {
   });
 
   const actions = [
-    appActions.setTool("SELECT"),
-    appActions.onCellHover({ r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 0, c: 6 }),
     ...generateMouseClickAction({ r: 0, c: 6 }),
   ];
 
-  const finalState = applyActions(appReducer, initialState, actions);
+  const finalState = applyActions(diagramReducer, initialState, actions);
 
   expect(finalState.selectedShapeId).toBeNull();
 });
