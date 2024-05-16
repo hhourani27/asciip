@@ -1,7 +1,14 @@
-import { Button, Menu, MenuItem } from "@mui/material";
+import {
+  Button,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { appActions, appSelectors } from "../../store/appSlice";
 import { useState } from "react";
+import SchemaIcon from "@mui/icons-material/Schema";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -57,7 +64,10 @@ export function ToolbarDiagrams(): JSX.Element {
             key={diagram.id}
             onClick={() => handleDiagramClick(diagram.id)}
           >
-            {diagram.name}
+            <ListItemIcon>
+              <SchemaIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText> {diagram.name}</ListItemText>
           </MenuItem>
         ))}
       </Menu>
