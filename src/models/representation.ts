@@ -331,7 +331,16 @@ export type COMMENT_STYLE =
   | "NONE"
   | "SLASHES"
   | "STANDARD_BLOCK"
-  | "STANDARD_BLOCK_ASTERISK";
+  | "STANDARD_BLOCK_ASTERISK"
+  | "HASHES"
+  | "TRIPLE_QUOTES"
+  | "TRIPLE_SLASH"
+  | "DOUBLE_DASH"
+  | "APOSTROPHE"
+  | "TRIPLE_BACKTICK"
+  | "FOUR_SPACES"
+  | "SEMI_COLON"
+  | "PERCENT";
 
 export function getTextExport(
   shapes: ShapeObject[] | Shape[],
@@ -369,6 +378,24 @@ export function getTextExport(
       ? ["/*", ...stringLines, "*/"]
       : commentStyle === "STANDARD_BLOCK_ASTERISK"
       ? ["/*", ...stringLines.map((line) => `* ${line}`), "*/"]
+      : commentStyle === "HASHES"
+      ? stringLines.map((line) => `# ${line}`)
+      : commentStyle === "TRIPLE_QUOTES"
+      ? ['"""', ...stringLines, '"""']
+      : commentStyle === "TRIPLE_SLASH"
+      ? stringLines.map((line) => `/// ${line}`)
+      : commentStyle === "DOUBLE_DASH"
+      ? stringLines.map((line) => `-- ${line}`)
+      : commentStyle === "APOSTROPHE"
+      ? stringLines.map((line) => `' ${line}`)
+      : commentStyle === "TRIPLE_BACKTICK"
+      ? ["```", ...stringLines, "```"]
+      : commentStyle === "FOUR_SPACES"
+      ? stringLines.map((line) => `    ${line}`)
+      : commentStyle === "SEMI_COLON"
+      ? stringLines.map((line) => `; ${line}`)
+      : commentStyle === "PERCENT"
+      ? stringLines.map((line) => `% ${line}`)
       : stringLines;
 
   const exportString = stringLinesWithCommentMarkers.join("\n");

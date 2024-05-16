@@ -31,7 +31,7 @@ const commentStyleDisplay: {
   NONE: { name: "None" },
   STANDARD_BLOCK: {
     name: "Standard block comment",
-    exemple: "/* */",
+    exemple: "/* ~ */",
     languages: "Many C-style languages, CSS, Kotlin, Scala...",
   },
   STANDARD_BLOCK_ASTERISK: {
@@ -42,7 +42,52 @@ const commentStyleDisplay: {
   SLASHES: {
     name: "Slashes",
     exemple: "//",
-    languages: "Many C-style languages, CSS, Kotlin, Scala...",
+    languages: "Many C-style languages, Kotlin, Scala...",
+  },
+  HASHES: {
+    name: "Hashes",
+    exemple: "#",
+    languages: "Python, Ruby, PHP, PowerShell...",
+  },
+  TRIPLE_QUOTES: {
+    name: "Triple quote",
+    exemple: '""" ~ """',
+    languages: "Python, Julia...",
+  },
+  TRIPLE_SLASH: {
+    name: "Triple slash",
+    exemple: "///",
+    languages: "C#, F#",
+  },
+  DOUBLE_DASH: {
+    name: "Double dash",
+    exemple: "--",
+    languages: "SQL, Haskell, Ada, Lua, VHDL...",
+  },
+  APOSTROPHE: {
+    name: "Apostrophe",
+    exemple: "'",
+    languages: "Visual Basic family...",
+  },
+  TRIPLE_BACKTICK: {
+    name: "Triple backticks",
+    exemple: "``` ~ ```",
+    languages: "Markdown",
+  },
+  FOUR_SPACES: {
+    name: "Four spaces",
+    exemple: "\u00a0\u00a0\u00a0\u00a0",
+    languages: "Markdown",
+  },
+  SEMI_COLON: {
+    name: "Semi-colon",
+    exemple: ";",
+    languages: "Lua, Scheme, Assembly...",
+  },
+  PERCENT: {
+    name: "Percent",
+    exemple: "%",
+    languages: "TeX, LaTeX, PostScript, Erlang...",
   },
 };
 
@@ -79,7 +124,8 @@ export function ExportDialog() {
   const styleMode = useAppSelector((state) => state.diagram.styleMode);
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
 
-  const [commentStyle, setCommentStyle] = useState<COMMENT_STYLE>("SLASHES");
+  const [commentStyle, setCommentStyle] =
+    useState<COMMENT_STYLE>("STANDARD_BLOCK");
 
   const exportText = getTextExport(
     shapeObjs,
