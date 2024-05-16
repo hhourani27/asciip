@@ -156,6 +156,7 @@ export function ToolbarStyles(): JSX.Element {
 
   return (
     <Box>
+      {/* Line style*/}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -165,7 +166,7 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="line-style-label"
           id="line-style"
-          value={globalStyle.lineStyle}
+          value={selectedShapeObj?.style?.lineStyle ?? globalStyle.lineStyle}
           label="Line style"
           onChange={handleLineStyleChange}
         >
@@ -174,6 +175,7 @@ export function ToolbarStyles(): JSX.Element {
           <MenuItem value={"HEAVY"}>Heavy</MenuItem>
         </Select>
       </FormControl>
+      {/* Arrow head presence/absence */}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -183,7 +185,12 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="arrow-head-label"
           id="arrow-head"
-          value={getArrowHeadSelectValue(globalStyle)}
+          value={
+            selectedShapeObj?.style?.arrowStartHead !== undefined &&
+            selectedShapeObj?.style?.arrowEndHead !== undefined
+              ? getArrowHeadSelectValue(selectedShapeObj.style)
+              : getArrowHeadSelectValue(globalStyle)
+          }
           label="Arrow head"
           onChange={handleArrowHeadStyleChange}
         >
@@ -205,6 +212,7 @@ export function ToolbarStyles(): JSX.Element {
           </MenuItem>
         </Select>
       </FormControl>
+      {/* Arrow head style*/}
       <FormControl
         size="small"
         sx={{ minWidth: "100px" }}
@@ -214,7 +222,7 @@ export function ToolbarStyles(): JSX.Element {
         <Select
           labelId="arrow-style-label"
           id="arrow-style"
-          value={globalStyle.arrowStyle}
+          value={selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle}
           label="Arrow style"
           onChange={handleArrowStyleChange}
         >
