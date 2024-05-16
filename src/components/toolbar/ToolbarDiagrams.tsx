@@ -17,6 +17,7 @@ import { appActions, appSelectors } from "../../store/appSlice";
 import { useState } from "react";
 import SchemaIcon from "@mui/icons-material/Schema";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -65,6 +66,7 @@ export function ToolbarDiagrams(): JSX.Element {
         color="inherit"
         sx={{ textTransform: "capitalize" }}
         onClick={handleClick}
+        endIcon={<ExpandMoreIcon />}
       >
         {activeDiagram.name}
       </Button>
