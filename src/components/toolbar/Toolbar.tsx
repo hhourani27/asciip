@@ -8,10 +8,7 @@ import { ToolbarExport } from "./ToolbarExport";
 
 export default function Toolbar() {
   return (
-    <MuiAppBar
-      position="static"
-      // sx={{ flexGrow: 0, flexShrink: 0, flexBasis: "auto" }}
-    >
+    <MuiAppBar position="static">
       <MuiToolbar sx={{ justifyContent: "space-between" }}>
         <Box
           id="left-toolbar"

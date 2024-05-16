@@ -10,9 +10,6 @@ import {
 } from "@mui/material";
 import { ARROW_STYLE, LINE_STYLE, Style } from "../../models/style";
 
-import HorizontalRuleIcon from "@mui/icons-material/HorizontalRule";
-import WestIcon from "@mui/icons-material/West";
-import EastIcon from "@mui/icons-material/East";
 export function ToolbarStyles(): JSX.Element {
   const dispatch = useAppDispatch();
 
@@ -155,9 +152,10 @@ export function ToolbarStyles(): JSX.Element {
   };
 
   return (
-    <Box>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {/* Line style*/}
       <FormControl
+        variant="standard"
         size="small"
         sx={{ minWidth: "100px" }}
         disabled={!isLineStyleSelectEnabled()}
@@ -177,6 +175,7 @@ export function ToolbarStyles(): JSX.Element {
       </FormControl>
       {/* Arrow head presence/absence */}
       <FormControl
+        variant="standard"
         size="small"
         sx={{ minWidth: "100px" }}
         disabled={!isArrowHeadSelectEnabled()}
@@ -194,26 +193,15 @@ export function ToolbarStyles(): JSX.Element {
           label="Arrow head"
           onChange={handleArrowHeadStyleChange}
         >
-          <MenuItem value={"NONE"}>
-            <HorizontalRuleIcon fontSize="small" />
-            <HorizontalRuleIcon fontSize="small" />
-          </MenuItem>
-          <MenuItem value={"END"}>
-            <HorizontalRuleIcon fontSize="small" />
-            <EastIcon fontSize="small" />
-          </MenuItem>
-          <MenuItem value={"START"}>
-            <WestIcon fontSize="small" />
-            <HorizontalRuleIcon fontSize="small" />
-          </MenuItem>
-          <MenuItem value={"START_END"}>
-            <WestIcon fontSize="small" />
-            <EastIcon fontSize="small" />
-          </MenuItem>
+          <MenuItem value={"NONE"}>{"‒ ― ‒"}</MenuItem>
+          <MenuItem value={"END"}>{"‒ ― ▶"}</MenuItem>
+          <MenuItem value={"START"}>{"◀ ― ‒"}</MenuItem>
+          <MenuItem value={"START_END"}>{"◀ ― ▶"}</MenuItem>
         </Select>
       </FormControl>
       {/* Arrow head style*/}
       <FormControl
+        variant="standard"
         size="small"
         sx={{ minWidth: "100px" }}
         disabled={!isArrowStyleSelectEnabled()}
