@@ -1,21 +1,12 @@
-import {
-  AppBar as MuiAppBar,
-  Toolbar as MuiToolbar,
-  IconButton,
-  Box,
-} from "@mui/material";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { AppBar as MuiAppBar, Toolbar as MuiToolbar, Box } from "@mui/material";
 import { ToolbarTools } from "./ToolbarTools";
 import { ToolbarStyleMode } from "./ToolbarStyleMode";
 
-import { useAppDispatch } from "../../store/hooks";
-import { diagramActions } from "../../store/diagramSlice";
 import { ToolbarStyles } from "./ToolbarStyles";
 import { ToolbarDiagrams } from "./ToolbarDiagrams";
+import { ToolbarExport } from "./ToolbarExport";
 
 export default function Toolbar() {
-  const dispatch = useAppDispatch();
-
   return (
     <MuiAppBar
       position="static"
@@ -34,12 +25,7 @@ export default function Toolbar() {
           id="right-toolbar"
           sx={{ flexGrow: 0, display: "flex", alignItems: "center", gap: 2 }}
         >
-          <IconButton
-            onClick={() => dispatch(diagramActions.openExport())}
-            aria-label="Export"
-          >
-            <FileDownloadIcon />
-          </IconButton>
+          <ToolbarExport />
           <ToolbarDiagrams />
         </Box>
       </MuiToolbar>
