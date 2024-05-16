@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -6,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -18,6 +20,9 @@ import { useState } from "react";
 import SchemaIcon from "@mui/icons-material/Schema";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import { DeleteDiagramConfirmationDialog } from "./DeleteDiagramConfirmationDialog";
 
 export function ToolbarDiagrams(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -25,6 +30,9 @@ export function ToolbarDiagrams(): JSX.Element {
   const diagrams = useAppSelector((state) => state.app.diagrams);
   const activeDiagram = useAppSelector((state) =>
     appSelectors.activeDiagram(state)
+  );
+  const deleteDiagramInProgress = useAppSelector(
+    (state) => state.app.deleteDiagramInProgress
   );
 
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -49,6 +57,10 @@ export function ToolbarDiagrams(): JSX.Element {
 
   const handleDiagramFormClose = () => {
     setDiagramFormOpen(false);
+  };
+
+  const handleDiagramDelete = (diagramId: string) => {
+    dispatch(appActions.startDeleteDiagram(diagramId));
   };
 
   const handleMenuClose = () => {
@@ -88,6 +100,23 @@ export function ToolbarDiagrams(): JSX.Element {
               <SchemaIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText> {diagram.name}</ListItemText>
+            <Box sx={{ paddingLeft: "20px" }}>
+              <ListItemIcon>
+                <IconButton>
+                  <DriveFileRenameOutlineIcon />
+                </IconButton>
+              </ListItemIcon>
+              <ListItemIcon>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDiagramDelete(diagram.id);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemIcon>
+            </Box>
           </MenuItem>
         ))}
         <Divider />
@@ -133,6 +162,7 @@ export function ToolbarDiagrams(): JSX.Element {
           <Button type="submit">Subscribe</Button>
         </DialogActions>
       </Dialog>
+      {deleteDiagramInProgress && <DeleteDiagramConfirmationDialog />}
     </div>
   );
 }

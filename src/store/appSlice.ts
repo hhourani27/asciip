@@ -14,6 +14,10 @@ export type Diagram = DiagramMetadata & {
 export type AppState = {
   diagrams: Diagram[];
   activeDiagramId: string;
+
+  // UI state
+  deleteDiagramInProgress: string | null;
+  createDiagramInProgress: boolean;
 };
 
 export const initAppState = (): AppState => {
@@ -28,6 +32,9 @@ export const initAppState = (): AppState => {
   return {
     diagrams: [firstDiagram],
     activeDiagramId: id,
+
+    deleteDiagramInProgress: null,
+    createDiagramInProgress: false,
   };
 };
 
@@ -39,15 +46,36 @@ export const appSlice = createSlice({
       state.activeDiagramId = action.payload;
     },
     addDiagram: (state, action: PayloadAction<string>) => {
-      const id = uuidv4();
-      const newDiagram: Diagram = {
-        id,
-        name: action.payload,
-        data: initDiagramData(),
-      };
-      state.diagrams = [...state.diagrams, newDiagram];
-      state.activeDiagramId = id;
+      addDiagram(state, action.payload);
     },
+    deleteDiagram: (state, action: PayloadAction<string>) => {
+      const deletedId = action.payload;
+      const deletedDiagramIdx = state.diagrams.findIndex(
+        (d) => d.id === deletedId
+      );
+
+      // Delete diagram
+      state.diagrams.splice(deletedDiagramIdx, 1);
+
+      // If we're deleting the last diagram, then create a new default diagram
+      if (state.diagrams.length === 0) {
+        addDiagram(state);
+      } else {
+        // If the deleted diagram is the active one, then set the active diagram to the first diagram on the list
+        if (deletedId === state.activeDiagramId) {
+          state.activeDiagramId = state.diagrams[0].id;
+        }
+      }
+
+      state.deleteDiagramInProgress = null;
+    },
+    startDeleteDiagram: (state, action: PayloadAction<string>) => {
+      state.deleteDiagramInProgress = action.payload;
+    },
+    cancelDeleteDiagram: (state) => {
+      state.deleteDiagramInProgress = null;
+    },
+
     updateDiagramData: (state, action: PayloadAction<DiagramData>) => {
       const idx = state.diagrams.findIndex(
         (d) => d.id === state.activeDiagramId
@@ -61,6 +89,18 @@ export const appSlice = createSlice({
     },
   },
 });
+
+//#region Helper state function that mutate directly the state
+function addDiagram(state: AppState, name: string = "New diagram") {
+  const id = uuidv4();
+  const newDiagram: Diagram = {
+    id,
+    name,
+    data: initDiagramData(),
+  };
+  state.diagrams = [...state.diagrams, newDiagram];
+  state.activeDiagramId = id;
+}
 
 export const appReducer = appSlice.reducer;
 export const appActions = appSlice.actions;
