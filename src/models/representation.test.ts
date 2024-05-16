@@ -214,22 +214,18 @@ describe("getStyledCanvasGrid()", () => {
 
 describe("getTextExport()", () => {
   test("Export a single rectangle at the center of the canvas (default styles)", () => {
-    const canvasSize: CanvasSize = { rows: 10, cols: 10 };
-
     const rectangle: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 3, c: 3 },
       br: { r: 6, c: 6 },
     };
 
-    const exportText = getTextExport(canvasSize, [rectangle]);
+    const exportText = getTextExport([rectangle]);
 
     expect(exportText).toBe("// +--+\n// |  |\n// |  |\n// +--+");
   });
 
   test("Export 2 adjacent rectangles (default styles)", () => {
-    const canvasSize: CanvasSize = { rows: 10, cols: 10 };
-
     const rectangle1: Rectangle = {
       type: "RECTANGLE",
       tl: { r: 0, c: 0 },
@@ -242,7 +238,7 @@ describe("getTextExport()", () => {
       br: { r: 7, c: 7 },
     };
 
-    const exportText = getTextExport(canvasSize, [rectangle1, rectangle2]);
+    const exportText = getTextExport([rectangle1, rectangle2]);
 
     expect(exportText).toBe(
       "// +--+    \n// |  |    \n// |  |    \n// +--+    \n//     +--+\n//     |  |\n//     |  |\n//     +--+"

@@ -5,12 +5,69 @@ import {
   DialogTitle,
   Button,
   Box,
+  Select,
+  InputLabel,
+  MenuItem,
+  SelectChangeEvent,
+  ListItemText,
+  Typography,
+  Chip,
+  FormControl,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { diagramActions } from "../../store/diagramSlice";
 import { FONT_FAMILY } from "../canvas/draw";
-import { getTextExport } from "../../models/representation";
+import { COMMENT_STYLE, getTextExport } from "../../models/representation";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useState } from "react";
+
+const commentStyleDisplay: {
+  [key in COMMENT_STYLE]: {
+    name: string;
+    exemple?: string;
+    languages?: string;
+  };
+} = {
+  NONE: { name: "None" },
+  STANDARD_BLOCK: {
+    name: "Standard block comment",
+    exemple: "/* */",
+    languages: "Many C-style languages, CSS, Kotlin, Scala...",
+  },
+  STANDARD_BLOCK_ASTERISK: {
+    name: "Asterisk-aligned block comment",
+    exemple: "/* * */",
+    languages: "Many C-style languages, CSS, Kotlin, Scala...",
+  },
+  SLASHES: {
+    name: "Slashes",
+    exemple: "//",
+    languages: "Many C-style languages, CSS, Kotlin, Scala...",
+  },
+};
+
+function renderCommentStyleValue(commentStyle: COMMENT_STYLE): React.ReactNode {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Typography
+        sx={{ display: "inline" }}
+        component="span"
+        variant="body1"
+        color="text.primary"
+      >
+        {commentStyleDisplay[commentStyle].name}
+      </Typography>
+      {commentStyleDisplay[commentStyle].exemple && (
+        <Chip
+          label={commentStyleDisplay[commentStyle].exemple}
+          variant="outlined"
+          size="small"
+          sx={{ borderRadius: "8px", ml: 1 }}
+        />
+      )}
+    </Box>
+  );
+}
 
 export function ExportDialog() {
   const dispatch = useAppDispatch();
@@ -22,12 +79,16 @@ export function ExportDialog() {
   const styleMode = useAppSelector((state) => state.diagram.styleMode);
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
 
-  const canvasSize = useAppSelector((state) => state.diagram.canvasSize);
+  const [commentStyle, setCommentStyle] = useState<COMMENT_STYLE>("SLASHES");
 
-  const exportText = getTextExport(canvasSize, shapeObjs, {
-    styleMode,
-    globalStyle,
-  });
+  const exportText = getTextExport(
+    shapeObjs,
+    {
+      styleMode,
+      globalStyle,
+    },
+    commentStyle
+  );
 
   const copyDiagramToClipboard = async () => {
     await navigator.clipboard.writeText(exportText);
@@ -41,6 +102,38 @@ export function ExportDialog() {
     >
       <DialogTitle>Export diagram</DialogTitle>
       <DialogContent>
+        <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+          <InputLabel id="comment-style-label">Comment style</InputLabel>
+          <Select
+            labelId="comment-style-label"
+            id="comment-style"
+            value={commentStyle}
+            label="Comment style"
+            onChange={(e: SelectChangeEvent<COMMENT_STYLE>) =>
+              setCommentStyle(e.target.value as COMMENT_STYLE)
+            }
+            renderValue={renderCommentStyleValue}
+          >
+            {Object.keys(commentStyleDisplay).map((value) => (
+              <MenuItem value={value}>
+                <ListItemText
+                  primary={renderCommentStyleValue(value as COMMENT_STYLE)}
+                  secondary={
+                    <Typography
+                      sx={{ display: "inline" }}
+                      component="span"
+                      variant="caption"
+                      color="text.primary"
+                    >
+                      {commentStyleDisplay[value as COMMENT_STYLE].languages}
+                    </Typography>
+                  }
+                />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <Box
           sx={{
             fontFamily: FONT_FAMILY,

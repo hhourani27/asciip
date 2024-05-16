@@ -327,13 +327,19 @@ export function getStyledCanvasGrid(
   return grid;
 }
 
+export type COMMENT_STYLE =
+  | "NONE"
+  | "SLASHES"
+  | "STANDARD_BLOCK"
+  | "STANDARD_BLOCK_ASTERISK";
+
 export function getTextExport(
-  canvasSize: CanvasSize,
   shapes: ShapeObject[] | Shape[],
   styleOpts: { styleMode: StyleMode; globalStyle: Style } = {
     styleMode: "ASCII",
     globalStyle: defaultStyle(),
-  }
+  },
+  commentStyle: COMMENT_STYLE = "SLASHES"
 ): string {
   if (shapes.length === 0) return "";
 
@@ -342,19 +348,32 @@ export function getTextExport(
   ): shapes is ShapeObject[] {
     return shapes.length > 0 && "id" in shapes[0];
   }
-
-  const grid = getStyledCanvasGrid(canvasSize, shapes, styleOpts);
   const bb = mergeBoundingBoxes(
     isShapeObjectArray(shapes) ? shapes.map((so) => so.shape) : shapes
   )!;
 
-  const exportText = grid
-    .filter((row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom)
-    .map((row) => row.join("").slice(bb.left, bb.right + 1))
-    .map((line) => `// ${line}`)
-    .join("\n");
+  const grid = getStyledCanvasGrid(
+    { rows: bb.bottom + 1, cols: bb.right + 1 },
+    shapes,
+    styleOpts
+  );
 
-  return exportText;
+  const stringLines: string[] = grid
+    .filter((row, rowIdx) => rowIdx >= bb.top && rowIdx <= bb.bottom)
+    .map((row) => row.join("").slice(bb.left, bb.right + 1));
+
+  const stringLinesWithCommentMarkers: string[] =
+    commentStyle === "SLASHES"
+      ? stringLines.map((line) => `// ${line}`)
+      : commentStyle === "STANDARD_BLOCK"
+      ? ["/*", ...stringLines, "*/"]
+      : commentStyle === "STANDARD_BLOCK_ASTERISK"
+      ? ["/*", ...stringLines.map((line) => `* ${line}`), "*/"]
+      : stringLines;
+
+  const exportString = stringLinesWithCommentMarkers.join("\n");
+
+  return exportString;
 }
 
 function reprHorizontalLine(
