@@ -110,7 +110,7 @@ export function SelectArrowHeadStyle(): JSX.Element {
         onChange={handleArrowStyleChange}
       >
         {Object.keys(arrowHeadStyleDisplay).map((value) => (
-          <MenuItem value={value} sx={{ pt: 0.5, pb: 0.5 }}>
+          <MenuItem key={value} value={value} sx={{ pt: 0.5, pb: 0.5 }}>
             <Tooltip
               title={arrowHeadStyleDisplay[value as ARROW_STYLE].tooltip}
               arrow

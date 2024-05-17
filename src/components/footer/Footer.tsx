@@ -1,8 +1,9 @@
 import { IconButton, Paper, Tooltip } from "@mui/material";
 import SettingsOverscanIcon from "@mui/icons-material/SettingsOverscan";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
-import { diagramActions } from "../store/diagramSlice";
-import { useAppDispatch } from "../store/hooks";
+import { diagramActions } from "../../store/diagramSlice";
+import { useAppDispatch } from "../../store/hooks";
+import { FooterTip } from "./FooterTip";
 
 export function Footer(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -11,6 +12,8 @@ export function Footer(): JSX.Element {
     <Paper
       component="footer"
       sx={{
+        display: "flex",
+        alignItems: "center",
         py: 0,
         px: 3,
       }}
@@ -33,6 +36,7 @@ export function Footer(): JSX.Element {
           <FitScreenIcon fontSize="inherit" />
         </IconButton>
       </Tooltip>
+      <FooterTip />
     </Paper>
   );
 }

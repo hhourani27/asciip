@@ -107,7 +107,7 @@ export function SelectLineStyle(): JSX.Element {
         onChange={handleLineStyleChange}
       >
         {Object.keys(lineStyleDisplay).map((value) => (
-          <MenuItem value={value} sx={{ pt: 0.5, pb: 0.5 }}>
+          <MenuItem key={value} value={value} sx={{ pt: 0.5, pb: 0.5 }}>
             <Tooltip
               title={lineStyleDisplay[value as LINE_STYLE].tooltip}
               arrow
