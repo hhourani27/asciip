@@ -8,8 +8,39 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Tooltip,
 } from "@mui/material";
-import { LINE_STYLE } from "../../models/style";
+import { LINE_STYLE, line_repr } from "../../models/style";
+
+const lineStyleDisplay: {
+  [key in LINE_STYLE]: { name: string; repr: string; tooltip: React.ReactNode };
+} = {
+  ASCII: {
+    name: "ASCII",
+    repr: `${line_repr.LINE_HORIZONTAL.ASCII}${line_repr.LINE_HORIZONTAL.ASCII}`,
+    tooltip: "This style displays correctly on most monospaced fonts",
+  },
+  LIGHT: {
+    name: "Light",
+    repr: `${line_repr.LINE_HORIZONTAL.LIGHT}${line_repr.LINE_HORIZONTAL.LIGHT}`,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:{" "}
+        <em>{"Monaco"}</em>
+      </span>
+    ),
+  },
+  HEAVY: {
+    name: "Heavy",
+    repr: `${line_repr.LINE_HORIZONTAL.HEAVY}${line_repr.LINE_HORIZONTAL.HEAVY}`,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:{" "}
+        <em>{"Courier New"}</em>, <em>{"Monaco"}</em>, <em>{"Ubuntu Mono"}</em>
+      </span>
+    ),
+  },
+};
 
 export function SelectLineStyle(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -73,42 +104,32 @@ export function SelectLineStyle(): JSX.Element {
         label="Line style"
         onChange={handleLineStyleChange}
       >
-        <MenuItem value={"LIGHT"}>
-          <ListItemText
-            primary={
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 3,
-                }}
-              >
-                <span>{"Light"}</span>
-                <Box sx={{ fontFamily: "monospace" }}>{"──"}</Box>
-              </Box>
-            }
-          />
-        </MenuItem>
-        <MenuItem value={"ASCII"}>
-          <ListItemText
-            primary={
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{"ASCII"}</span>
-                <Box sx={{ fontFamily: "monospace" }}>{"--"}</Box>
-              </Box>
-            }
-          />
-        </MenuItem>
-        <MenuItem value={"HEAVY"}>
-          <ListItemText
-            primary={
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{"Heavy"}</span>
-                <Box sx={{ fontFamily: "monospace" }}>{"━━"}</Box>
-              </Box>
-            }
-          />
-        </MenuItem>
+        {Object.keys(lineStyleDisplay).map((value) => (
+          <MenuItem value={value} sx={{ pt: 0.5, pb: 0.5 }}>
+            <Tooltip
+              title={lineStyleDisplay[value as LINE_STYLE].tooltip}
+              arrow
+              placement="right"
+            >
+              <ListItemText
+                primary={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 3,
+                    }}
+                  >
+                    <span>{lineStyleDisplay[value as LINE_STYLE].name}</span>
+                    <Box sx={{ fontFamily: "monospace" }}>
+                      {lineStyleDisplay[value as LINE_STYLE].repr}
+                    </Box>
+                  </Box>
+                }
+              />
+            </Tooltip>
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
   );

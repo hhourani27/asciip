@@ -14,7 +14,7 @@ export type ARROW_STYLE = "ASCII" | "OUTLINED" | "FILLED";
 //   | "FILLED_SMALL";
 
 //see https://symbl.cc/en/unicode/blocks/box-drawing/
-const line_repr = {
+export const line_repr = {
   LINE_HORIZONTAL: {
     ASCII: "-",
     LIGHT: "─",
@@ -47,7 +47,7 @@ const line_repr = {
   },
 };
 
-const arrow_repr = {
+export const arrow_repr = {
   ARROW_UP: {
     ASCII: "^",
     OUTLINED: "△",
