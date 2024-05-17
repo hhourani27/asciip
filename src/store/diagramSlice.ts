@@ -536,12 +536,27 @@ export const diagramSlice = createSlice({
 
 //#region Helper state function that mutate directly the state
 function addNewShape(state: DiagramState, shape: Shape) {
-  if (state.creationProgress) {
-    state.shapes.push({
-      id: uuidv4(),
-      shape: shape,
-      style: state.globalStyle,
-    });
+  const newShapeObj: ShapeObject = {
+    id: uuidv4(),
+    shape: shape,
+    style: state.globalStyle,
+  };
+
+  // If shape is a text, alwyas add it on top
+  if (shape.type === "TEXT") {
+    state.shapes.push(newShapeObj);
+  } else {
+    // Else, add it below the first text shape (Text shapes are always on top of other shapes)
+    const bottomTextShapeIdx = state.shapes.findIndex(
+      (s) => s.shape.type === "TEXT"
+    );
+    if (bottomTextShapeIdx < 0) {
+      // If there's no text shapes, just add it on top
+      state.shapes.push(newShapeObj);
+    } else {
+      // Add it below the bottom text shape
+      state.shapes.splice(bottomTextShapeIdx, 0, newShapeObj);
+    }
   }
 }
 

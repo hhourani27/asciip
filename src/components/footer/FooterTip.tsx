@@ -18,13 +18,13 @@ export function FooterTip(): JSX.Element {
   );
 
   const tip: string | null = isTextBeingWritten
-    ? "Press Ctrl+Enter to complete editing text"
+    ? "Press Ctrl+Enter to complete editing text."
     : isLineToolSelected
-    ? "Click-and-Drag to create the line"
+    ? "Click-and-Drag to create a line or arrow."
     : isMultiSegmmentLineToolSelected
-    ? "Click once, and then click again to position the segments"
+    ? "Click once, and then click again to position segments. Double-click to finish creating the line."
     : isTestShapeSelected && !isTextBeingWritten
-    ? "Double-click to edit text"
+    ? "Double-click to edit text."
     : null;
 
   return (
