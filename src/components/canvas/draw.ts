@@ -7,6 +7,7 @@ import {
 import { ResizePoint, getResizePoints } from "../../models/transformation";
 import { Style, StyleMode } from "../../models/style";
 import { ShapeObject } from "../../store/diagramSlice";
+import { alpha } from "@mui/material/styles";
 
 export const FONT_SIZE = 16;
 export const FONT_WIDTH = 9.603; // see https://stackoverflow.com/a/56379770/471461
@@ -15,6 +16,16 @@ export const CELL_HEIGHT = FONT_SIZE * 1.1;
 
 export const FONT_FAMILY = "monospace";
 export const FONT = `${FONT_SIZE}px ${FONT_FAMILY}`;
+
+function setBackground(
+  ctx: CanvasRenderingContext2D,
+  canvasWidth: number,
+  canvasHeight: number,
+  color: string
+) {
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+}
 
 function drawVerticalGridLine(
   ctx: CanvasRenderingContext2D,
@@ -42,7 +53,7 @@ function drawHorizontalGridLine(
   ctx.stroke(); // Draw the line
 }
 
-export function drawGrid(
+function drawGrid(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
   canvasHeight: number,
@@ -61,7 +72,7 @@ export function drawGrid(
   });
 }
 
-export function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
+function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
   ctx.fillStyle = "LightBlue";
   ctx.fillRect(
     cell.c * CELL_WIDTH,
@@ -71,7 +82,7 @@ export function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
   );
 }
 
-export function drawShapes(
+function drawShapes(
   ctx: CanvasRenderingContext2D,
   shapes: ShapeObject[] | Shape[],
   styleMode: StyleMode,
@@ -100,13 +111,14 @@ export function drawShapes(
   }
 }
 
-export function drawSelectedShape(
+function drawSelectedShape(
   ctx: CanvasRenderingContext2D,
   shapeObj: ShapeObject,
   styleMode: StyleMode,
-  globalStyle: Style
+  globalStyle: Style,
+  color: string
 ) {
-  drawShapes(ctx, [shapeObj], styleMode, globalStyle, "blue");
+  drawShapes(ctx, [shapeObj], styleMode, globalStyle, color);
 
   const resizePoints: ResizePoint[] = getResizePoints(shapeObj.shape);
   resizePoints.forEach(({ coords: { r, c } }) => {
@@ -118,8 +130,16 @@ export function drawSelectedShape(
       0,
       Math.PI * 2
     ); // Create a circular path
-    ctx.fillStyle = "#9e9e9eAA"; // Set the fill color
+    ctx.fillStyle = alpha(color, 0.66); // Set the fill color
     ctx.fill(); // Fill the path with the color
     ctx.closePath(); // Close the path
   });
 }
+
+export const canvasDraw = {
+  setBackground,
+  drawGrid,
+  drawHoveredCell,
+  drawShapes,
+  drawSelectedShape,
+};

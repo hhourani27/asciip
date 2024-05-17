@@ -13,6 +13,7 @@ import {
   Typography,
   Chip,
   FormControl,
+  useTheme,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { diagramActions } from "../../store/diagramSlice";
@@ -94,12 +95,7 @@ const commentStyleDisplay: {
 function renderCommentStyleValue(commentStyle: COMMENT_STYLE): React.ReactNode {
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Typography
-        sx={{ display: "inline" }}
-        component="span"
-        variant="body1"
-        color="text.primary"
-      >
+      <Typography sx={{ display: "inline" }} component="span" variant="body1">
         {commentStyleDisplay[commentStyle].name}
       </Typography>
       {commentStyleDisplay[commentStyle].exemple && (
@@ -116,6 +112,8 @@ function renderCommentStyleValue(commentStyle: COMMENT_STYLE): React.ReactNode {
 
 export function ExportDialog() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
+
   const exportInProgress = useAppSelector(
     (state) => state.diagram.exportInProgress
   );
@@ -147,7 +145,14 @@ export function ExportDialog() {
       maxWidth="lg"
     >
       <DialogTitle>Export diagram</DialogTitle>
-      <DialogContent>
+      <DialogContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          gap: 1,
+        }}
+      >
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
           <InputLabel id="comment-style-label">Comment style</InputLabel>
           <Select
@@ -169,7 +174,6 @@ export function ExportDialog() {
                       sx={{ display: "inline" }}
                       component="span"
                       variant="caption"
-                      color="text.primary"
                     >
                       {commentStyleDisplay[value as COMMENT_STYLE].languages}
                     </Typography>
@@ -189,6 +193,11 @@ export function ExportDialog() {
             maxHeight: "50vh",
             overflow: "auto",
             whiteSpace: "pre",
+            p: 1,
+            backgroundColor: theme.canvas.background,
+            color: theme.canvas.shape,
+            scrollbarColor: `${theme.palette.primary.light} ${theme.palette.primary.main}`,
+            scrollbarWidth: "thin",
           }}
         >
           {exportText}
@@ -198,6 +207,7 @@ export function ExportDialog() {
         <Button
           onClick={copyDiagramToClipboard}
           startIcon={<ContentCopyIcon />}
+          color="inherit"
         >
           Copy diagram
         </Button>

@@ -3,14 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
 import { Coords } from "../../models/shapes";
 import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
-import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  drawGrid,
-  drawHoveredCell,
-  drawSelectedShape,
-  drawShapes,
-} from "./draw";
+import { CELL_HEIGHT, CELL_WIDTH, canvasDraw } from "./draw";
 import _ from "lodash";
 import { TextShapeInput } from "./TextShapeInput";
 
@@ -67,6 +60,12 @@ export default function Canvas(): JSX.Element {
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvasDraw.setBackground(
+      ctx,
+      canvas.width,
+      canvas.height,
+      theme.canvas.background
+    );
 
     // Set the cursor
     canvas.style.cursor =
@@ -81,18 +80,18 @@ export default function Canvas(): JSX.Element {
         : "default";
 
     // Draw the grid
-    drawGrid(
+    canvasDraw.drawGrid(
       ctx,
       canvasWidth,
       canvasHeight,
       rowCount,
       colCount,
-      theme.palette.grey["200"]
+      theme.canvas.grid
     );
 
     // Draw hovered cell
     if (currentHoveredCell && nextActionOnClick === "CREATE") {
-      drawHoveredCell(ctx, currentHoveredCell);
+      canvasDraw.drawHoveredCell(ctx, currentHoveredCell);
     }
 
     // Draw shapes
@@ -101,15 +100,33 @@ export default function Canvas(): JSX.Element {
     const unselectedShapes = shapes.filter(
       (shape) => shape.id !== selectedShapeObj?.id
     );
-    drawShapes(ctx, unselectedShapes, styleMode, globalStyle, "black");
+    canvasDraw.drawShapes(
+      ctx,
+      unselectedShapes,
+      styleMode,
+      globalStyle,
+      theme.canvas.shape
+    );
 
     // Draw selected shape
     if (selectedShapeObj)
-      drawSelectedShape(ctx, selectedShapeObj, styleMode, globalStyle);
+      canvasDraw.drawSelectedShape(
+        ctx,
+        selectedShapeObj,
+        styleMode,
+        globalStyle,
+        theme.canvas.selectedShape
+      );
 
     // Draw new shape
     if (newShape)
-      drawShapes(ctx, [newShape], styleMode, globalStyle, "DodgerBlue");
+      canvasDraw.drawShapes(
+        ctx,
+        [newShape],
+        styleMode,
+        globalStyle,
+        theme.canvas.createdShape
+      );
   }, [
     canvasHeight,
     canvasWidth,
@@ -122,7 +139,11 @@ export default function Canvas(): JSX.Element {
     selectedShapeObj,
     shapes,
     styleMode,
-    theme.palette.grey,
+    theme.canvas.background,
+    theme.canvas.createdShape,
+    theme.canvas.grid,
+    theme.canvas.selectedShape,
+    theme.canvas.shape,
   ]);
 
   return (
@@ -131,6 +152,7 @@ export default function Canvas(): JSX.Element {
         flex: 1,
         overflow: "scroll",
         position: "relative",
+        scrollbarColor: `${theme.palette.primary.light} ${theme.palette.primary.main}`,
       }}
     >
       <canvas
