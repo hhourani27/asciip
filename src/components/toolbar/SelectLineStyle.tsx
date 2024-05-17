@@ -25,7 +25,8 @@ const lineStyleDisplay: {
     repr: `${line_repr.LINE_HORIZONTAL.LIGHT}${line_repr.LINE_HORIZONTAL.LIGHT}`,
     tooltip: (
       <span>
-        This style may not display correctly on these monospaced fonts:{" "}
+        This style may not display correctly on these monospaced fonts:
+        <br />
         <em>{"Monaco"}</em>
       </span>
     ),
@@ -35,8 +36,9 @@ const lineStyleDisplay: {
     repr: `${line_repr.LINE_HORIZONTAL.HEAVY}${line_repr.LINE_HORIZONTAL.HEAVY}`,
     tooltip: (
       <span>
-        This style may not display correctly on these monospaced fonts:{" "}
-        <em>{"Courier New"}</em>, <em>{"Monaco"}</em>, <em>{"Ubuntu Mono"}</em>
+        This style may not display correctly on these monospaced fonts:
+        <br />
+        <em>{"Courier New, Monaco, Ubuntu Mono"}</em>
       </span>
     ),
   },

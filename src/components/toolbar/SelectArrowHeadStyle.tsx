@@ -1,13 +1,56 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import {
+  Box,
   FormControl,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Tooltip,
 } from "@mui/material";
-import { ARROW_STYLE } from "../../models/style";
+import { ARROW_STYLE, arrow_repr } from "../../models/style";
+
+const arrowHeadStyleDisplay: {
+  [key in ARROW_STYLE]: {
+    name: string;
+    repr: string;
+    tooltip: React.ReactNode;
+  };
+} = {
+  ASCII: {
+    name: "ASCII",
+    repr: arrow_repr.ARROW_RIGHT.ASCII,
+    tooltip: "This style displays correctly on most monospaced fonts",
+  },
+  FILLED: {
+    name: "Filled",
+    repr: arrow_repr.ARROW_RIGHT.FILLED,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:
+        <br />
+        <em>{"IBM Plex Mono, Inconsolata, Monaco, Ubuntu Mono"}</em>
+      </span>
+    ),
+  },
+  OUTLINED: {
+    name: "Outlined",
+    repr: arrow_repr.ARROW_RIGHT.OUTLINED,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:
+        <br />
+        <em>
+          {
+            "Consolas, Courier New, Fira Code, IBM Plex Mono, Inconsolata, Monaco, Ubuntu Mono"
+          }
+        </em>
+      </span>
+    ),
+  },
+};
 
 export function SelectArrowHeadStyle(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -66,9 +109,34 @@ export function SelectArrowHeadStyle(): JSX.Element {
         label="Arrow style"
         onChange={handleArrowStyleChange}
       >
-        <MenuItem value={"FILLED"}>Filled</MenuItem>
-        <MenuItem value={"ASCII"}>ASCII</MenuItem>
-        <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
+        {Object.keys(arrowHeadStyleDisplay).map((value) => (
+          <MenuItem value={value} sx={{ pt: 0.5, pb: 0.5 }}>
+            <Tooltip
+              title={arrowHeadStyleDisplay[value as ARROW_STYLE].tooltip}
+              arrow
+              placement="right"
+            >
+              <ListItemText
+                primary={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 3,
+                    }}
+                  >
+                    <span>
+                      {arrowHeadStyleDisplay[value as ARROW_STYLE].name}
+                    </span>
+                    <Box sx={{ fontFamily: "monospace" }}>
+                      {arrowHeadStyleDisplay[value as ARROW_STYLE].repr}
+                    </Box>
+                  </Box>
+                }
+              />
+            </Tooltip>
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
   );

@@ -14,6 +14,20 @@ export type ARROW_STYLE = "ASCII" | "OUTLINED" | "FILLED";
 //   | "FILLED_SMALL";
 
 //see https://symbl.cc/en/unicode/blocks/box-drawing/
+/*
+Tested fonts are 
+
+Courier New
+Consolas
+Monaco
+DejaVu Sans Mono
+Menlo
+Ubuntu Mono
+Fira Code
+Source Code Pro
+Inconsolata
+IBM Plex Mono
+*/
 export const line_repr = {
   LINE_HORIZONTAL: {
     ASCII: "-",
@@ -50,23 +64,24 @@ export const line_repr = {
 export const arrow_repr = {
   ARROW_UP: {
     ASCII: "^",
-    OUTLINED: "△",
-    FILLED: "▲",
+    FILLED: "▲", // 25B2: Black Up-Pointing Triangle
+    OUTLINED: "△", // 25B3: White Up-Pointing Triangle
   },
   ARROW_DOWN: {
     ASCII: "v",
-    OUTLINED: "▽",
-    FILLED: "▼",
+    FILLED: "▼", // 25BC: Black Down-Pointing Triangle
+    OUTLINED: "▽", // 25BD: White Down-Pointing Triangle
   },
   ARROW_LEFT: {
     ASCII: "<",
-    OUTLINED: "◁",
-    FILLED: "◀",
+    FILLED: "◄", // 25C4: Black Left-Pointing Pointer
+    // OUTLINED: "◁", // 25C1: White Left-Pointing Triangle
+    OUTLINED: "◅", // 25C1: White Left-Pointing Triangle
   },
   ARROW_RIGHT: {
     ASCII: ">",
-    OUTLINED: "▷",
-    FILLED: "▶",
+    FILLED: "►", //25BA: Black Right-Pointing Pointer
+    OUTLINED: "▷", //25B7: White Right-Pointing Triangle
   },
 };
 

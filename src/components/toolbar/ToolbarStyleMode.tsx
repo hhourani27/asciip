@@ -26,7 +26,7 @@ export function ToolbarStyleMode(): JSX.Element {
       size="small"
     >
       <Tooltip
-        title="This mode ensures diagrams are displayed correctly on most monospace fonts but limits your styling options"
+        title="This mode ensures diagrams are displayed correctly on most monospaced fonts but limits your styling options"
         arrow
       >
         <ToggleButton value="ASCII" aria-label="ASCII">
@@ -34,7 +34,7 @@ export function ToolbarStyleMode(): JSX.Element {
         </ToggleButton>
       </Tooltip>
       <Tooltip
-        title="This mode offers more styling options but may not display correctly on some monospace fonts (hover over style options for details)."
+        title="This mode offers more styling options but may not display correctly on some monospaced fonts (hover over style options for details)."
         arrow
       >
         <ToggleButton value="UNICODE" aria-label="Unicode">
