@@ -154,25 +154,27 @@ export function ToolbarStyles(): JSX.Element {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {/* Line style*/}
-      <FormControl
-        variant="standard"
-        size="small"
-        sx={{ minWidth: "100px" }}
-        disabled={!isLineStyleSelectEnabled()}
-      >
-        <InputLabel id="line-style-label">Line style</InputLabel>
-        <Select
-          labelId="line-style-label"
-          id="line-style"
-          value={selectedShapeObj?.style?.lineStyle ?? globalStyle.lineStyle}
-          label="Line style"
-          onChange={handleLineStyleChange}
+      {styleMode === "UNICODE" && (
+        <FormControl
+          variant="standard"
+          size="small"
+          sx={{ minWidth: "100px" }}
+          disabled={!isLineStyleSelectEnabled()}
         >
-          <MenuItem value={"LIGHT"}>Light</MenuItem>
-          <MenuItem value={"ASCII"}>ASCII</MenuItem>
-          <MenuItem value={"HEAVY"}>Heavy</MenuItem>
-        </Select>
-      </FormControl>
+          <InputLabel id="line-style-label">Line style</InputLabel>
+          <Select
+            labelId="line-style-label"
+            id="line-style"
+            value={selectedShapeObj?.style?.lineStyle ?? globalStyle.lineStyle}
+            label="Line style"
+            onChange={handleLineStyleChange}
+          >
+            <MenuItem value={"LIGHT"}>Light</MenuItem>
+            <MenuItem value={"ASCII"}>ASCII</MenuItem>
+            <MenuItem value={"HEAVY"}>Heavy</MenuItem>
+          </Select>
+        </FormControl>
+      )}
       {/* Arrow head presence/absence */}
       <FormControl
         variant="standard"
@@ -200,25 +202,29 @@ export function ToolbarStyles(): JSX.Element {
         </Select>
       </FormControl>
       {/* Arrow head style*/}
-      <FormControl
-        variant="standard"
-        size="small"
-        sx={{ minWidth: "100px" }}
-        disabled={!isArrowStyleSelectEnabled()}
-      >
-        <InputLabel id="arrow-style-label">Head style</InputLabel>
-        <Select
-          labelId="arrow-style-label"
-          id="arrow-style"
-          value={selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle}
-          label="Arrow style"
-          onChange={handleArrowStyleChange}
+      {styleMode === "UNICODE" && (
+        <FormControl
+          variant="standard"
+          size="small"
+          sx={{ minWidth: "100px" }}
+          disabled={!isArrowStyleSelectEnabled()}
         >
-          <MenuItem value={"FILLED"}>Filled</MenuItem>
-          <MenuItem value={"ASCII"}>ASCII</MenuItem>
-          <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
-        </Select>
-      </FormControl>
+          <InputLabel id="arrow-style-label">Head style</InputLabel>
+          <Select
+            labelId="arrow-style-label"
+            id="arrow-style"
+            value={
+              selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle
+            }
+            label="Arrow style"
+            onChange={handleArrowStyleChange}
+          >
+            <MenuItem value={"FILLED"}>Filled</MenuItem>
+            <MenuItem value={"ASCII"}>ASCII</MenuItem>
+            <MenuItem value={"OUTLINED"}>Outlined</MenuItem>
+          </Select>
+        </FormControl>
+      )}
     </Box>
   );
 }
