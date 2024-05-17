@@ -1,4 +1,4 @@
-import { ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { diagramActions } from "../../store/diagramSlice";
@@ -25,12 +25,22 @@ export function ToolbarStyleMode(): JSX.Element {
       onChange={handleStyleModeChange}
       size="small"
     >
-      <ToggleButton value="UNICODE" aria-label="Unicode">
-        Unicode
-      </ToggleButton>
-      <ToggleButton value="ASCII" aria-label="ASCII">
-        ASCII
-      </ToggleButton>
+      <Tooltip
+        title="This mode ensures diagrams are displayed correctly on most monospaced fonts but limits your styling options"
+        arrow
+      >
+        <ToggleButton value="ASCII" aria-label="ASCII">
+          ASCII
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip
+        title="This mode offers more styling options but may not display correctly on some monospaced fonts (hover over style options for details)."
+        arrow
+      >
+        <ToggleButton value="UNICODE" aria-label="Unicode">
+          Unicode
+        </ToggleButton>
+      </Tooltip>
     </ToggleButtonGroup>
   );
 }

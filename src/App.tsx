@@ -5,7 +5,7 @@ import Canvas from "./components/canvas/Canvas";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { diagramActions } from "./store/diagramSlice";
 import { isShortcutsEnabled } from "./store/shortcuts";
-import { Footer } from "./components/Footer";
+import { Footer } from "./components/footer/Footer";
 
 function App() {
   const dispatch = useAppDispatch();

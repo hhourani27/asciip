@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import { CELL_HEIGHT, FONT_SIZE } from "./draw";
@@ -21,21 +21,24 @@ export function TextShapeInput(): JSX.Element {
       sx={{
         position: "fixed",
         left: "10px",
-        bottom: "20px",
+        bottom: "70px",
       }}
     >
-      <textarea
-        style={{
-          font: `${FONT_SIZE}px Courier New`,
-          lineHeight: `${CELL_HEIGHT}px`,
-          resize: "none",
-        }}
+      <TextField
+        id="outlined-multiline-flexible"
+        multiline
+        variant="filled"
+        color="secondary"
         autoFocus
-        wrap="off"
         rows={5}
-        cols={20}
         value={getStringFromShape(currentEditedText)}
         onChange={handleTextChange}
+        sx={{
+          font: `${FONT_SIZE}px Courier New`,
+          lineHeight: `${CELL_HEIGHT}px`,
+          backgroundColor: "secondary",
+          width: "300px",
+        }}
       />
     </Box>
   );

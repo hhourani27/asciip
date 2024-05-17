@@ -43,8 +43,10 @@ export function DeleteDiagramConfirmationDialog(): JSX.Element {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={cancelDelete}>Cancel</Button>
-        <Button onClick={confirmDelete} autoFocus>
+        <Button onClick={cancelDelete} color="inherit">
+          Cancel
+        </Button>
+        <Button onClick={confirmDelete} autoFocus color="inherit">
           Delete
         </Button>
       </DialogActions>

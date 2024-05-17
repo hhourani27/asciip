@@ -62,8 +62,12 @@ export function RenameDiagramFormDialog(): JSX.Element {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={cancelRename}>Cancel</Button>
-        <Button type="submit">Rename</Button>
+        <Button onClick={cancelRename} color="inherit">
+          Cancel
+        </Button>
+        <Button type="submit" color="inherit">
+          Rename
+        </Button>
       </DialogActions>
     </Dialog>
   );
