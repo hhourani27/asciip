@@ -152,6 +152,7 @@ export default function Canvas(): JSX.Element {
         flex: 1,
         overflow: "scroll",
         position: "relative",
+        scrollbarColor: `${theme.palette.primary.light} ${theme.palette.primary.main}`,
       }}
     >
       <canvas

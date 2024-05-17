@@ -196,6 +196,8 @@ export function ExportDialog() {
             p: 1,
             backgroundColor: theme.canvas.background,
             color: theme.canvas.shape,
+            scrollbarColor: `${theme.palette.primary.light} ${theme.palette.primary.main}`,
+            scrollbarWidth: "thin",
           }}
         >
           {exportText}
