@@ -7,15 +7,11 @@ import {
   isShapeLegal,
   normalizeMultiSegmentLine,
 } from "../models/shapes";
+import { getShapeObjAtCoords } from "../models/shapeInCanvas";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representation";
-import {
-  getResizePoints,
-  mergeBoundingBoxes,
-  resize,
-  translate,
-} from "../models/transformation";
+import { getResizePoints, resize, translate } from "../models/transformation";
+import { getBoundingBoxOfAll } from "../models/shapeInCanvas";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
 import { Style, StyleMode, defaultStyle } from "../models/style";
@@ -123,7 +119,7 @@ export const diagramSlice = createSlice({
           cols: Math.min(state.canvasSize.cols, DEFAULT_CANVAS_SIZE.cols),
         };
       } else {
-        const bb = mergeBoundingBoxes(state.shapes.map((so) => so.shape))!;
+        const bb = getBoundingBoxOfAll(state.shapes.map((so) => so.shape))!;
         state.canvasSize = {
           rows: bb.bottom + 1,
           cols: bb.right + 1,

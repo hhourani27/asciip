@@ -1,5 +1,6 @@
 import { Line, Rectangle } from "./shapes";
-import { mergeBoundingBoxes, resize, translate } from "./transformation";
+import { resize, translate } from "./transformation";
+import { getBoundingBoxOfAll } from "./shapeInCanvas";
 
 describe("translate()", () => {
   test("Translate rectangle dr,dc = 1,1", () => {
@@ -278,7 +279,7 @@ describe("mergeBoundingBoxes()", () => {
     br: { r: 7, c: 7 },
   };
 
-  const bb = mergeBoundingBoxes([rectangle1, rectangle2]);
+  const bb = getBoundingBoxOfAll([rectangle1, rectangle2]);
 
   expect(bb).toEqual({ top: 0, bottom: 7, left: 0, right: 7 });
 });

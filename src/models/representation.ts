@@ -1,7 +1,8 @@
 import { CanvasSize, ShapeObject } from "../store/diagramSlice";
-import { Coords, Shape } from "./shapes";
+import { Shape } from "./shapes";
 import _ from "lodash";
-import { getBoundingBox, mergeBoundingBoxes } from "./transformation";
+import { getBoundingBoxOfAll } from "./shapeInCanvas";
+import { getBoundingBox } from "./shapeInCanvas";
 import { Style, StyleMode, defaultStyle, getCharRepr } from "./style";
 
 export type LineChar =
@@ -357,7 +358,7 @@ export function getTextExport(
   ): shapes is ShapeObject[] {
     return shapes.length > 0 && "id" in shapes[0];
   }
-  const bb = mergeBoundingBoxes(
+  const bb = getBoundingBoxOfAll(
     isShapeObjectArray(shapes) ? shapes.map((so) => so.shape) : shapes
   )!;
 
@@ -436,37 +437,4 @@ function reprVerticalLine(
   }
 
   return repr;
-}
-
-/**
- *
- * @returns the shapes whose edge touch the coordinate. If there are multiple shapes, they are returned in the same order than shapes[]
- */
-export function getShapesAtCoords(
-  shapeObjs: ShapeObject[],
-  { r, c }: Coords
-): ShapeObject[] {
-  return shapeObjs.filter((obj) => {
-    const repr = getAbstractShapeRepresentation(obj.shape);
-    return r in repr && c in repr[r];
-  });
-}
-
-/**
- *
- * @returns a single shape whose edge touch the coordinate. If there are multiple shapes returns according to pos
- */
-export function getShapeAtCoords(
-  shapes: ShapeObject[],
-  coords: Coords,
-  priorityId?: string // If multiple shapes ate at coords, return the shape that has id = priorityId, else return the last one
-): ShapeObject | null {
-  const touchedShapes = getShapesAtCoords(shapes, coords);
-
-  if (touchedShapes.length === 0) return null;
-
-  if (priorityId) {
-    const priorityShape = touchedShapes.find((s) => s.id === priorityId);
-    return priorityShape ?? touchedShapes[touchedShapes.length - 1];
-  } else return touchedShapes[touchedShapes.length - 1];
 }
