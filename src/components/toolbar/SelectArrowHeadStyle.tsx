@@ -117,6 +117,7 @@ export function SelectArrowHeadStyle(): JSX.Element {
               placement="right"
             >
               <ListItemText
+                sx={{ m: 0 }} // So the width of the Select is the same as <SelectArrowHead/>
                 primary={
                   <Box
                     sx={{
