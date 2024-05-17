@@ -13,12 +13,18 @@ export function FooterTip(): JSX.Element {
     (state) => state.diagram.selectedTool === "MULTI_SEGMENT_LINE"
   );
 
+  const isTestShapeSelected = useAppSelector(
+    (state) => diagramSelectors.selectedShapeObj(state)?.shape.type === "TEXT"
+  );
+
   const tip: string | null = isTextBeingWritten
     ? "Press Ctrl+Enter to complete editing text"
     : isLineToolSelected
     ? "Click-and-Drag to create the line"
     : isMultiSegmmentLineToolSelected
     ? "Click once, and then click again to position the segments"
+    : isTestShapeSelected && !isTextBeingWritten
+    ? "Double-click to edit text"
     : null;
 
   return (
