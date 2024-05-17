@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { IconButton, Paper, Tooltip } from "@mui/material";
 import SettingsOverscanIcon from "@mui/icons-material/SettingsOverscan";
 import FitScreenIcon from "@mui/icons-material/FitScreen";
 import { diagramActions } from "../store/diagramSlice";
@@ -8,12 +8,11 @@ export function Footer(): JSX.Element {
   const dispatch = useAppDispatch();
 
   return (
-    <Box
+    <Paper
       component="footer"
       sx={{
         py: 0,
         px: 3,
-        backgroundColor: (theme) => theme.palette.grey[200],
       }}
     >
       <Tooltip title="Expand canvas" arrow>
@@ -34,6 +33,6 @@ export function Footer(): JSX.Element {
           <FitScreenIcon fontSize="inherit" />
         </IconButton>
       </Tooltip>
-    </Box>
+    </Paper>
   );
 }
