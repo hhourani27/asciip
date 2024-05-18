@@ -10,6 +10,7 @@ import { ToolbarStyleMode } from "./ToolbarStyleMode";
 import { ToolbarStyles } from "./ToolbarStyles";
 import { ToolbarDiagrams } from "./ToolbarDiagrams";
 import { ToolbarExport } from "./ToolbarExport";
+import { ToolbarOrder } from "./ToolbarOrder";
 
 export default function Toolbar() {
   return (
@@ -24,6 +25,8 @@ export default function Toolbar() {
           <ToolbarStyles />
           <Divider orientation="vertical" flexItem />
           <ToolbarStyleMode />
+          <Divider orientation="vertical" flexItem />
+          <ToolbarOrder />
         </Box>
         <Box
           id="right-toolbar"

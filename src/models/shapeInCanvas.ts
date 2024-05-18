@@ -36,6 +36,21 @@ export function getShapeObjAtCoords(
   } else return touchedShapes[touchedShapes.length - 1];
 }
 
+export function areShapesTouching(shape1: Shape, shape2: Shape): boolean {
+  const repr1 = getAbstractShapeRepresentation(shape1);
+  const repr2 = getAbstractShapeRepresentation(shape2);
+
+  for (const r in repr1) {
+    if (r in repr2) {
+      for (const c in repr1[r]) {
+        if (c in repr2[r]) return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 export type BoundingBox = {
   top: number;
   bottom: number;

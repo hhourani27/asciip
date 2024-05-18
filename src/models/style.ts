@@ -75,8 +75,7 @@ export const arrow_repr = {
   ARROW_LEFT: {
     ASCII: "<",
     FILLED: "◄", // 25C4: Black Left-Pointing Pointer
-    // OUTLINED: "◁", // 25C1: White Left-Pointing Triangle
-    OUTLINED: "◅", // 25C1: White Left-Pointing Triangle
+    OUTLINED: "◁", // 25C1: White Left-Pointing Triangle
   },
   ARROW_RIGHT: {
     ASCII: ">",
