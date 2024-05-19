@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,9 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+
+    // added to correctly configure jest for coverage (see https://github.com/vuejs/vue-cli/issues/1870#issuecomment-1141757462)
+    "inlineSourceMap": true,
+    "inlineSources": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
