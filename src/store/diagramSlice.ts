@@ -7,15 +7,15 @@ import {
   isShapeLegal,
   normalizeMultiSegmentLine,
 } from "../models/shapes";
+import {
+  getShapeObjAtCoords,
+  moveShapeToBack,
+  moveShapeToFront,
+} from "../models/shapeInCanvas";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getShapeAtCoords as getShapeObjAtCoords } from "../models/representation";
-import {
-  getResizePoints,
-  mergeBoundingBoxes,
-  resize,
-  translate,
-} from "../models/transformation";
+import { getResizePoints, resize, translate } from "../models/transformation";
+import { getBoundingBoxOfAll } from "../models/shapeInCanvas";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
 import { Style, StyleMode, defaultStyle } from "../models/style";
@@ -123,7 +123,7 @@ export const diagramSlice = createSlice({
           cols: Math.min(state.canvasSize.cols, DEFAULT_CANVAS_SIZE.cols),
         };
       } else {
-        const bb = mergeBoundingBoxes(state.shapes.map((so) => so.shape))!;
+        const bb = getBoundingBoxOfAll(state.shapes.map((so) => so.shape))!;
         state.canvasSize = {
           rows: bb.bottom + 1,
           cols: bb.right + 1,
@@ -469,6 +469,16 @@ export const diagramSlice = createSlice({
         }
       }
     },
+    onMoveToFrontButtonClick: (state) => {
+      if (state.selectedShapeId) {
+        state.shapes = moveShapeToFront(state.shapes, state.selectedShapeId);
+      }
+    },
+    onMoveToBackButtonClick: (state) => {
+      if (state.selectedShapeId) {
+        state.shapes = moveShapeToBack(state.shapes, state.selectedShapeId);
+      }
+    },
     //#endregion
     //#region Styling actions
     setStyleMode: (state, action: PayloadAction<StyleMode>) => {
@@ -536,12 +546,27 @@ export const diagramSlice = createSlice({
 
 //#region Helper state function that mutate directly the state
 function addNewShape(state: DiagramState, shape: Shape) {
-  if (state.creationProgress) {
-    state.shapes.push({
-      id: uuidv4(),
-      shape: shape,
-      style: state.globalStyle,
-    });
+  const newShapeObj: ShapeObject = {
+    id: uuidv4(),
+    shape: shape,
+    style: state.globalStyle,
+  };
+
+  // If shape is a text, alwyas add it on top
+  if (shape.type === "TEXT") {
+    state.shapes.push(newShapeObj);
+  } else {
+    // Else, add it below the first text shape (Text shapes are always on top of other shapes)
+    const bottomTextShapeIdx = state.shapes.findIndex(
+      (s) => s.shape.type === "TEXT"
+    );
+    if (bottomTextShapeIdx < 0) {
+      // If there's no text shapes, just add it on top
+      state.shapes.push(newShapeObj);
+    } else {
+      // Add it below the bottom text shape
+      state.shapes.splice(bottomTextShapeIdx, 0, newShapeObj);
+    }
   }
 }
 

@@ -2,6 +2,8 @@ import _ from "lodash";
 import { CanvasSize } from "../store/diagramSlice";
 import { Coords, Shape, normalizeMultiSegmentLine } from "./shapes";
 import { createLineSegment } from "./create";
+import { BoundingBox } from "./shapeInCanvas";
+import { getBoundingBox } from "./shapeInCanvas";
 
 export function translate(
   shape: Shape,
@@ -119,7 +121,7 @@ export function resize(
       const resizedShape = { ...shape, tl: corrected_tl, br: corrected_br };
 
       // If we resized outside the canvas bounds, then return the original shape
-      if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
+      if (isShapeOutsideCanvas(resizedShape, canvasSize)) return resizedShape;
       else return shape;
     }
     case "LINE": {
@@ -150,7 +152,7 @@ export function resize(
         };
       }
 
-      if (isShapeLegal(resizedShape, canvasSize)) return resizedShape;
+      if (isShapeOutsideCanvas(resizedShape, canvasSize)) return resizedShape;
       else return shape;
     }
     case "MULTI_SEGMENT_LINE": {
@@ -217,7 +219,7 @@ export function resize(
       }
 
       const correctedLine = normalizeMultiSegmentLine(resizedShape);
-      if (isShapeLegal(correctedLine, canvasSize)) return correctedLine;
+      if (isShapeOutsideCanvas(correctedLine, canvasSize)) return correctedLine;
       else return shape;
     }
     case "TEXT": {
@@ -268,10 +270,7 @@ export function getResizePoints(shape: Shape): ResizePoint[] {
   }
 }
 
-function isShapeLegal(
-  shape: Shape,
-  canvasSize: { rows: number; cols: number }
-): boolean {
+function isShapeOutsideCanvas(shape: Shape, canvasSize: CanvasSize): boolean {
   const bb = getBoundingBox(shape);
   if (bb.top < 0) return false;
   if (bb.bottom >= canvasSize.rows) return false;
@@ -279,73 +278,6 @@ function isShapeLegal(
   if (bb.right >= canvasSize.cols) return false;
 
   return true;
-}
-
-export type BoundingBox = {
-  top: number;
-  bottom: number;
-  left: number;
-  right: number;
-};
-export function getBoundingBox(shape: Shape): BoundingBox {
-  switch (shape.type) {
-    case "RECTANGLE": {
-      return {
-        top: shape.tl.r,
-        bottom: shape.br.r,
-        left: shape.tl.c,
-        right: shape.br.c,
-      };
-    }
-    case "LINE": {
-      return {
-        top: Math.min(shape.start.r, shape.end.r),
-        bottom: Math.max(shape.start.r, shape.end.r),
-        left: Math.min(shape.start.c, shape.end.c),
-        right: Math.max(shape.start.c, shape.end.c),
-      };
-    }
-    case "MULTI_SEGMENT_LINE": {
-      const points = [
-        ...shape.segments.map((s) => s.start),
-        ...shape.segments.map((s) => s.end),
-      ];
-
-      return {
-        top: Math.min(...points.map((p) => p.r)),
-        bottom: Math.max(...points.map((p) => p.r)),
-        left: Math.min(...points.map((p) => p.c)),
-        right: Math.max(...points.map((p) => p.c)),
-      };
-    }
-    case "TEXT": {
-      const lineCount = shape.lines.length;
-      const longestLineLength = Math.max(
-        ...shape.lines.map((line) => line.length)
-      );
-
-      return {
-        top: shape.start.r,
-        bottom: shape.start.r + lineCount,
-        left: shape.start.c,
-        right: shape.start.c + longestLineLength,
-      };
-    }
-  }
-}
-
-export function mergeBoundingBoxes(shapes: Shape[]): BoundingBox | null {
-  if (shapes.length === 0) return null;
-
-  const bb = getBoundingBox(shapes[0]);
-  shapes.slice(1).forEach((shape) => {
-    const sbb = getBoundingBox(shape);
-    bb.top = Math.min(bb.top, sbb.top);
-    bb.bottom = Math.max(bb.bottom, sbb.bottom);
-    bb.left = Math.min(bb.left, sbb.left);
-    bb.right = Math.max(bb.right, sbb.right);
-  });
-  return bb;
 }
 
 /**
