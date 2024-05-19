@@ -13,7 +13,7 @@ export function FooterTip(): JSX.Element {
     (state) => state.diagram.selectedTool === "MULTI_SEGMENT_LINE"
   );
 
-  const isTestShapeSelected = useAppSelector(
+  const isTextShapeSelected = useAppSelector(
     (state) => diagramSelectors.selectedShapeObj(state)?.shape.type === "TEXT"
   );
 
@@ -23,14 +23,13 @@ export function FooterTip(): JSX.Element {
     ? "Click-and-Drag to create a line or arrow."
     : isMultiSegmmentLineToolSelected
     ? "Click once, and then click again to position segments. Double-click to finish creating the line."
-    : isTestShapeSelected && !isTextBeingWritten
+    : isTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
     : null;
 
   return (
     <Box
       sx={{
-        ml: 10,
         display: "flex",
         alignItems: "center",
         gap: 1,
