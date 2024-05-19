@@ -1,5 +1,5 @@
-import { ShapeObject } from "../store/diagramSlice";
-import { moveShapeToFront } from "./shapeInCanvas";
+import { ShapeObject } from "../../store/diagramSlice";
+import { moveShapeToFront } from "../shapeInCanvas";
 
 describe("moveShapeToFront()", () => {
   // Moving a shape, no text

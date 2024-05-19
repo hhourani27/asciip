@@ -1,4 +1,4 @@
-import { range } from "./shapes";
+import { range } from "../shapes";
 
 describe("range()", () => {
   test("range()", () => {

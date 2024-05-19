@@ -1,5 +1,5 @@
-import { CanvasSize } from "../store/diagramSlice";
-import { capText } from "./text";
+import { CanvasSize } from "../../store/diagramSlice";
+import { capText } from "../text";
 
 describe("capTextShape()", () => {
   const canvasSize: CanvasSize = { rows: 10, cols: 10 };

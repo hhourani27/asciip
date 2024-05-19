@@ -1,10 +1,10 @@
-import { CanvasSize } from "../store/diagramSlice";
+import { CanvasSize } from "../../store/diagramSlice";
 import {
   getStyledCanvasGrid,
   getAbstractShapeRepresentation,
   getTextExport,
-} from "./representation";
-import { Line, MultiSegment, Rectangle } from "./shapes";
+} from "../representation";
+import { Line, MultiSegment, Rectangle } from "../shapes";
 
 describe("getAbstractShapeRepresentation()", () => {
   test("Abstract Representation of 6x6 rectangle", () => {
