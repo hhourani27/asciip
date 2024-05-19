@@ -1,6 +1,6 @@
-import { Line, Rectangle } from "./shapes";
-import { resize, translate } from "./transformation";
-import { getBoundingBoxOfAll } from "./shapeInCanvas";
+import { Line, Rectangle } from "../shapes";
+import { resize, translate } from "../transformation";
+import { getBoundingBoxOfAll } from "../shapeInCanvas";
 
 describe("translate()", () => {
   test("Translate rectangle dr,dc = 1,1", () => {
