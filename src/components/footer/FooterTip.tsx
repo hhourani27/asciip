@@ -30,7 +30,6 @@ export function FooterTip(): JSX.Element {
   return (
     <Box
       sx={{
-        ml: 10,
         display: "flex",
         alignItems: "center",
         gap: 1,

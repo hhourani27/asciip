@@ -1,13 +1,8 @@
-import { IconButton, Paper, Tooltip } from "@mui/material";
-import SettingsOverscanIcon from "@mui/icons-material/SettingsOverscan";
-import FitScreenIcon from "@mui/icons-material/FitScreen";
-import { diagramActions } from "../../store/diagramSlice";
-import { useAppDispatch } from "../../store/hooks";
+import { Box, Divider, Paper } from "@mui/material";
 import { FooterTip } from "./FooterTip";
+import { FooterCanvasSize } from "./FooterCanvasSize";
 
 export function Footer(): JSX.Element {
-  const dispatch = useAppDispatch();
-
   return (
     <Paper
       component="footer"
@@ -18,25 +13,18 @@ export function Footer(): JSX.Element {
         px: 3,
       }}
     >
-      <Tooltip title="Expand canvas" arrow>
-        <IconButton
-          aria-label="expand canvas"
-          size="medium"
-          onClick={() => dispatch(diagramActions.expandCanvas())}
-        >
-          <SettingsOverscanIcon fontSize="inherit" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Shrink canvas to fit" arrow>
-        <IconButton
-          aria-label="Shrink canvas to fit"
-          size="medium"
-          onClick={() => dispatch(diagramActions.shrinkCanvasToFit())}
-        >
-          <FitScreenIcon fontSize="inherit" />
-        </IconButton>
-      </Tooltip>
-      <FooterTip />
+      <Box
+        id="left-footer"
+        sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 3 }}
+      >
+        <FooterCanvasSize />
+        <Divider orientation="vertical" flexItem />
+        <FooterTip />
+      </Box>
+      <Box
+        id="right-footer"
+        sx={{ flexGrow: 0, display: "flex", alignItems: "center", gap: 2 }}
+      ></Box>
     </Paper>
   );
 }
