@@ -380,3 +380,73 @@ test("Rectangle | TEXT 1 | Text 2 | Text 3 => Bring to front => Rectangle | Text
   expect(finalState.shapes[2].id).toBe("text_3");
   expect(finalState.shapes[3].id).toBe("text_1");
 });
+
+test("Arrow (touch) | RECTANGLE => Push to back => RECTANGLE | Arrow", () => {
+  const canvasSize: CanvasSize = { rows: 10, cols: 10 };
+
+  const initialState = initDiagramState({
+    canvasSize,
+    shapes: [
+      {
+        id: "line_0",
+        shape: {
+          type: "LINE",
+          axis: "HORIZONTAL",
+          direction: "LEFT_TO_RIGHT",
+          start: { r: 1, c: 0 },
+          end: { r: 1, c: 4 },
+        },
+      },
+      {
+        id: "rectangle_1",
+        shape: { type: "RECTANGLE", tl: { r: 0, c: 1 }, br: { r: 2, c: 3 } },
+      },
+    ],
+  });
+
+  const actions = [
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onMoveToBackButtonClick(),
+  ];
+
+  const finalState = applyActions(diagramReducer, initialState, actions);
+  expect(finalState.shapes[0].id).toBe("rectangle_1");
+  expect(finalState.shapes[1].id).toBe("line_0");
+});
+
+test("RECTANGLE | Arrow (touch)  => Push to back => RECTANGLE | Arrow", () => {
+  const canvasSize: CanvasSize = { rows: 10, cols: 10 };
+
+  const initialState = initDiagramState({
+    canvasSize,
+    shapes: [
+      {
+        id: "rectangle_0",
+        shape: { type: "RECTANGLE", tl: { r: 0, c: 1 }, br: { r: 2, c: 3 } },
+      },
+      {
+        id: "line_1",
+        shape: {
+          type: "LINE",
+          axis: "HORIZONTAL",
+          direction: "LEFT_TO_RIGHT",
+          start: { r: 1, c: 0 },
+          end: { r: 1, c: 4 },
+        },
+      },
+    ],
+  });
+
+  const actions = [
+    diagramActions.setTool("SELECT"),
+    diagramActions.onCellHover({ r: 0, c: 1 }),
+    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onMoveToBackButtonClick(),
+  ];
+
+  const finalState = applyActions(diagramReducer, initialState, actions);
+  expect(finalState.shapes[0].id).toBe("rectangle_0");
+  expect(finalState.shapes[1].id).toBe("line_1");
+});

@@ -8,8 +8,9 @@ import {
   normalizeMultiSegmentLine,
 } from "../models/shapes";
 import {
-  areShapesTouching,
   getShapeObjAtCoords,
+  moveShapeToBack,
+  moveShapeToFront,
 } from "../models/shapeInCanvas";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
@@ -470,36 +471,12 @@ export const diagramSlice = createSlice({
     },
     onMoveToFrontButtonClick: (state) => {
       if (state.selectedShapeId) {
-        const selectedShapeIdx = state.shapes.findIndex(
-          (s) => s.id === state.selectedShapeId
-        );
-        const selectedShapeObj = state.shapes[selectedShapeIdx];
-
-        let newIdx = selectedShapeIdx + 1;
-
-        while (true) {
-          if (newIdx === state.shapes.length) break;
-          if (
-            selectedShapeObj.shape.type !== "TEXT" &&
-            state.shapes[newIdx].shape.type === "TEXT"
-          ) {
-            break;
-          }
-          if (
-            areShapesTouching(
-              selectedShapeObj.shape,
-              state.shapes[newIdx].shape
-            )
-          ) {
-            newIdx++; // We will insert this shape in front of it
-            break;
-          }
-
-          newIdx++;
-        }
-
-        state.shapes.splice(newIdx, 0, selectedShapeObj); // Insert shape at new position
-        state.shapes.splice(selectedShapeIdx, 1); // Remove shape from its previous position
+        state.shapes = moveShapeToFront(state.shapes, state.selectedShapeId);
+      }
+    },
+    onMoveToBackButtonClick: (state) => {
+      if (state.selectedShapeId) {
+        state.shapes = moveShapeToBack(state.shapes, state.selectedShapeId);
       }
     },
     //#endregion

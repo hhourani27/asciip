@@ -14,15 +14,34 @@ export function ToolbarOrder(): JSX.Element {
 
   return (
     <ButtonGroup size="small">
-      <Tooltip title="Push shape to back" arrow>
+      <Tooltip
+        title={
+          <span>
+            {"Push shape to back"}
+            <br />
+            <em>{"Text is always in front of shapes"}</em>
+          </span>
+        }
+        arrow
+      >
         <IconButton
           aria-label="push to back"
           disabled={selectedShapeId == null}
+          onClick={() => dispatch(diagramActions.onMoveToBackButtonClick())}
         >
           <FlipToBackIcon />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Bring shape to front" arrow>
+      <Tooltip
+        title={
+          <span>
+            {"Bring shape to front"}
+            <br />
+            <em>{"Text is always in front of shapes"}</em>
+          </span>
+        }
+        arrow
+      >
         <IconButton
           aria-label="bring to front"
           disabled={selectedShapeId == null}
