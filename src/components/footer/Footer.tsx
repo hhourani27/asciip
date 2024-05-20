@@ -19,7 +19,7 @@ export function Footer(): JSX.Element {
         sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 3 }}
       >
         <FooterCanvasSize />
-        <Divider orientation="vertical" flexItem />
+        <Divider orientation="vertical" variant="middle" flexItem />
         <FooterTip />
       </Box>
       <Box

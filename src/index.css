@@ -11,3 +11,10 @@ a {
   color: inherit; /* blue colors for links too */
   text-decoration: inherit; /* no underline */
 }
+
+@font-face {
+  font-family: "MartianMono";
+  src: url("./fonts/MartianMono-SemiBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}

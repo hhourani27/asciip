@@ -1,8 +1,9 @@
-import { ButtonGroup, IconButton, Tooltip } from "@mui/material";
+import { ButtonGroup, Divider, IconButton, Tooltip } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import InfoIcon from "@mui/icons-material/Info";
 import { useState } from "react";
 import { InfoDialog } from "../dialogs/InfoDialog";
+import { Logo } from "../Logo";
 
 export function FooterInfo(): JSX.Element {
   const [infoDialogOpen, setInfoDialogOpen] = useState<boolean>(false);
@@ -34,6 +35,8 @@ export function FooterInfo(): JSX.Element {
           </IconButton>
         </Tooltip>
       </ButtonGroup>
+      <Divider orientation="vertical" variant="middle" flexItem />
+      <Logo />
       {infoDialogOpen && (
         <InfoDialog onClose={() => setInfoDialogOpen(false)} />
       )}

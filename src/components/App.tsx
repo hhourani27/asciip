@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
-import Toolbar from "./components/toolbar/Toolbar";
-import Canvas from "./components/canvas/Canvas";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { diagramActions } from "./store/diagramSlice";
-import { isShortcutsEnabled } from "./store/uiSelectors";
-import { Footer } from "./components/footer/Footer";
+import Toolbar from "./toolbar/Toolbar";
+import Canvas from "./canvas/Canvas";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { diagramActions } from "../store/diagramSlice";
+import { isShortcutsEnabled } from "../store/uiSelectors";
+import { Footer } from "./footer/Footer";
 
 function App() {
   const dispatch = useAppDispatch();
