@@ -6,6 +6,7 @@ import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import { CELL_HEIGHT, CELL_WIDTH, canvasDraw } from "./draw";
 import _ from "lodash";
 import { TextShapeInput } from "./TextShapeInput";
+import { getPointer } from "../../store/uiSelectors";
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -30,15 +31,14 @@ export default function Canvas(): JSX.Element {
   const selectedShapeObj = useAppSelector((state) =>
     diagramSelectors.selectedShapeObj(state)
   );
-  const newShape = useAppSelector(
-    (state) => state.diagram.creationProgress?.shape
+  const newShape = useAppSelector((state) =>
+    diagramSelectors.currentCreatedShape(state)
   );
   const currentEditedText = useAppSelector((state) =>
     diagramSelectors.currentEditedText(state)
   );
-  const nextActionOnClick = useAppSelector(
-    (state) => state.diagram.nextActionOnClick
-  );
+
+  const nextActionOnClick = useAppSelector((state) => getPointer(state));
 
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;
@@ -157,16 +157,18 @@ export default function Canvas(): JSX.Element {
     >
       <canvas
         ref={canvasRef}
-        onMouseDown={(e) =>
+        onMouseDown={(e) => {
+          // console.log(`[Canvas] onMouseDown: timestamp=${e.timeStamp}`);
           dispatch(
             diagramActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
-          )
-        }
-        onMouseUp={(e) =>
+          );
+        }}
+        onMouseUp={(e) => {
+          // console.log(`[Canvas] onMouseUp: timestamp=${e.timeStamp}`);
           dispatch(
             diagramActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
-          )
-        }
+          );
+        }}
         onMouseMove={(e) => {
           const newCoords = getCellCoords(e.clientX, e.clientY);
           if (!_.isEqual(hoveredCellRef.current, newCoords)) {
@@ -179,18 +181,21 @@ export default function Canvas(): JSX.Element {
         onMouseLeave={(e) => {
           dispatch(diagramActions.onCanvasMouseLeave());
         }}
-        onClick={(e) =>
+        onClick={(e) => {
+          // console.log(`[Canvas] onClick: timestamp=${e.timeStamp}`);
           dispatch(
             diagramActions.onCellClick(getCellCoords(e.clientX, e.clientY))
-          )
-        }
-        onDoubleClick={(e) =>
+          );
+        }}
+        onDoubleClick={(e) => {
+          // console.log(`[Canvas] onDoubleClick: timestamp=${e.timeStamp}`);
+
           dispatch(
             diagramActions.onCellDoubleClick(
               getCellCoords(e.clientX, e.clientY)
             )
-          )
-        }
+          );
+        }}
       ></canvas>
       {currentEditedText && (
         <TextShapeInput

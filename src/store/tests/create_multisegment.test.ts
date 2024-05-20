@@ -7,6 +7,7 @@ import {
 import {
   applyActions,
   generateMouseClickAction,
+  generateMouseDoubleClickAction,
   generateMouseMoveActions,
 } from "./utils";
 
@@ -22,7 +23,7 @@ test("Create multi-line segment with all segment types", () => {
     diagramActions.onCellHover({ r: 2, c: 1 }),
     ...generateMouseClickAction({ r: 2, c: 1 }),
     diagramActions.onCellHover({ r: 1, c: 1 }),
-    diagramActions.onCellDoubleClick({ r: 1, c: 1 }),
+    ...generateMouseDoubleClickAction({ r: 1, c: 1 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -70,7 +71,7 @@ test("Two consecutive segments with the same direction are merged", () => {
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseMoveActions({ r: 0, c: 3 }, { r: 0, c: 4 }),
-    diagramActions.onCellDoubleClick({ r: 0, c: 4 }),
+    ...generateMouseDoubleClickAction({ r: 0, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -101,7 +102,7 @@ test("0-length segments are ignored", () => {
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
-    diagramActions.onCellDoubleClick({ r: 0, c: 2 }),
+    ...generateMouseDoubleClickAction({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);

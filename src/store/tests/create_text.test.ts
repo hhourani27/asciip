@@ -14,7 +14,7 @@ import {
 
 const canvasSize: CanvasSize = { rows: 10, cols: 10 };
 
-test("Create text", () => {
+test("Create a text shape", () => {
   const actions = [
     diagramActions.setTool("TEXT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
@@ -37,7 +37,7 @@ test("Create text", () => {
 
   expect(finalState.shapes).toHaveLength(1);
   expect(finalState.shapes[0].shape).toEqual(expectedShape);
-  expect(finalState.creationProgress).toBeNull();
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });
 
 test("Text cannot exceed canvas", () => {
@@ -67,7 +67,7 @@ test("Text cannot exceed canvas", () => {
   expect(finalState.shapes[0].shape).toEqual(expectedShape);
 });
 
-test("Create 2 texts", () => {
+test("Create 2 text shapes", () => {
   const actions = [
     diagramActions.setTool("TEXT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
@@ -101,5 +101,41 @@ test("Create 2 texts", () => {
   expect(finalState.shapes).toHaveLength(2);
   expect(finalState.shapes[0].shape).toEqual(expectedShape1);
   expect(finalState.shapes[1].shape).toEqual(expectedShape2);
-  expect(finalState.creationProgress).toBeNull();
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
+});
+
+test("Clicking on an empty cell while creating a Text shape, saves the text and creates a new one", () => {
+  const actions = [
+    diagramActions.setTool("TEXT"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    ...generateMouseClickAction({ r: 0, c: 0 }),
+    ...generateUpdateText("Hello"),
+    ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 0 }),
+    ...generateMouseClickAction({ r: 2, c: 0 }),
+    ...generateUpdateText("World"),
+    diagramActions.onCtrlEnterPress(),
+  ];
+
+  const finalState = applyActions(
+    diagramReducer,
+    initDiagramState({ canvasSize }),
+    actions
+  );
+
+  const expectedShape1: TextShape = {
+    type: "TEXT",
+    start: { r: 0, c: 0 },
+    lines: ["Hello"],
+  };
+
+  const expectedShape2: TextShape = {
+    type: "TEXT",
+    start: { r: 2, c: 0 },
+    lines: ["World"],
+  };
+
+  expect(finalState.shapes).toHaveLength(2);
+  expect(finalState.shapes[0].shape).toEqual(expectedShape1);
+  expect(finalState.shapes[1].shape).toEqual(expectedShape2);
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });

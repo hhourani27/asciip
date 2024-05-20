@@ -2,6 +2,7 @@ import {
   diagramReducer,
   diagramActions,
   initDiagramState,
+  diagramSelectors,
 } from "../diagramSlice";
 import {
   applyActions,
@@ -9,7 +10,7 @@ import {
   generateMouseMoveActions,
 } from "./utils";
 
-test("When clicking on empty cell, selection should be cleared", () => {
+test("I select a shape, I click on an empty cell => selection is cleared", () => {
   const initialState = initDiagramState({
     shapes: [
       {
@@ -29,5 +30,21 @@ test("When clicking on empty cell, selection should be cleared", () => {
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(finalState.selectedShapeId).toBeNull();
+  expect(
+    diagramSelectors.selectedShapeObj({ diagram: finalState })
+  ).toBeUndefined();
+});
+
+test("I am creating a shape, then I select the Select tool (with the S shortcut) => The new shape creation is cancelled", () => {
+  const actions = [
+    diagramActions.setTool("RECTANGLE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
+    ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
+    diagramActions.setTool("SELECT"),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.shapes).toHaveLength(0);
 });

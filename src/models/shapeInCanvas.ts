@@ -1,6 +1,8 @@
+import _ from "lodash";
 import { ShapeObject } from "../store/diagramSlice";
 import { getAbstractShapeRepresentation } from "./representation";
 import { Coords, Shape } from "./shapes";
+import { getResizePoints } from "./transformation";
 
 export type BoundingBox = {
   top: number;
@@ -70,11 +72,21 @@ export function getBoundingBoxOfAll(shapes: Shape[]): BoundingBox | null {
   return bb;
 }
 
+export function isShapeAtCoords(shape: Shape, { r, c }: Coords): boolean {
+  const repr = getAbstractShapeRepresentation(shape);
+  return r in repr && c in repr[r];
+}
+
+export function hasResizePointAtCoords(shape: Shape, coords: Coords): boolean {
+  const resizePoints = getResizePoints(shape);
+
+  return resizePoints.some((rp) => _.isEqual(rp.coords, coords));
+}
+
 /**
  *
  * @returns the shapes whose edge touch the coordinate. If there are multiple shapes, they are returned in the same order than shapes[]
  */
-
 export function getShapeObjsAtCoords(
   shapeObjs: ShapeObject[],
   { r, c }: Coords

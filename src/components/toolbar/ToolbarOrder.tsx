@@ -3,13 +3,13 @@ import FlipToFrontIcon from "@mui/icons-material/FlipToFront";
 import FlipToBackIcon from "@mui/icons-material/FlipToBack";
 
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions } from "../../store/diagramSlice";
+import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 
 export function ToolbarOrder(): JSX.Element {
   const dispatch = useAppDispatch();
 
-  const selectedShapeId = useAppSelector(
-    (state) => state.diagram.selectedShapeId
+  const selectedShapeObj = useAppSelector((state) =>
+    diagramSelectors.selectedShapeObj(state)
   );
 
   return (
@@ -26,7 +26,7 @@ export function ToolbarOrder(): JSX.Element {
       >
         <IconButton
           aria-label="push to back"
-          disabled={selectedShapeId == null}
+          disabled={!selectedShapeObj}
           onClick={() => dispatch(diagramActions.onMoveToBackButtonClick())}
         >
           <FlipToBackIcon />
@@ -44,7 +44,7 @@ export function ToolbarOrder(): JSX.Element {
       >
         <IconButton
           aria-label="bring to front"
-          disabled={selectedShapeId == null}
+          disabled={!selectedShapeObj}
           onClick={() => dispatch(diagramActions.onMoveToFrontButtonClick())}
         >
           <FlipToFrontIcon />
