@@ -2,6 +2,7 @@ import {
   diagramReducer,
   diagramActions,
   initDiagramState,
+  diagramSelectors,
 } from "../diagramSlice";
 import {
   applyActions,
@@ -29,5 +30,7 @@ test("When clicking on empty cell, selection should be cleared", () => {
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(finalState.selectedShapeId).toBeNull();
+  expect(
+    diagramSelectors.selectedShapeObj({ diagram: finalState })
+  ).toBeUndefined();
 });

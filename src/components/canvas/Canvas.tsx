@@ -6,6 +6,7 @@ import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import { CELL_HEIGHT, CELL_WIDTH, canvasDraw } from "./draw";
 import _ from "lodash";
 import { TextShapeInput } from "./TextShapeInput";
+import { getPointer } from "../../store/pointer";
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -30,15 +31,14 @@ export default function Canvas(): JSX.Element {
   const selectedShapeObj = useAppSelector((state) =>
     diagramSelectors.selectedShapeObj(state)
   );
-  const newShape = useAppSelector(
-    (state) => state.diagram.creationProgress?.shape
+  const newShape = useAppSelector((state) =>
+    diagramSelectors.currentCreatedShape(state)
   );
   const currentEditedText = useAppSelector((state) =>
     diagramSelectors.currentEditedText(state)
   );
-  const nextActionOnClick = useAppSelector(
-    (state) => state.diagram.nextActionOnClick
-  );
+
+  const nextActionOnClick = useAppSelector((state) => getPointer(state));
 
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;

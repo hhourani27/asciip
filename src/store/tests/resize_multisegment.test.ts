@@ -225,7 +225,7 @@ test("Shrink first segment", () => {
   expect(finalState.shapes[0]).toEqual(expected);
 });
 
-test("Add segment at start", () => {
+test("Add 4 segments at start (all segment types)", () => {
   const initialState = initDiagramState({
     shapes: [
       {
@@ -256,11 +256,15 @@ test("Add segment at start", () => {
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
     ...generateMouseClickAction({ r: 0, c: 2 }),
-    // Drag start point
+    // Drag start point down and add an UP Segment
     diagramActions.onCellHover({ r: 0, c: 1 }),
     diagramActions.onCellMouseDown({ r: 0, c: 1 }),
-    diagramActions.onCellHover({ r: 1, c: 1 }),
-    ...generateMouseUpAction({ r: 1, c: 1 }),
+    ...generateMouseMoveActions({ r: 0, c: 1 }, { r: 3, c: 1 }),
+    ...generateMouseUpAction({ r: 3, c: 1 }),
+    // Drag new start point left and add a RIGHT-TO-LEFT Segment
+    diagramActions.onCellMouseDown({ r: 3, c: 1 }),
+    ...generateMouseMoveActions({ r: 3, c: 1 }, { r: 3, c: 6 }),
+    ...generateMouseUpAction({ r: 3, c: 6 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -271,9 +275,15 @@ test("Add segment at start", () => {
       type: "MULTI_SEGMENT_LINE",
       segments: [
         {
+          axis: "HORIZONTAL",
+          direction: "RIGHT_TO_LEFT",
+          start: { r: 3, c: 6 },
+          end: { r: 3, c: 1 },
+        },
+        {
           axis: "VERTICAL",
           direction: "UP",
-          start: { r: 1, c: 1 },
+          start: { r: 3, c: 1 },
           end: { r: 0, c: 1 },
         },
         {
@@ -455,7 +465,6 @@ test("Add segment at end", () => {
     ...generateMouseClickAction({ r: 0, c: 2 }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
-    diagramActions.onCellHover({ r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 2, c: 4 }),
     ...generateMouseUpAction({ r: 2, c: 4 }),

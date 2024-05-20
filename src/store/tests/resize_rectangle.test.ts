@@ -200,9 +200,10 @@ test("Fix: If a shape has another shape that overlaps it on top, even if I selec
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 2 }),
     ...generateMouseClickAction({ r: 2, c: 2 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
+    diagramActions.onCellMouseDown({ r: 2, c: 3 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(finalState.nextActionOnClick).toBe("RESIZE");
+  expect(finalState.currentMode.mode).toBe("RESIZE");
 });

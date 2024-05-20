@@ -9,12 +9,14 @@ import {
 } from "../models/shapes";
 import {
   getShapeObjAtCoords,
+  hasResizePointAtCoords,
+  isShapeAtCoords,
   moveShapeToBack,
   moveShapeToFront,
 } from "../models/shapeInCanvas";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { getResizePoints, resize, translate } from "../models/transformation";
+import { resize, translate } from "../models/transformation";
 import { getBoundingBoxOfAll } from "../models/shapeInCanvas";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
@@ -38,6 +40,20 @@ export type CanvasSize = {
   cols: number;
 };
 
+export type ActionMode =
+  | { mode: "BEFORE_CREATING" }
+  | {
+      mode: "CREATE";
+      start: Coords;
+      curr: Coords;
+      checkpoint: Shape | null;
+      shape: Shape;
+    }
+  | { mode: "SELECT"; selectedShapeId: string | null }
+  | { mode: "MOVE"; start: Coords; shapeId: string; startShape: Shape }
+  | { mode: "RESIZE"; resizePoint: Coords; shapeId: string; startShape: Shape }
+  | { mode: "TEXT_EDIT"; shapeId: string; startShape: TextShape };
+
 export type DiagramData = {
   canvasSize: CanvasSize;
   shapes: ShapeObject[];
@@ -50,22 +66,7 @@ export type DiagramState = DiagramData & {
   currentHoveredCell: Coords | null;
 
   selectedTool: Tool;
-  creationProgress: null | {
-    start: Coords;
-    curr: Coords;
-    checkpoint: Shape | null;
-    shape: Shape;
-  };
-
-  // Properties set when selectedTool === SELECT
-  selectedShapeId: null | string;
-  nextActionOnClick: null | "CREATE" | "SELECT" | "MOVE" | "RESIZE";
-  moveProgress: null | { start: Coords; startShape: Shape };
-  resizeProgress: null | {
-    resizePoint: Coords;
-    startShape: Shape;
-  };
-  textEditProgress: null | { startShape: TextShape };
+  currentMode: ActionMode;
 
   /* Other state of the app */
   exportInProgress: boolean;
@@ -89,12 +90,7 @@ export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
     currentHoveredCell: null,
 
     selectedTool: "SELECT",
-    creationProgress: null,
-    selectedShapeId: null,
-    nextActionOnClick: "SELECT",
-    moveProgress: null,
-    resizeProgress: null,
-    textEditProgress: null,
+    currentMode: { mode: "SELECT", selectedShapeId: null },
 
     exportInProgress: false,
   };
@@ -132,125 +128,153 @@ export const diagramSlice = createSlice({
     },
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
-        state.creationProgress = null;
-        state.moveProgress = null;
-        state.resizeProgress = null;
-        state.textEditProgress = null;
+        if (action.payload === "SELECT") {
+          state.currentMode = { mode: "SELECT", selectedShapeId: null };
+        } else {
+          state.currentMode = { mode: "BEFORE_CREATING" };
+        }
       }
 
       state.selectedTool = action.payload;
-      if (action.payload !== "SELECT") {
-        state.selectedShapeId = null;
-        state.nextActionOnClick = "CREATE";
-      }
     },
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
-      if (state.selectedTool === "SELECT") {
-        //* I select the SELECT tool, I double-click on a Text => Start editing Text
+      if (
+        state.currentMode.mode === "SELECT" ||
+        state.currentMode.mode === "TEXT_EDIT"
+      ) {
         const shapeObj = getShapeObjAtCoords(state.shapes, action.payload);
         if (shapeObj?.shape.type === "TEXT") {
-          state.selectedShapeId = shapeObj.id;
-          state.textEditProgress = { startShape: { ...shapeObj.shape } };
+          state.currentMode = {
+            mode: "TEXT_EDIT",
+            shapeId: shapeObj.id,
+            startShape: { ...shapeObj.shape },
+          };
         }
-      } else if (state.creationProgress?.shape.type === "MULTI_SEGMENT_LINE") {
+      } else if (
+        state.currentMode.mode === "CREATE" &&
+        state.currentMode.shape.type === "MULTI_SEGMENT_LINE"
+      ) {
+        const createMode = state.currentMode;
+
         const newShape: MultiSegment | null = isShapeLegal(
-          state.creationProgress.shape
+          createMode.shape as MultiSegment
         )
-          ? state.creationProgress.shape
-          : (state.creationProgress.checkpoint as MultiSegment);
+          ? (createMode.shape as MultiSegment)
+          : (createMode.checkpoint as MultiSegment | null);
 
         if (newShape) {
           addNewShape(state, normalizeMultiSegmentLine(newShape));
         }
-        state.creationProgress = null;
+        state.currentMode = { mode: "BEFORE_CREATING" };
       }
     },
     onCellClick: (state, action: PayloadAction<Coords>) => {
-      if (state.selectedTool === "SELECT") {
+      if (state.currentMode.mode === "SELECT") {
         const shape = getShapeObjAtCoords(state.shapes, action.payload);
-        if (shape) {
-          state.selectedShapeId = shape.id;
-          state.nextActionOnClick = "MOVE";
-        } else {
-          state.selectedShapeId = null;
-          state.nextActionOnClick = "SELECT";
-        }
+        state.currentMode = {
+          mode: "SELECT",
+          selectedShapeId: shape ? shape.id : null,
+        };
+      } else if (state.currentMode.mode === "TEXT_EDIT") {
+        const shape = getShapeObjAtCoords(state.shapes, action.payload);
+        state.currentMode = {
+          mode: "SELECT",
+          selectedShapeId: shape ? shape.id : null,
+        };
+      } else if (
+        state.currentMode.mode === "BEFORE_CREATING" &&
+        state.selectedTool === "MULTI_SEGMENT_LINE"
+      ) {
+        state.currentMode = {
+          mode: "CREATE",
+          start: action.payload,
+          curr: action.payload,
+          checkpoint: null,
+          shape: {
+            type: "MULTI_SEGMENT_LINE",
+            segments: [createZeroWidthSegment(action.payload)],
+          },
+        };
+      } else if (
+        state.currentMode.mode === "CREATE" &&
+        state.selectedTool === "MULTI_SEGMENT_LINE"
+      ) {
+        const createMode = state.currentMode;
+        if (isShapeLegal(createMode.shape)) {
+          createMode.shape = normalizeMultiSegmentLine(
+            createMode.shape as MultiSegment
+          );
+          createMode.checkpoint = _.cloneDeep(createMode.shape as MultiSegment);
 
-        //* I am editing a text, and I click on the canvas =>  I complete editing text (since editing a text is progressively saved, I don't need to save it here)
-        state.textEditProgress = null;
-      } else if (state.selectedTool === "MULTI_SEGMENT_LINE") {
-        if (state.creationProgress == null) {
-          state.creationProgress = {
-            start: action.payload,
-            curr: action.payload,
-            checkpoint: null,
-            shape: {
-              type: "MULTI_SEGMENT_LINE",
-              segments: [createZeroWidthSegment(action.payload)],
-            },
-          };
-        } else if (state.creationProgress.shape.type === "MULTI_SEGMENT_LINE") {
-          if (isShapeLegal(state.creationProgress.shape)) {
-            state.creationProgress.shape = normalizeMultiSegmentLine(
-              state.creationProgress.shape
-            );
-            state.creationProgress.checkpoint = _.cloneDeep(
-              state.creationProgress.shape
-            );
-
-            const lastPoint =
-              state.creationProgress.shape.segments[
-                state.creationProgress.shape.segments.length - 1
-              ].end;
-            state.creationProgress.start = lastPoint;
-            state.creationProgress.shape.segments.push(
-              createZeroWidthSegment(lastPoint)
-            );
-          }
+          const lastPoint =
+            createMode.shape.segments[createMode.shape.segments.length - 1].end;
+          createMode.start = lastPoint;
+          createMode.shape.segments.push(createZeroWidthSegment(lastPoint));
         }
-      } else if (state.selectedTool === "TEXT") {
-        if (state.creationProgress == null) {
-          state.creationProgress = {
-            start: action.payload,
-            curr: action.payload,
-            checkpoint: null,
-            shape: { type: "TEXT", start: action.payload, lines: [] },
-          };
-        } else if (state.creationProgress) {
-          addNewShape(state, state.creationProgress.shape);
-          state.creationProgress = {
-            start: action.payload,
-            curr: action.payload,
-            checkpoint: null,
-            shape: { type: "TEXT", start: action.payload, lines: [] },
-          };
-        }
+      } else if (
+        state.currentMode.mode === "BEFORE_CREATING" &&
+        state.selectedTool === "TEXT"
+      ) {
+        state.currentMode = {
+          mode: "CREATE",
+          start: action.payload,
+          curr: action.payload,
+          checkpoint: null,
+          shape: { type: "TEXT", start: action.payload, lines: [] },
+        };
+      } else if (
+        state.currentMode.mode === "CREATE" &&
+        state.selectedTool === "TEXT"
+      ) {
+        addNewShape(state, state.currentMode.shape);
+        state.currentMode = {
+          mode: "CREATE",
+          start: action.payload,
+          curr: action.payload,
+          checkpoint: null,
+          shape: { type: "TEXT", start: action.payload, lines: [] },
+        };
       }
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
-      if (state.selectedTool === "SELECT") {
-        if (state.nextActionOnClick === "MOVE" && state.moveProgress == null) {
-          const selectedShapeObj = state.shapes.find(
-            (s) => s.id === state.selectedShapeId
-          )!;
-          state.moveProgress = {
-            start: action.payload,
+      if (
+        state.currentMode.mode === "SELECT" &&
+        state.currentMode.selectedShapeId != null
+      ) {
+        const selectMode = state.currentMode;
+
+        const selectedShapeObj = state.shapes.find(
+          (s) => s.id === selectMode.selectedShapeId
+        )!;
+
+        if (
+          hasResizePointAtCoords(
+            selectedShapeObj.shape,
+            state.currentHoveredCell!
+          )
+        ) {
+          state.currentMode = {
+            mode: "RESIZE",
+            shapeId: selectedShapeObj.id,
+            resizePoint: state.currentHoveredCell!,
             startShape: { ...selectedShapeObj.shape },
           };
         } else if (
-          state.nextActionOnClick === "RESIZE" &&
-          state.resizeProgress == null
+          isShapeAtCoords(selectedShapeObj.shape, state.currentHoveredCell!)
         ) {
-          const selectedShapeObj = state.shapes.find(
-            (s) => s.id === state.selectedShapeId
-          )!;
-          state.resizeProgress = {
-            resizePoint: action.payload,
+          state.currentMode = {
+            mode: "MOVE",
+            shapeId: selectedShapeObj.id,
+            start: state.currentHoveredCell!,
             startShape: { ...selectedShapeObj.shape },
           };
         }
-      } else if (state.selectedTool === "RECTANGLE") {
-        state.creationProgress = {
+      } else if (
+        state.currentMode.mode === "BEFORE_CREATING" &&
+        state.selectedTool === "RECTANGLE"
+      ) {
+        state.currentMode = {
+          mode: "CREATE",
           start: action.payload,
           curr: action.payload,
           checkpoint: null,
@@ -260,8 +284,12 @@ export const diagramSlice = createSlice({
             br: action.payload,
           },
         };
-      } else if (state.selectedTool === "LINE") {
-        state.creationProgress = {
+      } else if (
+        state.currentMode.mode === "BEFORE_CREATING" &&
+        state.selectedTool === "LINE"
+      ) {
+        state.currentMode = {
+          mode: "CREATE",
           start: action.payload,
           curr: action.payload,
           checkpoint: null,
@@ -270,119 +298,101 @@ export const diagramSlice = createSlice({
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
-      if (state.moveProgress) {
-        state.moveProgress = null;
-      } else if (state.resizeProgress) {
-        state.resizeProgress = null;
-      } else if (state.creationProgress) {
-        if (
-          state.creationProgress.shape.type === "RECTANGLE" ||
-          state.creationProgress.shape.type === "LINE"
-        ) {
-          // Else, I finished creating a shape
+      if (state.currentMode.mode === "MOVE") {
+        state.currentMode = {
+          mode: "SELECT",
+          selectedShapeId: state.currentMode.shapeId,
+        };
+      } else if (state.currentMode.mode === "RESIZE") {
+        state.currentMode = {
+          mode: "SELECT",
+          selectedShapeId: state.currentMode.shapeId,
+        };
+      } else if (
+        state.currentMode.mode === "CREATE" &&
+        (state.currentMode.shape.type === "RECTANGLE" ||
+          state.currentMode.shape.type === "LINE")
+      ) {
+        // Else, I finished creating a shape
+        const newShape: Shape | null = isShapeLegal(state.currentMode.shape)
+          ? state.currentMode.shape
+          : null;
 
-          const newShape: Shape | null = isShapeLegal(
-            state.creationProgress.shape
-          )
-            ? state.creationProgress.shape
-            : null;
-
-          if (newShape) {
-            addNewShape(state, newShape);
-          }
-          state.creationProgress = null;
+        if (newShape) {
+          addNewShape(state, newShape);
         }
+        state.currentMode = { mode: "BEFORE_CREATING" };
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
       state.currentHoveredCell = action.payload;
 
-      if (state.selectedTool === "SELECT") {
-        if (state.moveProgress) {
-          //* I'm currently moving a Shape and I change mouse position => Update shape position
-          // Get selected shape
-          const selectedShapeIdx: number = state.shapes.findIndex(
-            (s) => s.id === state.selectedShapeId
-          )!;
-          // Translate shape
-          const from = state.moveProgress.start;
-          const to = action.payload;
-          const delta = { r: to.r - from.r, c: to.c - from.c };
-          const translatedShape: Shape = translate(
-            state.moveProgress.startShape,
-            delta,
-            state.canvasSize
-          );
-          // Replace translated shape
-          state.shapes[selectedShapeIdx].shape = translatedShape;
-        } else if (state.resizeProgress) {
-          //* I'm currently resizing a Shape and I change mouse position => Update shape
+      if (state.currentMode.mode === "MOVE") {
+        const moveMode = state.currentMode;
+        //* I'm currently moving a Shape and I change mouse position => Update shape position
+        // Get selected shape
+        const selectedShapeIdx: number = state.shapes.findIndex(
+          (s) => s.id === moveMode.shapeId
+        )!;
+        // Translate shape
+        const from = moveMode.start;
+        const to = action.payload;
+        const delta = { r: to.r - from.r, c: to.c - from.c };
+        const translatedShape: Shape = translate(
+          moveMode.startShape,
+          delta,
+          state.canvasSize
+        );
+        // Replace translated shape
+        state.shapes[selectedShapeIdx].shape = translatedShape;
+      } else if (state.currentMode.mode === "RESIZE") {
+        const resizeMode = state.currentMode;
+        //* I'm currently resizing a Shape and I change mouse position => Update shape
 
-          // Get selected shape
-          const selectedShapeIdx: number = state.shapes.findIndex(
-            (s) => s.id === state.selectedShapeId
-          )!;
-          // Resize shape
-          const resizePoint = state.resizeProgress.resizePoint;
-          const to = action.payload;
-          const delta = { r: to.r - resizePoint.r, c: to.c - resizePoint.c };
-          const resizedShape: Shape = resize(
-            state.resizeProgress.startShape,
-            resizePoint,
-            delta,
-            state.canvasSize
-          );
-          if (isShapeLegal(resizedShape)) {
-            // Replace resized shape
-            state.shapes[selectedShapeIdx].shape = resizedShape;
-          }
-        } else if (!state.moveProgress && !state.resizeProgress) {
-          const shapeObj = getShapeObjAtCoords(
-            state.shapes,
-            action.payload,
-            state.selectedShapeId ?? undefined
-          );
-          if (shapeObj) {
-            //* I'm hovering above a shape
-            if (shapeObj.id === state.selectedShapeId) {
-              const resizePoints = getResizePoints(shapeObj.shape);
-              if (
-                resizePoints.find((rp) => _.isEqual(rp.coords, action.payload))
-              )
-                state.nextActionOnClick = "RESIZE";
-              else state.nextActionOnClick = "MOVE";
-            } else {
-              state.nextActionOnClick = "SELECT";
-            }
-          } else {
-            //* I'm not hovering above a shape
-            state.nextActionOnClick = null;
-          }
+        // Get selected shape
+        const selectedShapeIdx: number = state.shapes.findIndex(
+          (s) => s.id === resizeMode.shapeId
+        )!;
+        // Resize shape
+        const resizePoint = resizeMode.resizePoint;
+        const to = action.payload;
+        const delta = { r: to.r - resizePoint.r, c: to.c - resizePoint.c };
+        const resizedShape: Shape = resize(
+          resizeMode.startShape,
+          resizePoint,
+          delta,
+          state.canvasSize
+        );
+        if (isShapeLegal(resizedShape)) {
+          // Replace resized shape
+          state.shapes[selectedShapeIdx].shape = resizedShape;
         }
       } else if (
+        state.currentMode.mode === "CREATE" &&
         (state.selectedTool === "RECTANGLE" ||
           state.selectedTool === "LINE" ||
-          state.selectedTool === "MULTI_SEGMENT_LINE") &&
-        state.creationProgress != null
+          state.selectedTool === "MULTI_SEGMENT_LINE")
       ) {
-        if (!_.isEqual(state.creationProgress.curr, action.payload)) {
+        const creationMode = state.currentMode;
+        if (!_.isEqual(creationMode.curr, action.payload)) {
           const curr = action.payload;
-          switch (state.creationProgress.shape.type) {
+          switch (creationMode.shape.type) {
             case "RECTANGLE": {
               const tl: Coords = {
-                r: Math.min(state.creationProgress.start.r, curr.r),
-                c: Math.min(state.creationProgress.start.c, curr.c),
+                r: Math.min(creationMode.start.r, curr.r),
+                c: Math.min(creationMode.start.c, curr.c),
               };
 
               const br: Coords = {
-                r: Math.max(state.creationProgress.start.r, curr.r),
-                c: Math.max(state.creationProgress.start.c, curr.c),
+                r: Math.max(creationMode.start.r, curr.r),
+                c: Math.max(creationMode.start.c, curr.c),
               };
-              state.creationProgress = {
-                ...state.creationProgress,
+
+              state.currentMode = {
+                ...creationMode,
                 curr,
                 shape: {
-                  ...state.creationProgress.shape,
+                  ...creationMode.shape,
                   tl,
                   br,
                 },
@@ -390,23 +400,20 @@ export const diagramSlice = createSlice({
               break;
             }
             case "LINE": {
-              state.creationProgress = {
-                ...state.creationProgress,
+              state.currentMode = {
+                ...creationMode,
                 curr,
                 shape: {
                   type: "LINE",
-                  ...createLineSegment(state.creationProgress.start, curr),
+                  ...createLineSegment(creationMode.start, curr),
                 },
               };
               break;
             }
             case "MULTI_SEGMENT_LINE": {
-              const newSegment = createLineSegment(
-                state.creationProgress.start,
-                curr
-              );
-              state.creationProgress.shape.segments.pop();
-              state.creationProgress.shape.segments.push(newSegment);
+              const newSegment = createLineSegment(creationMode.start, curr);
+              creationMode.shape.segments.pop();
+              creationMode.shape.segments.push(newSegment);
               break;
             }
           }
@@ -417,66 +424,81 @@ export const diagramSlice = createSlice({
       state.currentHoveredCell = null;
     },
     onCtrlEnterPress: (state) => {
-      if (state.creationProgress?.shape.type === "TEXT") {
-        addNewShape(state, state.creationProgress.shape);
-        state.creationProgress = null;
-      } else if (state.textEditProgress) {
+      if (
+        state.currentMode.mode === "CREATE" &&
+        state.selectedTool === "TEXT"
+      ) {
+        addNewShape(state, state.currentMode.shape);
+        state.currentMode = { mode: "BEFORE_CREATING" };
+      } else if (state.currentMode.mode === "TEXT_EDIT") {
         //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
-        state.textEditProgress = null;
+        state.currentMode = {
+          mode: "SELECT",
+          selectedShapeId: state.currentMode.shapeId,
+        };
       }
     },
     onDeletePress: (state) => {
       if (
-        state.selectedTool === "SELECT" &&
-        state.selectedShapeId != null &&
-        !state.moveProgress &&
-        !state.resizeProgress &&
-        !state.textEditProgress
+        state.currentMode.mode === "SELECT" &&
+        state.currentMode.selectedShapeId != null
       ) {
+        const selectMode = state.currentMode;
         //* I selected shape, I'm not currently editing it, I press delete => Delete shape
         const shapeObjIdx = state.shapes.findIndex(
-          (s) => s.id === state.selectedShapeId
+          (s) => s.id === selectMode.selectedShapeId
         );
         state.shapes.splice(shapeObjIdx, 1);
-        state.selectedShapeId = null;
-        state.nextActionOnClick = null;
+        state.currentMode = { mode: "SELECT", selectedShapeId: null };
       }
     },
     updateText: (state, action: PayloadAction<string>) => {
-      if (state.creationProgress?.shape.type === "TEXT") {
-        state.creationProgress.shape.lines = getLines(action.payload);
-        state.creationProgress.shape.lines = capText(
-          state.creationProgress.shape.start,
-          state.creationProgress.shape.lines,
+      if (
+        state.currentMode.mode === "CREATE" &&
+        state.currentMode.shape.type === "TEXT"
+      ) {
+        state.currentMode.shape.lines = capText(
+          state.currentMode.shape.start,
+          getLines(action.payload),
           state.canvasSize
         );
-      } else if (state.textEditProgress) {
-        const selectedTextShapeObjIdx = state.shapes.findIndex(
-          (s) => s.id === state.selectedShapeId
-        );
-        if (
-          selectedTextShapeObjIdx >= 0 &&
-          state.shapes[selectedTextShapeObjIdx].shape.type === "TEXT"
-        ) {
-          const selectTextShape = state.shapes[selectedTextShapeObjIdx]
-            .shape as TextShape;
+      } else if (state.currentMode.mode === "TEXT_EDIT") {
+        const textEditMode = state.currentMode;
 
-          selectTextShape.lines = capText(
-            selectTextShape.start,
-            getLines(action.payload),
-            state.canvasSize
-          );
-        }
+        const selectedTextShapeObjIdx = state.shapes.findIndex(
+          (s) => s.id === textEditMode.shapeId
+        );
+
+        const selectTextShape = state.shapes[selectedTextShapeObjIdx]
+          .shape as TextShape;
+
+        selectTextShape.lines = capText(
+          selectTextShape.start,
+          getLines(action.payload),
+          state.canvasSize
+        );
       }
     },
     onMoveToFrontButtonClick: (state) => {
-      if (state.selectedShapeId) {
-        state.shapes = moveShapeToFront(state.shapes, state.selectedShapeId);
+      if (
+        state.currentMode.mode === "SELECT" &&
+        state.currentMode.selectedShapeId != null
+      ) {
+        state.shapes = moveShapeToFront(
+          state.shapes,
+          state.currentMode.selectedShapeId
+        );
       }
     },
     onMoveToBackButtonClick: (state) => {
-      if (state.selectedShapeId) {
-        state.shapes = moveShapeToBack(state.shapes, state.selectedShapeId);
+      if (
+        state.currentMode.mode === "SELECT" &&
+        state.currentMode.selectedShapeId != null
+      ) {
+        state.shapes = moveShapeToBack(
+          state.shapes,
+          state.currentMode.selectedShapeId
+        );
       }
     },
     //#endregion
@@ -524,14 +546,30 @@ export const diagramSlice = createSlice({
   },
   selectors: {
     selectedShapeObj: (state) => {
-      return state.shapes.find((shape) => shape.id === state.selectedShapeId);
+      if (
+        state.currentMode.mode === "SELECT" &&
+        state.currentMode.selectedShapeId != null
+      ) {
+        const selectedShapeId = state.currentMode.selectedShapeId;
+        return state.shapes.find((shape) => shape.id === selectedShapeId);
+      } else {
+        return undefined;
+      }
+    },
+    currentCreatedShape: (state): Shape | null => {
+      if (state.currentMode.mode === "CREATE") return state.currentMode.shape;
+      else return null;
     },
     currentEditedText: (state): TextShape | null => {
-      if (state.creationProgress?.shape.type === "TEXT") {
-        return state.creationProgress.shape;
-      } else if (state.textEditProgress) {
+      if (
+        state.currentMode.mode === "CREATE" &&
+        state.currentMode.shape.type === "TEXT"
+      ) {
+        return state.currentMode.shape;
+      } else if (state.currentMode.mode === "TEXT_EDIT") {
+        const selectedShapeId = state.currentMode.shapeId;
         const selectedTextShapeObj = state.shapes.find(
-          (s) => s.id === state.selectedShapeId
+          (s) => s.id === selectedShapeId
         );
 
         return selectedTextShapeObj
