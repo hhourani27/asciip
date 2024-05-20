@@ -31,14 +31,13 @@ export function DeleteDiagramConfirmationDialog(): JSX.Element {
     <Dialog
       open
       onClose={cancelDelete}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      aria-labelledby="delete-confirmation-dialog"
     >
-      <DialogTitle id="alert-dialog-title">
+      <DialogTitle id="delete-confirmation-dialog-title">
         {`Delete Diagram "${deletedDiagramName}"`}
       </DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
+        <DialogContentText id="delete-confirmation-dialog-description">
           Are you sure you want to delete this diagram?{" "}
         </DialogContentText>
       </DialogContent>
