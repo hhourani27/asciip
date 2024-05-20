@@ -37,7 +37,7 @@ test("Create a text shape", () => {
 
   expect(finalState.shapes).toHaveLength(1);
   expect(finalState.shapes[0].shape).toEqual(expectedShape);
-  expect(finalState.currentMode.mode).toBe("BEFORE_CREATING");
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });
 
 test("Text cannot exceed canvas", () => {
@@ -101,7 +101,7 @@ test("Create 2 text shapes", () => {
   expect(finalState.shapes).toHaveLength(2);
   expect(finalState.shapes[0].shape).toEqual(expectedShape1);
   expect(finalState.shapes[1].shape).toEqual(expectedShape2);
-  expect(finalState.currentMode.mode).toBe("BEFORE_CREATING");
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });
 
 test("Clicking on an empty cell while creating a Text shape, saves the text and creates a new one", () => {
@@ -137,5 +137,5 @@ test("Clicking on an empty cell while creating a Text shape, saves the text and 
   expect(finalState.shapes).toHaveLength(2);
   expect(finalState.shapes[0].shape).toEqual(expectedShape1);
   expect(finalState.shapes[1].shape).toEqual(expectedShape2);
-  expect(finalState.currentMode.mode).toBe("BEFORE_CREATING");
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });

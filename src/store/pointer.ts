@@ -12,19 +12,16 @@ export const getPointer = createSelector(
   [(state: RootState) => state],
   (state): Pointer => {
     if (
-      state.diagram.currentMode.mode === "BEFORE_CREATING" ||
-      state.diagram.currentMode.mode === "CREATE"
+      state.diagram.mode.M === "BEFORE_CREATING" ||
+      state.diagram.mode.M === "CREATE"
     )
       return "CREATE";
 
-    if (state.diagram.currentMode.mode === "MOVE") return "MOVE";
-    if (state.diagram.currentMode.mode === "RESIZE") return "RESIZE";
+    if (state.diagram.mode.M === "MOVE") return "MOVE";
+    if (state.diagram.mode.M === "RESIZE") return "RESIZE";
 
-    if (
-      state.diagram.currentMode.mode === "SELECT" &&
-      state.diagram.currentHoveredCell
-    ) {
-      const selectMode = state.diagram.currentMode;
+    if (state.diagram.mode.M === "SELECT" && state.diagram.currentHoveredCell) {
+      const selectMode = state.diagram.mode;
 
       if (selectMode.selectedShapeId == null) {
         if (

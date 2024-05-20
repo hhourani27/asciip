@@ -9,10 +9,10 @@ export const isShortcutsEnabled = createSelector(
       state.app.renameDiagramInProgress == null &&
       state.app.deleteDiagramInProgress == null &&
       !(
-        state.diagram.currentMode.mode === "CREATE" &&
-        state.diagram.currentMode.shape.type === "TEXT"
+        state.diagram.mode.M === "CREATE" &&
+        state.diagram.mode.shape.type === "TEXT"
       ) &&
-      state.diagram.currentMode.mode !== "TEXT_EDIT"
+      state.diagram.mode.M !== "TEXT_EDIT"
     );
   }
 );

@@ -205,5 +205,5 @@ test("Fix: If a shape has another shape that overlaps it on top, even if I selec
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(finalState.currentMode.mode).toBe("RESIZE");
+  expect(finalState.mode.M).toBe("RESIZE");
 });
