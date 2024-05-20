@@ -38,7 +38,18 @@ const lineStyleDisplay: {
       <span>
         This style may not display correctly on these monospaced fonts:
         <br />
-        <em>{"Courier New, Monaco, Ubuntu Mono"}</em>
+        <em>{"Courier New, Monaco"}</em>
+      </span>
+    ),
+  },
+  DOUBLE: {
+    name: "Double",
+    repr: `${line_repr.LINE_HORIZONTAL.DOUBLE}${line_repr.LINE_HORIZONTAL.DOUBLE}`,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:
+        <br />
+        <em>{"Monaco"}</em>
       </span>
     ),
   },

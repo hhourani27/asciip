@@ -3,15 +3,9 @@ import { Char, LineChar } from "./representation";
 
 export type StyleMode = "ASCII" | "UNICODE";
 
-export type LINE_STYLE = "ASCII" | "LIGHT" | "HEAVY";
-//   | "DOUBLE"
-//   | "DOUBLE_DASH"
-//   | "TRIPLE_DASH"
-//   | "QUADRUPLE_DASH";
+export type LINE_STYLE = "ASCII" | "LIGHT" | "HEAVY" | "DOUBLE";
 
 export type ARROW_STYLE = "ASCII" | "OUTLINED" | "FILLED";
-//   | "OUTLINED_SMALL"
-//   | "FILLED_SMALL";
 
 //see https://symbl.cc/en/unicode/blocks/box-drawing/
 /*
@@ -33,31 +27,37 @@ export const line_repr = {
     ASCII: "-",
     LIGHT: "─",
     HEAVY: "━",
+    DOUBLE: "═",
   },
   LINE_VERTICAL: {
     ASCII: "|",
     LIGHT: "│",
     HEAVY: "┃",
+    DOUBLE: "║",
   },
   CORNER_TL: {
     ASCII: "+",
     LIGHT: "┌",
     HEAVY: "┏",
+    DOUBLE: "╔",
   },
   CORNER_TR: {
     ASCII: "+",
     LIGHT: "┐",
     HEAVY: "┓",
+    DOUBLE: "╗",
   },
   CORNER_BR: {
     ASCII: "+",
     LIGHT: "┘",
     HEAVY: "┛",
+    DOUBLE: "╝",
   },
   CORNER_BL: {
     ASCII: "+",
     LIGHT: "└",
     HEAVY: "┗",
+    DOUBLE: "╚",
   },
 };
 
