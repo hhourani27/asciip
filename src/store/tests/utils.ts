@@ -66,3 +66,15 @@ export function generateMouseClickAction(cell: Coords): UnknownAction[] {
 export function generateMouseUpAction(cell: Coords): UnknownAction[] {
   return [diagramActions.onCellMouseUp(cell), diagramActions.onCellClick(cell)];
 }
+
+export function generateMouseDoubleClickAction(cell: Coords): UnknownAction[] {
+  return [
+    diagramActions.onCellMouseDown(cell),
+    diagramActions.onCellMouseUp(cell),
+    diagramActions.onCellClick(cell),
+    diagramActions.onCellMouseDown(cell),
+    diagramActions.onCellMouseUp(cell),
+    diagramActions.onCellClick(cell),
+    diagramActions.onCellDoubleClick(cell),
+  ];
+}
