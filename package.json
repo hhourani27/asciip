@@ -36,12 +36,6 @@
     "test:cov": "jest --coverage",
     "eject": "react-scripts eject"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -56,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@playwright/test": "^1.44.0",
     "@types/lodash": "^4.17.1",
     "@types/uuid": "^9.0.8",
     "eslint": "^8.57.0",
