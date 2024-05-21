@@ -24,13 +24,15 @@ export function ToolbarOrder(): JSX.Element {
         }
         arrow
       >
-        <IconButton
-          aria-label="push to back"
-          disabled={!selectedShapeObj}
-          onClick={() => dispatch(diagramActions.onMoveToBackButtonClick())}
-        >
-          <FlipToBackIcon />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="push to back"
+            disabled={!selectedShapeObj}
+            onClick={() => dispatch(diagramActions.onMoveToBackButtonClick())}
+          >
+            <FlipToBackIcon />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip
         title={
@@ -42,13 +44,15 @@ export function ToolbarOrder(): JSX.Element {
         }
         arrow
       >
-        <IconButton
-          aria-label="bring to front"
-          disabled={!selectedShapeObj}
-          onClick={() => dispatch(diagramActions.onMoveToFrontButtonClick())}
-        >
-          <FlipToFrontIcon />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="bring to front"
+            disabled={!selectedShapeObj}
+            onClick={() => dispatch(diagramActions.onMoveToFrontButtonClick())}
+          >
+            <FlipToFrontIcon />
+          </IconButton>
+        </span>
       </Tooltip>
     </ButtonGroup>
   );

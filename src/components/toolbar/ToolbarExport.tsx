@@ -16,13 +16,15 @@ export function ToolbarExport(): JSX.Element {
   return (
     <>
       <Tooltip title="Export diagram" arrow>
-        <IconButton
-          onClick={() => dispatch(diagramActions.openExport())}
-          aria-label="Export diagram"
-          disabled={shapesCount === 0}
-        >
-          <FileDownloadIcon />
-        </IconButton>
+        <span>
+          <IconButton
+            onClick={() => dispatch(diagramActions.openExport())}
+            aria-label="Export diagram"
+            disabled={shapesCount === 0}
+          >
+            <FileDownloadIcon />
+          </IconButton>
+        </span>
       </Tooltip>
       {exportInProgress && <ExportDialog />}
     </>
