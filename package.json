@@ -34,6 +34,7 @@
     "test": "react-scripts test",
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "test:cov": "jest --coverage",
+    "e2e": "npx playwright test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
