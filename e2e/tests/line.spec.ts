@@ -69,6 +69,36 @@ test.describe("Create Line", () => {
 
     await expect(canvas.locator()).toHaveScreenshot();
   });
+
+  test("Create a left-to-right horizontal line while mouse is not on the line", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Create Simple Line" }).click();
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.down();
+    await canvas.mouse.move(3, 10);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot();
+  });
+
+  test("Create a downwards vertical line while mouse is not on the line", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Create Simple Line" }).click();
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.down();
+    await canvas.mouse.move(10, 7);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot();
+  });
 });
 
 test.describe("Resize horizontal Line", () => {
