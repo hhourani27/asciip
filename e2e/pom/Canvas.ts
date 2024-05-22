@@ -37,7 +37,18 @@ class CanvasMouse {
 
   async click() {
     await this.page.mouse.down();
+    await new Promise((f) => setTimeout(f, 0));
     await this.page.mouse.up();
+  }
+
+  async dblclick() {
+    await this.page.mouse.down({ clickCount: 1 });
+    await new Promise((f) => setTimeout(f, 0));
+    await this.page.mouse.up({ clickCount: 1 });
+    await new Promise((f) => setTimeout(f, 0));
+    await this.page.mouse.down({ clickCount: 2 });
+    await new Promise((f) => setTimeout(f, 0));
+    await this.page.mouse.up({ clickCount: 2 });
   }
 
   async leave() {
