@@ -34,12 +34,34 @@
     "test": "react-scripts test",
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "test:cov": "jest --coverage",
+    "e2e": "npx playwright test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "plugins": [
+      "playwright"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "e2e/**/*"
+        ],
+        "rules": {
+          "testing-library/prefer-screen-queries": "off"
+        }
+      },
+      {
+        "files": [
+          "e2e/**/*"
+        ],
+        "extends": [
+          "plugin:playwright/recommended"
+        ]
+      }
     ]
   },
   "browserslist": {
@@ -56,9 +78,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.2.0",
+    "@playwright/test": "^1.44.0",
     "@types/lodash": "^4.17.1",
     "@types/uuid": "^9.0.8",
     "eslint": "^8.57.0",
+    "eslint-plugin-playwright": "^1.6.2",
     "eslint-plugin-react": "^7.34.1",
     "gh-pages": "^6.1.1",
     "globals": "^15.1.0",

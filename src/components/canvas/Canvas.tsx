@@ -148,6 +148,7 @@ export default function Canvas(): JSX.Element {
 
   return (
     <div
+      id="canvas-container"
       style={{
         flex: 1,
         overflow: "scroll",

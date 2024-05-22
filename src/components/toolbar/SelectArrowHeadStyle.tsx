@@ -101,12 +101,12 @@ export function SelectArrowHeadStyle(): JSX.Element {
       sx={{ minWidth: "100px" }}
       disabled={!isArrowStyleSelectEnabled()}
     >
-      <InputLabel id="arrow-style-label">Head style</InputLabel>
+      <InputLabel id="head-style-label">Head style</InputLabel>
       <Select
-        labelId="arrow-style-label"
-        id="arrow-style"
+        labelId="head-style-label"
+        id="head-style"
         value={selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle}
-        label="Arrow style"
+        label="Head style"
         onChange={handleArrowStyleChange}
       >
         {Object.keys(arrowHeadStyleDisplay).map((value) => (

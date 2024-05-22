@@ -1,0 +1,68 @@
+{
+  "diagrams": [
+    {
+      "id": "cc03790d-db05-412c-8689-6accd9d1a682",
+      "name": "New diagram",
+      "data": {
+        "canvasSize": { "rows": 75, "cols": 250 },
+        "shapes": [
+          {
+            "id": "083f26b6-0bf7-4096-a828-35a6b1ba5a4e",
+            "shape": {
+              "type": "RECTANGLE",
+              "tl": { "r": 5, "c": 5 },
+              "br": { "r": 10, "c": 10 }
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "3bb95d15-8294-49c9-a504-dc00c31ed917",
+            "shape": {
+              "type": "LINE",
+              "axis": "HORIZONTAL",
+              "start": { "r": 8, "c": 3 },
+              "end": { "r": 8, "c": 12 },
+              "direction": "LEFT_TO_RIGHT"
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "6378eac8-19a6-476e-80a3-eab169f7eb29",
+            "shape": {
+              "type": "TEXT",
+              "start": { "r": 8, "c": 5 },
+              "lines": ["foo"]
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          }
+        ],
+        "styleMode": "ASCII",
+        "globalStyle": {
+          "lineStyle": "LIGHT",
+          "arrowStyle": "FILLED",
+          "arrowStartHead": false,
+          "arrowEndHead": true
+        }
+      }
+    }
+  ],
+  "activeDiagramId": "cc03790d-db05-412c-8689-6accd9d1a682",
+  "deleteDiagramInProgress": null,
+  "renameDiagramInProgress": null,
+  "createDiagramInProgress": false
+}

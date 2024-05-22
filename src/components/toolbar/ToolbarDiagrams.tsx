@@ -69,7 +69,7 @@ export function ToolbarDiagrams(): JSX.Element {
   return (
     <div>
       <Button
-        id="diagrams-button"
+        id="diagram-list"
         aria-controls={menuOpen ? "diagrams-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={menuOpen ? "true" : undefined}
@@ -82,13 +82,10 @@ export function ToolbarDiagrams(): JSX.Element {
         {activeDiagram.name}
       </Button>
       <Menu
-        id="basic-menu"
+        id="diagrams-menu"
         anchorEl={menuAnchorEl}
         open={menuOpen}
         onClose={handleMenuClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
       >
         {diagrams.map((diagram) => (
           <MenuItem
