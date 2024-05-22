@@ -160,7 +160,7 @@ test.describe("Resize horizontal Line", () => {
     await expect(canvas.locator()).toHaveScreenshot();
   });
 
-  test("Turn horizontal line 180 degres by dragging the end point", async ({
+  test("Turn horizontal line 180 degrees by dragging the end point", async ({
     page,
     canvas,
   }) => {
@@ -169,6 +169,25 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.down();
     await canvas.mouse.move(5, 0);
+    await canvas.mouse.up();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.click();
+
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot();
+  });
+
+  test("Turn horizontal line 90 degrees by dragging the end point", async ({
+    page,
+    canvas,
+  }) => {
+    await canvas.mouse.move(5, 10);
+    await canvas.mouse.click();
+
+    await canvas.mouse.down();
+    await canvas.mouse.move(10, 5);
     await canvas.mouse.up();
 
     await canvas.mouse.move(0, 0);
