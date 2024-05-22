@@ -23,7 +23,8 @@ class CanvasMouse {
   }
 
   async move(r: number, c: number) {
-    await this.page.mouse.move(...(await this.coords(r, c)), { steps: 30 });
+    const coords = await this.coords(r, c);
+    await this.page.mouse.move(...coords, { steps: 30 });
   }
 
   async down() {
