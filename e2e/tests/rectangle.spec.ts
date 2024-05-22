@@ -11,7 +11,7 @@ test.afterEach(async ({ page }) => {
 });
 
 test.describe("Create rectangle", () => {
-  test("Create a 10x10 Rectangle by starting from the top left", async ({
+  test("01-Create a 10x10 Rectangle by starting from the top left", async ({
     page,
     canvas,
   }) => {
@@ -23,10 +23,10 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-01.png");
   });
 
-  test("Create a 10x10 Rectangle by starting from the bottom right", async ({
+  test("02-Create a 10x10 Rectangle by starting from the bottom right", async ({
     page,
     canvas,
   }) => {
@@ -38,10 +38,10 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-02.png");
   });
 
-  test("Cannot create a 0x0 Rectangle", async ({ page, canvas }) => {
+  test("03-Cannot create a 0x0 Rectangle", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Rectangle" }).click();
 
     await canvas.mouse.move(0, 0);
@@ -50,10 +50,10 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-03.png");
   });
 
-  test("Cannot create a 5x0 rectangle", async ({ page, canvas }) => {
+  test("04-Cannot create a 5x0 rectangle", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Rectangle" }).click();
 
     await canvas.mouse.move(0, 0);
@@ -62,10 +62,10 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-04.png");
   });
 
-  test("Cannot create a 0x5 rectangle", async ({ page, canvas }) => {
+  test("05-Cannot create a 0x5 rectangle", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Rectangle" }).click();
 
     await canvas.mouse.move(0, 0);
@@ -74,7 +74,7 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-05.png");
   });
 });
 
@@ -92,7 +92,7 @@ test.describe("Resize rectangle", () => {
     await page.getByRole("button", { name: "Select tool" }).click();
   });
 
-  test("Enlarge a rectangle by dragging the bottom right point", async ({
+  test("06-Enlarge a rectangle by dragging the bottom right point", async ({
     page,
     canvas,
   }) => {
@@ -108,10 +108,10 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-06.png");
   });
 
-  test("Shrink a rectangle by dragging the top left point", async ({
+  test("07-Shrink a rectangle by dragging the top left point", async ({
     page,
     canvas,
   }) => {
@@ -127,10 +127,10 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-07.png");
   });
 
-  test("Invert a rectangle by dragging the bottom right point", async ({
+  test("08-Invert a rectangle by dragging the bottom right point", async ({
     page,
     canvas,
   }) => {
@@ -146,10 +146,10 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-08.png");
   });
 
-  test("Cannot resize a rectangle to a single point", async ({
+  test("09-Cannot resize a rectangle to a single point", async ({
     page,
     canvas,
   }) => {
@@ -165,10 +165,10 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-09.png");
   });
 
-  test("Cannot resize a rectangle to a vertical line", async ({
+  test("10-Cannot resize a rectangle to a vertical line", async ({
     page,
     canvas,
   }) => {
@@ -184,10 +184,10 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-10.png");
   });
 
-  test("Cannot resize a rectangle to a horizontal line", async ({
+  test("11-Cannot resize a rectangle to a horizontal line", async ({
     page,
     canvas,
   }) => {
@@ -203,6 +203,6 @@ test.describe("Resize rectangle", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("rectangle-11.png");
   });
 });

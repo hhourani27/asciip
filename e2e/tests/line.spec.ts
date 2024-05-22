@@ -11,7 +11,10 @@ test.afterEach(async ({ page }) => {
 });
 
 test.describe("Create Line", () => {
-  test("Create a left-to-right horizontal line", async ({ page, canvas }) => {
+  test("01-Create a left-to-right horizontal line", async ({
+    page,
+    canvas,
+  }) => {
     await page.getByRole("button", { name: "Create Simple Line" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -20,10 +23,13 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-01.png");
   });
 
-  test("Create a right-to-left horizontal line", async ({ page, canvas }) => {
+  test("02-Create a right-to-left horizontal line", async ({
+    page,
+    canvas,
+  }) => {
     await page.getByRole("button", { name: "Create Simple Line" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -32,10 +38,10 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-02.png");
   });
 
-  test("Create a downward vertical line", async ({ page, canvas }) => {
+  test("03-Create a downward vertical line", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Simple Line" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -44,10 +50,10 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-03.png");
   });
 
-  test("Create an upward vertical line", async ({ page, canvas }) => {
+  test("04-Create an upward vertical line", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Simple Line" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -56,10 +62,10 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-04.png");
   });
 
-  test("Cannot create zero-length line", async ({ page, canvas }) => {
+  test("05-Cannot create zero-length line", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Create Simple Line" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -67,10 +73,10 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-05.png");
   });
 
-  test("Create a left-to-right horizontal line while mouse is not on the line", async ({
+  test("06-Create a left-to-right horizontal line while mouse is not on the line", async ({
     page,
     canvas,
   }) => {
@@ -82,10 +88,10 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-06.png");
   });
 
-  test("Create a downwards vertical line while mouse is not on the line", async ({
+  test("07-Create a downwards vertical line while mouse is not on the line", async ({
     page,
     canvas,
   }) => {
@@ -97,7 +103,7 @@ test.describe("Create Line", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-07.png");
   });
 });
 
@@ -114,7 +120,7 @@ test.describe("Resize horizontal Line", () => {
     await page.getByRole("button", { name: "Select tool" }).click();
   });
 
-  test("Extend horizontal line by dragging the end point", async ({
+  test("08-Extend horizontal line by dragging the end point", async ({
     page,
     canvas,
   }) => {
@@ -130,10 +136,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-08.png");
   });
 
-  test("Shrink horizontal line by dragging the end point", async ({
+  test("09-Shrink horizontal line by dragging the end point", async ({
     page,
     canvas,
   }) => {
@@ -149,10 +155,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-09.png");
   });
 
-  test("Extend horizontal line by dragging the start point", async ({
+  test("10-Extend horizontal line by dragging the start point", async ({
     page,
     canvas,
   }) => {
@@ -168,10 +174,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-10.png");
   });
 
-  test("Shrink horizontal line by dragging the start point", async ({
+  test("11-Shrink horizontal line by dragging the start point", async ({
     page,
     canvas,
   }) => {
@@ -187,10 +193,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-11.png");
   });
 
-  test("Turn horizontal line 180 degrees by dragging the end point", async ({
+  test("12-Turn horizontal line 180 degrees by dragging the end point", async ({
     page,
     canvas,
   }) => {
@@ -206,10 +212,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-12.png");
   });
 
-  test("Turn horizontal line 90 degrees by dragging the end point", async ({
+  test("13-Turn horizontal line 90 degrees by dragging the end point", async ({
     page,
     canvas,
   }) => {
@@ -225,10 +231,10 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-13.png");
   });
 
-  test("Cannot shrink horizontal line to a zero-length line", async ({
+  test("14-Cannot shrink horizontal line to a zero-length line", async ({
     page,
     canvas,
   }) => {
@@ -244,6 +250,6 @@ test.describe("Resize horizontal Line", () => {
 
     await canvas.mouse.leave();
 
-    await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot("line-14.png");
   });
 });
