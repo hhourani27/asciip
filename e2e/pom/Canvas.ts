@@ -34,6 +34,11 @@ class CanvasMouse {
     await this.page.mouse.up();
   }
 
+  async click() {
+    await this.page.mouse.down();
+    await this.page.mouse.up();
+  }
+
   async leave() {
     await this.page.mouse.move(0, 0, { steps: 30 });
   }
