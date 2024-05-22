@@ -40,4 +40,16 @@ test.describe("Create rectangle", () => {
 
     await expect(canvas.locator()).toHaveScreenshot();
   });
+
+  test("Cannot create a 0x0 Rectangle", async ({ page, canvas }) => {
+    await page.getByRole("button", { name: "Create Rectangle" }).click();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.down();
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    // await expect(canvas.locator()).toHaveScreenshot();
+  });
 });

@@ -35,7 +35,7 @@ class CanvasMouse {
   }
 
   async leave() {
-    this.page.mouse.move(0, 0);
+    this.page.mouse.move(0, 0, { steps: 30 });
   }
 
   private async coords(r: number, c: number): Promise<[number, number]> {
