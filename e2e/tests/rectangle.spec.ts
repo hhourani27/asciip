@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures/fixture";
+import { test, expect } from "../fixtures/fixture";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("http://localhost:3000/");
