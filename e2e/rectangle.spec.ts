@@ -50,6 +50,30 @@ test.describe("Create rectangle", () => {
     await canvas.mouse.up();
     await canvas.mouse.leave();
 
-    // await expect(canvas.locator()).toHaveScreenshot();
+    await expect(canvas.locator()).toHaveScreenshot();
+  });
+
+  test("Cannot create a 5x0 rectangle", async ({ page, canvas }) => {
+    await page.getByRole("button", { name: "Create Rectangle" }).click();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.down();
+    await canvas.mouse.move(5, 0);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot();
+  });
+
+  test("Cannot create a 0x5 rectangle", async ({ page, canvas }) => {
+    await page.getByRole("button", { name: "Create Rectangle" }).click();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.down();
+    await canvas.mouse.move(0, 5);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot();
   });
 });
