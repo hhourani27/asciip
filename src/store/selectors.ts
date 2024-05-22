@@ -7,7 +7,6 @@ import {
 
 import { RootState } from "./store";
 
-/* Selectors that are used for extract state data into specific UI data */
 export type Pointer = "SELECT" | "MOVE" | "CREATE" | "RESIZE" | "NONE";
 export const getPointer = createSelector(
   [(state: RootState) => state],

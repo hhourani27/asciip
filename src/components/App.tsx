@@ -4,7 +4,7 @@ import Toolbar from "./toolbar/Toolbar";
 import Canvas from "./canvas/Canvas";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { diagramActions } from "../store/diagramSlice";
-import { isShortcutsEnabled } from "../store/uiSelectors";
+import { isShortcutsEnabled } from "../store/selectors";
 import { Footer } from "./footer/Footer";
 
 function App() {

@@ -6,7 +6,7 @@ import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
 import { CELL_HEIGHT, CELL_WIDTH, canvasDraw } from "./draw";
 import _ from "lodash";
 import { TextShapeInput } from "./TextShapeInput";
-import { getPointer } from "../../store/uiSelectors";
+import { getPointer } from "../../store/selectors";
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
