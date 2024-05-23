@@ -1,7 +1,7 @@
 import { test, expect } from "../fixtures/fixture";
 
 // A single diagram, in ASCII mode, containing 1 rectangle, 1 line, 1 multi-segment, 1 text
-import data_01 from "../fixtures/style.spec.ts/data_01.json";
+import data_01 from "../fixtures/select.spec.ts/data_01.json";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("http://localhost:3000/");

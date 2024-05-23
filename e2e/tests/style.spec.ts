@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures/fixture";
 
-// A single diagram, in ASCII mode, containing 1 rectangle, 1 line, 1 multi-segment, 1 text
+// A single diagram, in ASCII mode, containing 2 rectangles, 4 lines, 2 multi-segment, 2 text
 import data_01 from "../fixtures/style.spec.ts/data_01.json";
 // Same as data_01 but with styleMode = UNICODE
 import data_02 from "../fixtures/style.spec.ts/data_02.json";
@@ -46,7 +46,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(5, 5);
+    await canvas.mouse.move(3, 3);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Arrow head")).toBeDisabled();
@@ -58,7 +58,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(5, 15);
+    await canvas.mouse.move(3, 9);
     await canvas.mouse.click();
     await page.getByLabel("Arrow head").click();
     await page.locator('li[role="option"][data-value="START_END"]').click();
@@ -75,7 +75,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(15, 5);
+    await canvas.mouse.move(3, 15);
     await canvas.mouse.click();
     await page.getByLabel("Arrow head").click();
     await page.locator('li[role="option"][data-value="START_END"]').click();
@@ -89,14 +89,14 @@ test.describe("ASCII mode", () => {
   test("05-You cannot change the style of a text", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(15, 15);
+    await canvas.mouse.move(3, 25);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Arrow head")).toBeDisabled();
   });
 });
 
-test.describe("ASCII mode", () => {
+test.describe("UNICODE mode", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:3000/");
 
@@ -116,7 +116,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(5, 5);
+    await canvas.mouse.move(3, 3);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Line style")).toBeEnabled();
@@ -138,7 +138,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(5, 15);
+    await canvas.mouse.move(3, 9);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Line style")).toBeEnabled();
@@ -166,7 +166,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(15, 5);
+    await canvas.mouse.move(3, 15);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Line style")).toBeEnabled();
@@ -194,7 +194,7 @@ test.describe("ASCII mode", () => {
   }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
-    await canvas.mouse.move(15, 15);
+    await canvas.mouse.move(3, 25);
     await canvas.mouse.click();
 
     await expect(page.getByLabel("Line style")).toBeDisabled();
