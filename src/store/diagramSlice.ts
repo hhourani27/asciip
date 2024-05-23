@@ -49,7 +49,7 @@ export type ActionMode =
       checkpoint: Shape | null;
       shape: Shape;
     }
-  | { M: "SELECT"; selectedShapeIds: string[] }
+  | { M: "SELECT"; shapeIds: string[] }
   | { M: "MOVE"; start: Coords; shapeIds: string[]; startShapes: Shape[] }
   | { M: "RESIZE"; resizePoint: Coords; shapeId: string; startShape: Shape }
   | { M: "TEXT_EDIT"; shapeId: string; startShape: TextShape };
@@ -90,7 +90,7 @@ export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
     currentHoveredCell: null,
 
     selectedTool: "SELECT",
-    mode: { M: "SELECT", selectedShapeIds: [] },
+    mode: { M: "SELECT", shapeIds: [] },
 
     exportInProgress: false,
   };
@@ -129,7 +129,7 @@ export const diagramSlice = createSlice({
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
         if (action.payload === "SELECT") {
-          state.mode = { M: "SELECT", selectedShapeIds: [] };
+          state.mode = { M: "SELECT", shapeIds: [] };
         } else {
           state.mode = { M: "BEFORE_CREATING" };
         }
@@ -174,9 +174,9 @@ export const diagramSlice = createSlice({
         const shape = getShapeObjAtCoords(state.shapes, coords);
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: shape
+          shapeIds: shape
             ? ctrlKey
-              ? [...state.mode.selectedShapeIds, shape.id]
+              ? [...state.mode.shapeIds, shape.id]
               : [shape.id]
             : [],
         };
@@ -184,7 +184,7 @@ export const diagramSlice = createSlice({
         const shape = getShapeObjAtCoords(state.shapes, coords);
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: shape ? [shape.id] : [],
+          shapeIds: shape ? [shape.id] : [],
         };
       } else if (
         state.mode.M === "BEFORE_CREATING" &&
@@ -239,14 +239,8 @@ export const diagramSlice = createSlice({
       }
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
-      if (
-        state.mode.M === "SELECT" &&
-        state.mode.selectedShapeIds.length === 1
-      ) {
-        const shapeObj = toShapeObject(
-          state.shapes,
-          state.mode.selectedShapeIds[0]
-        );
+      if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
+        const shapeObj = toShapeObject(state.shapes, state.mode.shapeIds[0]);
 
         if (hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell!)) {
           state.mode = {
@@ -295,12 +289,12 @@ export const diagramSlice = createSlice({
       if (state.mode.M === "MOVE") {
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: state.mode.shapeIds,
+          shapeIds: state.mode.shapeIds,
         };
       } else if (state.mode.M === "RESIZE") {
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: [state.mode.shapeId],
+          shapeIds: [state.mode.shapeId],
         };
       } else if (
         state.mode.M === "CREATE" &&
@@ -426,14 +420,14 @@ export const diagramSlice = createSlice({
         //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: [state.mode.shapeId],
+          shapeIds: [state.mode.shapeId],
         };
       }
     },
     onDeletePress: (state) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeIds.length > 0) {
-        deleteShapes(state, state.mode.selectedShapeIds);
-        state.mode = { M: "SELECT", selectedShapeIds: [] };
+      if (state.mode.M === "SELECT" && state.mode.shapeIds.length > 0) {
+        deleteShapes(state, state.mode.shapeIds);
+        state.mode = { M: "SELECT", shapeIds: [] };
       }
     },
     updateText: (state, action: PayloadAction<string>) => {
@@ -461,25 +455,13 @@ export const diagramSlice = createSlice({
       }
     },
     onMoveToFrontButtonClick: (state) => {
-      if (
-        state.mode.M === "SELECT" &&
-        state.mode.selectedShapeIds.length === 1
-      ) {
-        state.shapes = moveShapeToFront(
-          state.shapes,
-          state.mode.selectedShapeIds[0]
-        );
+      if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
+        state.shapes = moveShapeToFront(state.shapes, state.mode.shapeIds[0]);
       }
     },
     onMoveToBackButtonClick: (state) => {
-      if (
-        state.mode.M === "SELECT" &&
-        state.mode.selectedShapeIds.length === 1
-      ) {
-        state.shapes = moveShapeToBack(
-          state.shapes,
-          state.mode.selectedShapeIds[0]
-        );
+      if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
+        state.shapes = moveShapeToBack(state.shapes, state.mode.shapeIds[0]);
       }
     },
     //#endregion

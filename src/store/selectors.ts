@@ -14,7 +14,7 @@ const hasSelectedShape = createSelector(
   [(state: DiagramState) => state],
   (state): boolean => {
     if (state.mode.M === "SELECT") {
-      return state.mode.selectedShapeIds.length > 0;
+      return state.mode.shapeIds.length > 0;
     } else if (state.mode.M === "MOVE") {
       return state.mode.shapeIds.length > 0;
     } else if (state.mode.M === "RESIZE") {
@@ -29,7 +29,7 @@ const hasSingleSelectedShape = createSelector(
   [(state: DiagramState) => state],
   (state): boolean => {
     if (state.mode.M === "SELECT") {
-      return state.mode.selectedShapeIds.length === 1;
+      return state.mode.shapeIds.length === 1;
     } else if (state.mode.M === "MOVE") {
       return state.mode.shapeIds.length === 1;
     } else if (state.mode.M === "RESIZE") {
@@ -44,7 +44,7 @@ const selectedShapeObjs = createSelector(
   [(state: DiagramState) => state],
   (state): ShapeObject[] => {
     if (state.mode.M === "SELECT") {
-      return state.mode.selectedShapeIds.map(
+      return state.mode.shapeIds.map(
         (shapeId) => state.shapes.find((shape) => shape.id === shapeId)!
       );
     } else if (state.mode.M === "MOVE") {
@@ -64,8 +64,8 @@ const selectedShapeObj = createSelector(
   [(state: DiagramState) => state],
   (state): ShapeObject | undefined => {
     if (state.mode.M === "SELECT" && hasSelectedShape(state)) {
-      if (state.mode.selectedShapeIds.length === 1) {
-        const selectedShapeId = state.mode.selectedShapeIds[0];
+      if (state.mode.shapeIds.length === 1) {
+        const selectedShapeId = state.mode.shapeIds[0];
         return state.shapes.find((shape) => shape.id === selectedShapeId)!;
       } else {
         throw new Error("There's more than 1 selected shape");
@@ -121,9 +121,9 @@ const getPointer = createSelector(
       );
       if (shapeObj) {
         // If I'm hovering a shape
-        if (state.mode.selectedShapeIds.includes(shapeObj.id)) {
+        if (state.mode.shapeIds.includes(shapeObj.id)) {
           // If I'm hovering a selected shape
-          if (state.mode.selectedShapeIds.length === 1) {
+          if (state.mode.shapeIds.length === 1) {
             // If it's the only selected shape (I can either move or resize)
             if (
               hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell)
