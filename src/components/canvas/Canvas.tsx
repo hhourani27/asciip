@@ -175,7 +175,10 @@ export default function Canvas(): JSX.Element {
         onClick={(e) => {
           // console.log(`[Canvas] onClick: timestamp=${e.timeStamp}`);
           dispatch(
-            diagramActions.onCellClick(getCellCoords(e.clientX, e.clientY))
+            diagramActions.onCellClick({
+              coords: getCellCoords(e.clientX, e.clientY),
+              ctrlKey: e.ctrlKey,
+            })
           );
         }}
         onDoubleClick={(e) => {

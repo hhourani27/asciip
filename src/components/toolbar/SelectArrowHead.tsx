@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions } from "../../store/diagramSlice";
+import { ShapeObject, diagramActions } from "../../store/diagramSlice";
 import {
   FormControl,
   InputLabel,
@@ -9,26 +9,27 @@ import {
 } from "@mui/material";
 import { Style } from "../../models/style";
 import { selectors } from "../../store/selectors";
+import _ from "lodash";
 
 export function SelectArrowHead(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
   const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
-  const selectedShapeObj = useAppSelector((state) =>
-    selectors.selectedShapeObj(state.diagram)
+  const selectedShapeObjs: ShapeObject[] = useAppSelector((state) =>
+    selectors.selectedShapeObjs(state.diagram)
   );
 
   const isArrowHeadSelectEnabled = (): boolean => {
     if (selectedTool === "LINE" || selectedTool === "MULTI_SEGMENT_LINE")
       return true;
 
-    const selectedShape = selectedShapeObj?.shape;
     if (
-      selectedShape &&
       selectedTool === "SELECT" &&
-      (selectedShape.type === "LINE" ||
-        selectedShape.type === "MULTI_SEGMENT_LINE")
+      selectedShapeObjs.length > 0 &&
+      selectedShapeObjs.every(
+        (s) => s.shape.type === "LINE" || s.shape.type === "MULTI_SEGMENT_LINE"
+      )
     )
       return true;
 
@@ -36,9 +37,10 @@ export function SelectArrowHead(): JSX.Element {
   };
 
   const handleArrowHeadStyleChange = (event: SelectChangeEvent<string>) => {
-    const selectedShapeId: string | undefined = selectedShapeObj
-      ? selectedShapeObj.id
-      : undefined;
+    const shapeIds: string[] | undefined =
+      selectedShapeObjs.length === 0
+        ? undefined
+        : selectedShapeObjs.map((so) => so.id);
 
     if (event.target.value === "NONE") {
       dispatch(
@@ -47,28 +49,28 @@ export function SelectArrowHead(): JSX.Element {
             arrowStartHead: false,
             arrowEndHead: false,
           },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
     } else if (event.target.value === "END") {
       dispatch(
         diagramActions.setStyle({
           style: { arrowStartHead: false, arrowEndHead: true },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
     } else if (event.target.value === "START") {
       dispatch(
         diagramActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: false },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
     } else if (event.target.value === "START_END") {
       dispatch(
         diagramActions.setStyle({
           style: { arrowStartHead: true, arrowEndHead: true },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
     }
@@ -79,6 +81,23 @@ export function SelectArrowHead(): JSX.Element {
     else if (style.arrowEndHead && !style.arrowStartHead) return "END";
     else if (!style.arrowEndHead && style.arrowStartHead) return "START";
     else return "NONE";
+  };
+
+  const getValue = (): string | "" => {
+    if (selectedShapeObjs.length === 0) {
+      return getArrowHeadSelectValue(globalStyle);
+    }
+
+    const values = selectedShapeObjs.map((s) =>
+      s.style?.arrowStartHead !== undefined &&
+      s.style?.arrowEndHead !== undefined
+        ? getArrowHeadSelectValue(s.style)
+        : getArrowHeadSelectValue(globalStyle)
+    );
+
+    if (_.uniq(values).length === 1) {
+      return values[0];
+    } else return "";
   };
 
   return (
@@ -92,12 +111,7 @@ export function SelectArrowHead(): JSX.Element {
       <Select
         labelId="arrow-head-label"
         id="arrow-head"
-        value={
-          selectedShapeObj?.style?.arrowStartHead !== undefined &&
-          selectedShapeObj?.style?.arrowEndHead !== undefined
-            ? getArrowHeadSelectValue(selectedShapeObj.style)
-            : getArrowHeadSelectValue(globalStyle)
-        }
+        value={getValue()}
         label="Arrow head"
         onChange={handleArrowHeadStyleChange}
       >

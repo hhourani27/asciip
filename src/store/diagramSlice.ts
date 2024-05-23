@@ -165,15 +165,23 @@ export const diagramSlice = createSlice({
         state.mode = { M: "BEFORE_CREATING" };
       }
     },
-    onCellClick: (state, action: PayloadAction<Coords>) => {
+    onCellClick: (
+      state,
+      action: PayloadAction<{ coords: Coords; ctrlKey?: boolean }>
+    ) => {
+      const { coords, ctrlKey = false } = action.payload;
       if (state.mode.M === "SELECT") {
-        const shape = getShapeObjAtCoords(state.shapes, action.payload);
+        const shape = getShapeObjAtCoords(state.shapes, coords);
         state.mode = {
           M: "SELECT",
-          selectedShapeIds: shape ? [shape.id] : [],
+          selectedShapeIds: shape
+            ? ctrlKey
+              ? [...state.mode.selectedShapeIds, shape.id]
+              : [shape.id]
+            : [],
         };
       } else if (state.mode.M === "TEXT_EDIT") {
-        const shape = getShapeObjAtCoords(state.shapes, action.payload);
+        const shape = getShapeObjAtCoords(state.shapes, coords);
         state.mode = {
           M: "SELECT",
           selectedShapeIds: shape ? [shape.id] : [],
@@ -184,12 +192,12 @@ export const diagramSlice = createSlice({
       ) {
         state.mode = {
           M: "CREATE",
-          start: action.payload,
-          curr: action.payload,
+          start: coords,
+          curr: coords,
           checkpoint: null,
           shape: {
             type: "MULTI_SEGMENT_LINE",
-            segments: [createZeroWidthSegment(action.payload)],
+            segments: [createZeroWidthSegment(coords)],
           },
         };
       } else if (
@@ -214,19 +222,19 @@ export const diagramSlice = createSlice({
       ) {
         state.mode = {
           M: "CREATE",
-          start: action.payload,
-          curr: action.payload,
+          start: coords,
+          curr: coords,
           checkpoint: null,
-          shape: { type: "TEXT", start: action.payload, lines: [] },
+          shape: { type: "TEXT", start: coords, lines: [] },
         };
       } else if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
         addNewShape(state, state.mode.shape);
         state.mode = {
           M: "CREATE",
-          start: action.payload,
-          curr: action.payload,
+          start: coords,
+          curr: coords,
           checkpoint: null,
-          shape: { type: "TEXT", start: action.payload, lines: [] },
+          shape: { type: "TEXT", start: coords, lines: [] },
         };
       }
     },
@@ -491,21 +499,22 @@ export const diagramSlice = createSlice({
     },
     setStyle: (
       state,
-      action: PayloadAction<{ style: Partial<Style>; shapeId?: string }>
+      action: PayloadAction<{ style: Partial<Style>; shapeIds?: string[] }>
     ) => {
-      if (!action.payload.shapeId) {
-        _.merge(state.globalStyle, action.payload.style);
+      const { style, shapeIds } = action.payload;
+      if (!shapeIds) {
+        _.merge(state.globalStyle, style);
       } else {
-        const shapeObj = state.shapes.find(
-          (s) => s.id === action.payload.shapeId
-        );
-        if (shapeObj) {
-          if ("style" in shapeObj) {
-            _.merge(shapeObj.style, action.payload.style);
-          } else {
-            shapeObj.style = action.payload.style;
+        shapeIds.forEach((sid) => {
+          const shapeObj = state.shapes.find((s) => s.id === sid);
+          if (shapeObj) {
+            if ("style" in shapeObj) {
+              _.merge(shapeObj.style, style);
+            } else {
+              shapeObj.style = style;
+            }
           }
-        }
+        });
       }
     },
     //#endregion

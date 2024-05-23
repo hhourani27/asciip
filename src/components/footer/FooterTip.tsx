@@ -14,7 +14,9 @@ export function FooterTip(): JSX.Element {
   );
 
   const isSingleTextShapeSelected = useAppSelector(
-    (state) => selectors.selectedShapeObj(state.diagram)?.shape.type === "TEXT"
+    (state) =>
+      selectors.hasSingleSelectedShape(state.diagram) &&
+      selectors.selectedShapeObj(state.diagram)?.shape.type === "TEXT"
   );
 
   const tip: string | null = isTextBeingWritten

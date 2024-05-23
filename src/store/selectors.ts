@@ -115,16 +115,32 @@ const getPointer = createSelector(
     if (state.mode.M === "RESIZE") return "RESIZE";
 
     if (state.mode.M === "SELECT" && state.currentHoveredCell) {
-      if (!hasSelectedShape(state)) {
-        if (getShapeObjAtCoords(state.shapes, state.currentHoveredCell))
+      const shapeObj = getShapeObjAtCoords(
+        state.shapes,
+        state.currentHoveredCell
+      );
+      if (shapeObj) {
+        // If I'm hovering a shape
+        if (state.mode.selectedShapeIds.includes(shapeObj.id)) {
+          // If I'm hovering a selected shape
+          if (state.mode.selectedShapeIds.length === 1) {
+            // If it's the only selected shape (I can either move or resize)
+            if (
+              hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell)
+            ) {
+              return "RESIZE";
+            } else if (
+              isShapeAtCoords(shapeObj.shape, state.currentHoveredCell)
+            ) {
+              return "MOVE";
+            }
+          } else {
+            // Else there are other selected shapes (I can only move)
+            return "MOVE";
+          }
+        } else {
+          // Else I'm govering an unselected shape
           return "SELECT";
-      } else if (hasSingleSelectedShape(state)) {
-        const shapeObj = selectedShapeObj(state)!;
-
-        if (hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell)) {
-          return "RESIZE";
-        } else if (isShapeAtCoords(shapeObj.shape, state.currentHoveredCell)) {
-          return "MOVE";
         }
       }
     }

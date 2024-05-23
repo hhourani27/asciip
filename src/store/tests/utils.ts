@@ -55,26 +55,32 @@ export function generateUpdateText(text: string): UnknownAction[] {
 /**
  * When simulating a cell click, in real usage, it is always accompanied by a mouseDown and mouseUp event
  */
-export function generateMouseClickAction(cell: Coords): UnknownAction[] {
+export function generateMouseClickAction(
+  cell: Coords,
+  ctrlKey: boolean = false
+): UnknownAction[] {
   return [
     diagramActions.onCellMouseDown(cell),
     diagramActions.onCellMouseUp(cell),
-    diagramActions.onCellClick(cell),
+    diagramActions.onCellClick({ coords: cell, ctrlKey }),
   ];
 }
 
 export function generateMouseUpAction(cell: Coords): UnknownAction[] {
-  return [diagramActions.onCellMouseUp(cell), diagramActions.onCellClick(cell)];
+  return [
+    diagramActions.onCellMouseUp(cell),
+    diagramActions.onCellClick({ coords: cell }),
+  ];
 }
 
 export function generateMouseDoubleClickAction(cell: Coords): UnknownAction[] {
   return [
     diagramActions.onCellMouseDown(cell),
     diagramActions.onCellMouseUp(cell),
-    diagramActions.onCellClick(cell),
+    diagramActions.onCellClick({ coords: cell }),
     diagramActions.onCellMouseDown(cell),
     diagramActions.onCellMouseUp(cell),
-    diagramActions.onCellClick(cell),
+    diagramActions.onCellClick({ coords: cell }),
     diagramActions.onCellDoubleClick(cell),
   ];
 }
