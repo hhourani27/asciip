@@ -4,13 +4,15 @@ import Toolbar from "./toolbar/Toolbar";
 import Canvas from "./canvas/Canvas";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { diagramActions } from "../store/diagramSlice";
-import { isShortcutsEnabled } from "../store/uiSelectors";
+import { selectors } from "../store/selectors";
 import { Footer } from "./footer/Footer";
 
 function App() {
   const dispatch = useAppDispatch();
 
-  const shortcutsEnabled = useAppSelector((state) => isShortcutsEnabled(state));
+  const shortcutsEnabled = useAppSelector((state) =>
+    selectors.isShortcutsEnabled(state)
+  );
 
   // Centralize key presses listener in this component
   useEffect(() => {

@@ -1,30 +1,42 @@
 import { Box, Typography } from "@mui/material";
 import { useAppSelector } from "../../store/hooks";
-import { diagramSelectors } from "../../store/diagramSlice";
 import InfoIcon from "@mui/icons-material/Info";
+import { selectors } from "../../store/selectors";
 export function FooterTip(): JSX.Element {
   const isTextBeingWritten = useAppSelector(
-    (state) => diagramSelectors.currentEditedText(state) != null
+    (state) => selectors.currentEditedText(state.diagram) != null
   );
   const isLineToolSelected = useAppSelector(
     (state) => state.diagram.selectedTool === "LINE"
   );
-  const isMultiSegmmentLineToolSelected = useAppSelector(
+  const isMultiSegmentLineToolSelected = useAppSelector(
     (state) => state.diagram.selectedTool === "MULTI_SEGMENT_LINE"
   );
 
-  const isTextShapeSelected = useAppSelector(
-    (state) => diagramSelectors.selectedShapeObj(state)?.shape.type === "TEXT"
+  const isSingleTextShapeSelected = useAppSelector(
+    (state) =>
+      selectors.hasSingleSelectedShape(state.diagram) &&
+      selectors.selectedShapeObj(state.diagram)?.shape.type === "TEXT"
+  );
+
+  const isSelectToolSelected = useAppSelector(
+    (state) => state.diagram.selectedTool === "SELECT"
+  );
+
+  const hasSelectedShape = useAppSelector((state) =>
+    selectors.hasSelectedShape(state.diagram)
   );
 
   const tip: string | null = isTextBeingWritten
     ? "Press Ctrl+Enter to complete editing text."
     : isLineToolSelected
     ? "Click-and-Drag to create a line or arrow."
-    : isMultiSegmmentLineToolSelected
+    : isMultiSegmentLineToolSelected
     ? "Click once, and then click again to position segments. Double-click to finish creating the line."
-    : isTextShapeSelected && !isTextBeingWritten
+    : isSingleTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
+    : isSelectToolSelected && hasSelectedShape
+    ? "Press Ctrl to select multiple shapes"
     : null;
 
   return (

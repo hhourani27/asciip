@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
+import { ShapeObject, diagramActions } from "../../store/diagramSlice";
 import {
   Box,
   FormControl,
@@ -11,6 +11,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import { LINE_STYLE, line_repr } from "../../models/style";
+import { selectors } from "../../store/selectors";
+import _ from "lodash";
 
 const lineStyleDisplay: {
   [key in LINE_STYLE]: { name: string; repr: string; tooltip: React.ReactNode };
@@ -61,8 +63,8 @@ export function SelectLineStyle(): JSX.Element {
   const styleMode = useAppSelector((state) => state.diagram.styleMode);
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
   const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
-  const selectedShapeObj = useAppSelector((state) =>
-    diagramSelectors.selectedShapeObj(state)
+  const selectedShapeObjs: ShapeObject[] = useAppSelector((state) =>
+    selectors.selectedShapeObjs(state.diagram)
   );
 
   const isLineStyleSelectEnabled = (): boolean => {
@@ -75,13 +77,15 @@ export function SelectLineStyle(): JSX.Element {
     )
       return true;
 
-    const selectedShape = selectedShapeObj?.shape;
     if (
-      selectedShape &&
       selectedTool === "SELECT" &&
-      (selectedShape.type === "RECTANGLE" ||
-        selectedShape.type === "LINE" ||
-        selectedShape.type === "MULTI_SEGMENT_LINE")
+      selectedShapeObjs.length > 0 &&
+      selectedShapeObjs.every(
+        (s) =>
+          s.shape.type === "RECTANGLE" ||
+          s.shape.type === "LINE" ||
+          s.shape.type === "MULTI_SEGMENT_LINE"
+      )
     )
       return true;
 
@@ -89,17 +93,32 @@ export function SelectLineStyle(): JSX.Element {
   };
 
   const handleLineStyleChange = (event: SelectChangeEvent<LINE_STYLE>) => {
-    const selectedShapeId: string | undefined = selectedShapeObj
-      ? selectedShapeObj.id
-      : undefined;
+    const shapeIds: string[] | undefined =
+      selectedShapeObjs.length === 0
+        ? undefined
+        : selectedShapeObjs.map((so) => so.id);
 
     if (event.target.value)
       dispatch(
         diagramActions.setStyle({
           style: { lineStyle: event.target.value as LINE_STYLE },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
+  };
+
+  const getValue = (): LINE_STYLE | "" => {
+    if (selectedShapeObjs.length === 0) {
+      return globalStyle.lineStyle;
+    }
+
+    const values = selectedShapeObjs.map(
+      (s) => s?.style?.lineStyle ?? globalStyle.lineStyle
+    );
+
+    if (_.uniq(values).length === 1) {
+      return values[0];
+    } else return "";
   };
 
   return (
@@ -113,7 +132,7 @@ export function SelectLineStyle(): JSX.Element {
       <Select
         labelId="line-style-label"
         id="line-style"
-        value={selectedShapeObj?.style?.lineStyle ?? globalStyle.lineStyle}
+        value={getValue()}
         label="Line style"
         onChange={handleLineStyleChange}
       >

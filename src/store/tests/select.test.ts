@@ -2,8 +2,8 @@ import {
   diagramReducer,
   diagramActions,
   initDiagramState,
-  diagramSelectors,
 } from "../diagramSlice";
+import { selectors } from "../selectors";
 import {
   applyActions,
   generateMouseClickAction,
@@ -30,9 +30,7 @@ test("I select a shape, I click on an empty cell => selection is cleared", () =>
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(
-    diagramSelectors.selectedShapeObj({ diagram: finalState })
-  ).toBeUndefined();
+  expect(selectors.hasSelectedShape(finalState)).toBeFalse();
 });
 
 test("I am creating a shape, then I select the Select tool (with the S shortcut) => The new shape creation is cancelled", () => {
@@ -47,4 +45,31 @@ test("I am creating a shape, then I select the Select tool (with the S shortcut)
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
 
   expect(finalState.shapes).toHaveLength(0);
+});
+
+test("Select 2 shapes", () => {
+  const initialState = initDiagramState({
+    shapes: [
+      {
+        id: "1",
+        shape: { type: "RECTANGLE", tl: { r: 1, c: 1 }, br: { r: 5, c: 5 } },
+      },
+      {
+        id: "2",
+        shape: { type: "RECTANGLE", tl: { r: 10, c: 1 }, br: { r: 15, c: 5 } },
+      },
+    ],
+  });
+
+  const actions = [
+    diagramActions.setTool("SELECT"),
+    ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
+    ...generateMouseClickAction({ r: 1, c: 1 }),
+    ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
+    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+  ];
+
+  const finalState = applyActions(diagramReducer, initialState, actions);
+
+  expect(selectors.selectedShapeObjs(finalState)).toHaveLength(2);
 });

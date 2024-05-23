@@ -87,7 +87,7 @@ export const arrow_repr = {
 export type Style = {
   lineStyle: LINE_STYLE;
   arrowStyle: ARROW_STYLE;
-  arrowStartHead: boolean;
+  arrowStartHead: boolean; // TODO: simplify and use a single value arrowHeadStyle
   arrowEndHead: boolean;
 };
 

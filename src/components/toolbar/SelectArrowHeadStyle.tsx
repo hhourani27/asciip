@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
+import { ShapeObject, diagramActions } from "../../store/diagramSlice";
 import {
   Box,
   FormControl,
@@ -11,6 +11,8 @@ import {
   Tooltip,
 } from "@mui/material";
 import { ARROW_STYLE, arrow_repr } from "../../models/style";
+import { selectors } from "../../store/selectors";
+import _ from "lodash";
 
 const arrowHeadStyleDisplay: {
   [key in ARROW_STYLE]: {
@@ -58,8 +60,8 @@ export function SelectArrowHeadStyle(): JSX.Element {
   const styleMode = useAppSelector((state) => state.diagram.styleMode);
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
   const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
-  const selectedShapeObj = useAppSelector((state) =>
-    diagramSelectors.selectedShapeObj(state)
+  const selectedShapeObjs: ShapeObject[] = useAppSelector((state) =>
+    selectors.selectedShapeObjs(state.diagram)
   );
 
   const isArrowStyleSelectEnabled = (): boolean => {
@@ -68,12 +70,12 @@ export function SelectArrowHeadStyle(): JSX.Element {
     if (selectedTool === "LINE" || selectedTool === "MULTI_SEGMENT_LINE")
       return true;
 
-    const selectedShape = selectedShapeObj?.shape;
     if (
-      selectedShape &&
       selectedTool === "SELECT" &&
-      (selectedShape.type === "LINE" ||
-        selectedShape.type === "MULTI_SEGMENT_LINE")
+      selectedShapeObjs.length > 0 &&
+      selectedShapeObjs.every(
+        (s) => s.shape.type === "LINE" || s.shape.type === "MULTI_SEGMENT_LINE"
+      )
     )
       return true;
 
@@ -81,17 +83,32 @@ export function SelectArrowHeadStyle(): JSX.Element {
   };
 
   const handleArrowStyleChange = (event: SelectChangeEvent<ARROW_STYLE>) => {
-    const selectedShapeId: string | undefined = selectedShapeObj
-      ? selectedShapeObj.id
-      : undefined;
+    const shapeIds: string[] | undefined =
+      selectedShapeObjs.length === 0
+        ? undefined
+        : selectedShapeObjs.map((so) => so.id);
 
     if (event.target.value)
       dispatch(
         diagramActions.setStyle({
           style: { arrowStyle: event.target.value as ARROW_STYLE },
-          shapeId: selectedShapeId,
+          shapeIds,
         })
       );
+  };
+
+  const getValue = (): ARROW_STYLE | "" => {
+    if (selectedShapeObjs.length === 0) {
+      return globalStyle.arrowStyle;
+    }
+
+    const values = selectedShapeObjs.map(
+      (s) => s?.style?.arrowStyle ?? globalStyle.arrowStyle
+    );
+
+    if (_.uniq(values).length === 1) {
+      return values[0];
+    } else return "";
   };
 
   return (
@@ -105,7 +122,7 @@ export function SelectArrowHeadStyle(): JSX.Element {
       <Select
         labelId="head-style-label"
         id="head-style"
-        value={selectedShapeObj?.style?.arrowStyle ?? globalStyle.arrowStyle}
+        value={getValue()}
         label="Head style"
         onChange={handleArrowStyleChange}
       >
