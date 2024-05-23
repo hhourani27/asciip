@@ -283,7 +283,7 @@ export function getStyledCanvasRepresentation(
   globalStyle: Style
 ): CellValueMap {
   function isShapeObject(shape: ShapeObject | Shape): shape is ShapeObject {
-    return "id" in shapes[0]; // TODO: this doesn't seem right. correct?
+    return "id" in shape;
   }
 
   let repr: CellValueMap = {};
