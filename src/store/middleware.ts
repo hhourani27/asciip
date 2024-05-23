@@ -39,7 +39,6 @@ startAppListening({
  * If the active diagram data is modified in diagramSlice => Update the diagram in appSlice
  */
 const debouncedUpdateDiagramData = _.debounce((action, listenerApi) => {
-  console.log("[Listener] Detected a change in the current diagram");
   const { canvasSize, shapes, styleMode, globalStyle } =
     listenerApi.getState().diagram;
 
