@@ -9,7 +9,7 @@ export function FooterTip(): JSX.Element {
   const isLineToolSelected = useAppSelector(
     (state) => state.diagram.selectedTool === "LINE"
   );
-  const isMultiSegmmentLineToolSelected = useAppSelector(
+  const isMultiSegmentLineToolSelected = useAppSelector(
     (state) => state.diagram.selectedTool === "MULTI_SEGMENT_LINE"
   );
 
@@ -19,14 +19,24 @@ export function FooterTip(): JSX.Element {
       selectors.selectedShapeObj(state.diagram)?.shape.type === "TEXT"
   );
 
+  const isSelectToolSelected = useAppSelector(
+    (state) => state.diagram.selectedTool === "SELECT"
+  );
+
+  const hasSelectedShape = useAppSelector((state) =>
+    selectors.hasSelectedShape(state.diagram)
+  );
+
   const tip: string | null = isTextBeingWritten
     ? "Press Ctrl+Enter to complete editing text."
     : isLineToolSelected
     ? "Click-and-Drag to create a line or arrow."
-    : isMultiSegmmentLineToolSelected
+    : isMultiSegmentLineToolSelected
     ? "Click once, and then click again to position segments. Double-click to finish creating the line."
     : isSingleTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
+    : isSelectToolSelected && hasSelectedShape
+    ? "Press Ctrl to select multiple shapes"
     : null;
 
   return (
