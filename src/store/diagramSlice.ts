@@ -16,7 +16,7 @@ import {
 } from "../models/shapeInCanvas";
 import _ from "lodash";
 import { v4 as uuidv4 } from "uuid";
-import { resize, translate } from "../models/transformation";
+import { resize, translateAll } from "../models/transformation";
 import { getBoundingBoxOfAll } from "../models/shapeInCanvas";
 import { createLineSegment, createZeroWidthSegment } from "../models/create";
 import { capText, getLines } from "../models/text";
@@ -257,6 +257,20 @@ export const diagramSlice = createSlice({
             startShapes: [{ ...shapeObj.shape }],
           };
         }
+      } else if (state.mode.M === "SELECT" && state.mode.shapeIds.length > 1) {
+        const shapeObjs = toShapeObjects(state.shapes, state.mode.shapeIds);
+        if (
+          shapeObjs.some((so) =>
+            isShapeAtCoords(so.shape, state.currentHoveredCell!)
+          )
+        ) {
+          state.mode = {
+            M: "MOVE",
+            shapeIds: state.mode.shapeIds,
+            start: state.currentHoveredCell!,
+            startShapes: shapeObjs.map((so) => so.shape),
+          };
+        }
       } else if (
         state.mode.M === "BEFORE_CREATING" &&
         state.selectedTool === "RECTANGLE"
@@ -320,20 +334,18 @@ export const diagramSlice = createSlice({
         //* I'm currently moving a Shape and I change mouse position => Update shape position
         // Get selected shape
 
-        // TODO: For now, assume there's a single shape. handle moving multiple shapes
-        const shapeObj = toShapeObject(state.shapes, moveMode.shapeIds[0]);
-
-        // Translate shape
         const from = moveMode.start;
         const to = action.payload;
         const delta = { r: to.r - from.r, c: to.c - from.c };
-        const translatedShape: Shape = translate(
-          moveMode.startShapes[0],
+        const translatedShapes: Shape[] = translateAll(
+          moveMode.startShapes,
           delta,
           state.canvasSize
         );
-        // Replace translated shape
-        replaceShape(state, shapeObj.id, translatedShape);
+
+        moveMode.shapeIds.forEach((id, idx) => {
+          replaceShape(state, id, translatedShapes[idx]);
+        });
       } else if (state.mode.M === "RESIZE") {
         const resizeMode = state.mode;
         //* I'm currently resizing a Shape and I change mouse position => Update shape

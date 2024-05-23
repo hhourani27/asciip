@@ -2,7 +2,7 @@ import _ from "lodash";
 import { CanvasSize } from "../store/diagramSlice";
 import { Coords, Shape, normalizeMultiSegmentLine } from "./shapes";
 import { createLineSegment } from "./create";
-import { BoundingBox } from "./shapeInCanvas";
+import { BoundingBox, getBoundingBoxOfAll } from "./shapeInCanvas";
 import { getBoundingBox } from "./shapeInCanvas";
 
 export function translate(
@@ -61,6 +61,21 @@ export function translate(
       };
     }
   }
+}
+
+export function translateAll(
+  shapes: Shape[],
+  delta: Coords,
+  canvasSize: CanvasSize
+): Shape[] {
+  if (shapes.length === 0) {
+    return [];
+  }
+
+  const bb = getBoundingBoxOfAll(shapes)!;
+  const cappedDelta = capDelta(delta, bb, canvasSize);
+
+  return shapes.map((s) => translate(s, cappedDelta, canvasSize));
 }
 
 export type ResizePoint = {
