@@ -104,7 +104,7 @@ const currentEditedText = createSelector(
   }
 );
 
-export type Pointer = "SELECT" | "MOVE" | "CREATE" | "RESIZE" | "NONE";
+export type Pointer = "SELECT" | "MOVE" | "RESIZE" | "CREATE" | "NONE";
 const getPointer = createSelector(
   [(state: DiagramState) => state],
   (state): Pointer => {
