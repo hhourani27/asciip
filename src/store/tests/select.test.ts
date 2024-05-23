@@ -2,8 +2,8 @@ import {
   diagramReducer,
   diagramActions,
   initDiagramState,
-  diagramSelectors,
 } from "../diagramSlice";
+import { selectors } from "../selectors";
 import {
   applyActions,
   generateMouseClickAction,
@@ -30,9 +30,7 @@ test("I select a shape, I click on an empty cell => selection is cleared", () =>
 
   const finalState = applyActions(diagramReducer, initialState, actions);
 
-  expect(
-    diagramSelectors.selectedShapeObj({ diagram: finalState })
-  ).toBeUndefined();
+  expect(selectors.hasSelectedShape(finalState)).toBeFalse();
 });
 
 test("I am creating a shape, then I select the Select tool (with the S shortcut) => The new shape creation is cancelled", () => {

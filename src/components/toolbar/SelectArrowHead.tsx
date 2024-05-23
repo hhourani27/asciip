@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
+import { diagramActions } from "../../store/diagramSlice";
 import {
   FormControl,
   InputLabel,
@@ -8,6 +8,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { Style } from "../../models/style";
+import { selectors } from "../../store/selectors";
 
 export function SelectArrowHead(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -15,7 +16,7 @@ export function SelectArrowHead(): JSX.Element {
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
   const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
   const selectedShapeObj = useAppSelector((state) =>
-    diagramSelectors.selectedShapeObj(state)
+    selectors.selectedShapeObj(state.diagram)
   );
 
   const isArrowHeadSelectEnabled = (): boolean => {

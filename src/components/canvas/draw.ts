@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Coords, Shape } from "../../models/shapes";
 import {
   CellValueMap,
-  getStyledCanvasRepresentation,
+  getStyledShapeRepresentation,
 } from "../../models/representation";
 import { ResizePoint, getResizePoints } from "../../models/transformation";
 import { Style, StyleMode } from "../../models/style";
@@ -82,57 +82,111 @@ function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
   );
 }
 
+export type DrawOptions = {
+  color: string;
+  drawResizePoints: boolean;
+};
+
+type CellGraphicElemMap = {
+  [key: number]: {
+    [key: number]: { char: string; color: string };
+  };
+};
+
+function getGraphicCanvasRepresentation(
+  shapes: ShapeObject[] | Shape[],
+  styleMode: StyleMode,
+  globalStyle: Style,
+  drawOpts: DrawOptions[]
+): CellGraphicElemMap {
+  function isShapeObject(shape: ShapeObject | Shape): shape is ShapeObject {
+    return "id" in shape;
+  }
+
+  let graphicCanvasRepr: CellGraphicElemMap = {};
+
+  shapes.forEach((s, idx) => {
+    const shape = isShapeObject(s) ? s.shape : s;
+    const shapeStyle = isShapeObject(s) ? s.style : undefined;
+    const color = drawOpts[idx].color;
+
+    const styledShapeRepr: CellValueMap = getStyledShapeRepresentation(
+      shape,
+      styleMode,
+      globalStyle,
+      shapeStyle
+    );
+
+    const graphicShapeRepr: CellGraphicElemMap = {};
+    for (const row in styledShapeRepr) {
+      graphicShapeRepr[row] = {};
+      for (const col in styledShapeRepr[row]) {
+        graphicShapeRepr[row][col] = {
+          char: styledShapeRepr[row][col],
+          color,
+        };
+      }
+    }
+
+    graphicCanvasRepr = _.merge(graphicCanvasRepr, graphicShapeRepr);
+  });
+
+  return graphicCanvasRepr;
+}
+
 function drawShapes(
   ctx: CanvasRenderingContext2D,
   shapes: ShapeObject[] | Shape[],
   styleMode: StyleMode,
   globalStyle: Style,
-  color: string
+  opts: DrawOptions[]
 ): void {
   if (shapes.length === 0) return;
 
-  const repr: CellValueMap = getStyledCanvasRepresentation(
+  const repr: CellGraphicElemMap = getGraphicCanvasRepresentation(
     shapes,
     styleMode,
-    globalStyle
+    globalStyle,
+    opts
   );
 
-  ctx.fillStyle = color;
   ctx.font = FONT;
   ctx.textBaseline = "middle"; // To align the text in the middle of the cell (the default value "alphabetic" does not align the text in the middle)
   for (const row in repr) {
     for (const col in repr[row]) {
-      const value = repr[row][col];
+      const { char, color } = repr[row][col];
+      ctx.fillStyle = color;
+
       const x = parseInt(col) * CELL_WIDTH;
       const y = parseInt(row) * CELL_HEIGHT + 0.5 * CELL_HEIGHT;
 
-      ctx.fillText(value, x, y);
+      ctx.fillText(char, x, y);
     }
   }
-}
 
-function drawSelectedShape(
-  ctx: CanvasRenderingContext2D,
-  shapeObj: ShapeObject,
-  styleMode: StyleMode,
-  globalStyle: Style,
-  color: string
-) {
-  drawShapes(ctx, [shapeObj], styleMode, globalStyle, color);
-
-  const resizePoints: ResizePoint[] = getResizePoints(shapeObj.shape);
-  resizePoints.forEach(({ coords: { r, c } }) => {
-    ctx.beginPath(); // Start a new path
-    ctx.arc(
-      c * CELL_WIDTH + 0.5 * CELL_WIDTH,
-      r * CELL_HEIGHT + 0.5 * CELL_HEIGHT,
-      0.5 * CELL_HEIGHT,
-      0,
-      Math.PI * 2
-    ); // Create a circular path
-    ctx.fillStyle = alpha(color, 0.66); // Set the fill color
-    ctx.fill(); // Fill the path with the color
-    ctx.closePath(); // Close the path
+  // Draw resize points
+  function isShapeObject(shape: ShapeObject | Shape): shape is ShapeObject {
+    return "id" in shape;
+  }
+  shapes.forEach((s, idx) => {
+    if (opts[idx].drawResizePoints) {
+      const resizePoints: ResizePoint[] = getResizePoints(
+        isShapeObject(s) ? s.shape : s
+      );
+      resizePoints.forEach(({ coords: { r, c } }) => {
+        ctx.beginPath(); // Start a new path
+        ctx.arc(
+          c * CELL_WIDTH + 0.5 * CELL_WIDTH,
+          r * CELL_HEIGHT + 0.5 * CELL_HEIGHT,
+          0.5 * CELL_HEIGHT,
+          0,
+          Math.PI * 2
+        ); // Create a circular path
+        ctx.fillStyle = alpha(opts[idx].color, 0.66); // Set the fill color
+        ctx.fill(); // Fill the path with the color
+        ctx.closePath(); // Close the path
+      });
+    }
   });
 }
 
@@ -141,5 +195,4 @@ export const canvasDraw = {
   drawGrid,
   drawHoveredCell,
   drawShapes,
-  drawSelectedShape,
 };

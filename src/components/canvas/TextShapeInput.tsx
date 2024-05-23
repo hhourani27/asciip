@@ -1,15 +1,16 @@
 import { Box, TextField } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
+import { diagramActions } from "../../store/diagramSlice";
 import { CELL_HEIGHT, FONT_SIZE } from "./draw";
 import { getStringFromShape } from "../../models/text";
 import { ChangeEvent } from "react";
+import { selectors } from "../../store/selectors";
 
 export function TextShapeInput(): JSX.Element {
   const dispatch = useAppDispatch();
 
   const currentEditedText = useAppSelector((state) =>
-    diagramSelectors.currentEditedText(state)
+    selectors.currentEditedText(state.diagram)
   )!;
 
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {

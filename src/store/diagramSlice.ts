@@ -49,8 +49,8 @@ export type ActionMode =
       checkpoint: Shape | null;
       shape: Shape;
     }
-  | { M: "SELECT"; selectedShapeId: string | null }
-  | { M: "MOVE"; start: Coords; shapeId: string; startShape: Shape }
+  | { M: "SELECT"; selectedShapeIds: string[] }
+  | { M: "MOVE"; start: Coords; shapeIds: string[]; startShapes: Shape[] }
   | { M: "RESIZE"; resizePoint: Coords; shapeId: string; startShape: Shape }
   | { M: "TEXT_EDIT"; shapeId: string; startShape: TextShape };
 
@@ -90,7 +90,7 @@ export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
     currentHoveredCell: null,
 
     selectedTool: "SELECT",
-    mode: { M: "SELECT", selectedShapeId: null },
+    mode: { M: "SELECT", selectedShapeIds: [] },
 
     exportInProgress: false,
   };
@@ -129,7 +129,7 @@ export const diagramSlice = createSlice({
     setTool: (state, action: PayloadAction<Tool>) => {
       if (state.selectedTool !== action.payload) {
         if (action.payload === "SELECT") {
-          state.mode = { M: "SELECT", selectedShapeId: null };
+          state.mode = { M: "SELECT", selectedShapeIds: [] };
         } else {
           state.mode = { M: "BEFORE_CREATING" };
         }
@@ -170,13 +170,13 @@ export const diagramSlice = createSlice({
         const shape = getShapeObjAtCoords(state.shapes, action.payload);
         state.mode = {
           M: "SELECT",
-          selectedShapeId: shape ? shape.id : null,
+          selectedShapeIds: shape ? [shape.id] : [],
         };
       } else if (state.mode.M === "TEXT_EDIT") {
         const shape = getShapeObjAtCoords(state.shapes, action.payload);
         state.mode = {
           M: "SELECT",
-          selectedShapeId: shape ? shape.id : null,
+          selectedShapeIds: shape ? [shape.id] : [],
         };
       } else if (
         state.mode.M === "BEFORE_CREATING" &&
@@ -231,33 +231,28 @@ export const diagramSlice = createSlice({
       }
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeId != null) {
-        const selectMode = state.mode;
+      if (
+        state.mode.M === "SELECT" &&
+        state.mode.selectedShapeIds.length === 1
+      ) {
+        const shapeObj = toShapeObject(
+          state.shapes,
+          state.mode.selectedShapeIds[0]
+        );
 
-        const selectedShapeObj = state.shapes.find(
-          (s) => s.id === selectMode.selectedShapeId
-        )!;
-
-        if (
-          hasResizePointAtCoords(
-            selectedShapeObj.shape,
-            state.currentHoveredCell!
-          )
-        ) {
+        if (hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell!)) {
           state.mode = {
             M: "RESIZE",
-            shapeId: selectedShapeObj.id,
+            shapeId: shapeObj.id,
             resizePoint: state.currentHoveredCell!,
-            startShape: { ...selectedShapeObj.shape },
+            startShape: { ...shapeObj.shape },
           };
-        } else if (
-          isShapeAtCoords(selectedShapeObj.shape, state.currentHoveredCell!)
-        ) {
+        } else if (isShapeAtCoords(shapeObj.shape, state.currentHoveredCell!)) {
           state.mode = {
             M: "MOVE",
-            shapeId: selectedShapeObj.id,
+            shapeIds: [shapeObj.id],
             start: state.currentHoveredCell!,
-            startShape: { ...selectedShapeObj.shape },
+            startShapes: [{ ...shapeObj.shape }],
           };
         }
       } else if (
@@ -292,12 +287,12 @@ export const diagramSlice = createSlice({
       if (state.mode.M === "MOVE") {
         state.mode = {
           M: "SELECT",
-          selectedShapeId: state.mode.shapeId,
+          selectedShapeIds: state.mode.shapeIds,
         };
       } else if (state.mode.M === "RESIZE") {
         state.mode = {
           M: "SELECT",
-          selectedShapeId: state.mode.shapeId,
+          selectedShapeIds: [state.mode.shapeId],
         };
       } else if (
         state.mode.M === "CREATE" &&
@@ -322,20 +317,21 @@ export const diagramSlice = createSlice({
         const moveMode = state.mode;
         //* I'm currently moving a Shape and I change mouse position => Update shape position
         // Get selected shape
-        const selectedShapeIdx: number = state.shapes.findIndex(
-          (s) => s.id === moveMode.shapeId
-        )!;
+
+        // TODO: For now, assume there's a single shape. handle moving multiple shapes
+        const shapeObj = toShapeObject(state.shapes, moveMode.shapeIds[0]);
+
         // Translate shape
         const from = moveMode.start;
         const to = action.payload;
         const delta = { r: to.r - from.r, c: to.c - from.c };
         const translatedShape: Shape = translate(
-          moveMode.startShape,
+          moveMode.startShapes[0],
           delta,
           state.canvasSize
         );
         // Replace translated shape
-        state.shapes[selectedShapeIdx].shape = translatedShape;
+        replaceShape(state, shapeObj.id, translatedShape);
       } else if (state.mode.M === "RESIZE") {
         const resizeMode = state.mode;
         //* I'm currently resizing a Shape and I change mouse position => Update shape
@@ -422,19 +418,14 @@ export const diagramSlice = createSlice({
         //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
         state.mode = {
           M: "SELECT",
-          selectedShapeId: state.mode.shapeId,
+          selectedShapeIds: [state.mode.shapeId],
         };
       }
     },
     onDeletePress: (state) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeId != null) {
-        const selectMode = state.mode;
-        //* I selected shape, I'm not currently editing it, I press delete => Delete shape
-        const shapeObjIdx = state.shapes.findIndex(
-          (s) => s.id === selectMode.selectedShapeId
-        );
-        state.shapes.splice(shapeObjIdx, 1);
-        state.mode = { M: "SELECT", selectedShapeId: null };
+      if (state.mode.M === "SELECT" && state.mode.selectedShapeIds.length > 0) {
+        deleteShapes(state, state.mode.selectedShapeIds);
+        state.mode = { M: "SELECT", selectedShapeIds: [] };
       }
     },
     updateText: (state, action: PayloadAction<string>) => {
@@ -462,18 +453,24 @@ export const diagramSlice = createSlice({
       }
     },
     onMoveToFrontButtonClick: (state) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeId != null) {
+      if (
+        state.mode.M === "SELECT" &&
+        state.mode.selectedShapeIds.length === 1
+      ) {
         state.shapes = moveShapeToFront(
           state.shapes,
-          state.mode.selectedShapeId
+          state.mode.selectedShapeIds[0]
         );
       }
     },
     onMoveToBackButtonClick: (state) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeId != null) {
+      if (
+        state.mode.M === "SELECT" &&
+        state.mode.selectedShapeIds.length === 1
+      ) {
         state.shapes = moveShapeToBack(
           state.shapes,
-          state.mode.selectedShapeId
+          state.mode.selectedShapeIds[0]
         );
       }
     },
@@ -520,40 +517,10 @@ export const diagramSlice = createSlice({
       state.exportInProgress = false;
     }, //#endregion
   },
-  selectors: {
-    selectedShapeObj: (state) => {
-      if (state.mode.M === "SELECT" && state.mode.selectedShapeId != null) {
-        const selectedShapeId = state.mode.selectedShapeId;
-        return state.shapes.find((shape) => shape.id === selectedShapeId);
-      } else {
-        return undefined;
-      }
-    },
-    currentCreatedShape: (state): Shape | null => {
-      if (state.mode.M === "CREATE") return state.mode.shape;
-      else return null;
-    },
-    currentEditedText: (state): TextShape | null => {
-      if (state.mode.M === "CREATE" && state.mode.shape.type === "TEXT") {
-        return state.mode.shape;
-      } else if (state.mode.M === "TEXT_EDIT") {
-        const selectedShapeId = state.mode.shapeId;
-        const selectedTextShapeObj = state.shapes.find(
-          (s) => s.id === selectedShapeId
-        );
-
-        return selectedTextShapeObj
-          ? (selectedTextShapeObj.shape as TextShape)
-          : null;
-      } else {
-        return null;
-      }
-    },
-  },
 });
 
 //#region Helper state function that mutate directly the state
-function addNewShape(state: DiagramState, shape: Shape) {
+function addNewShape(state: DiagramState, shape: Shape): void {
   const newShapeObj: ShapeObject = {
     id: uuidv4(),
     shape: shape,
@@ -578,6 +545,38 @@ function addNewShape(state: DiagramState, shape: Shape) {
   }
 }
 
+function replaceShape(
+  state: DiagramState,
+  shapeId: string,
+  shape: Shape
+): void {
+  const idx = state.shapes.findIndex((s) => s.id === shapeId);
+  state.shapes[idx].shape = shape;
+}
+
+function deleteShapes(state: DiagramState, shapeIds: string[]): void {
+  shapeIds.forEach((shapeId) => {
+    const shapeIdx = state.shapes.findIndex((s) => s.id === shapeId);
+    if (shapeIdx >= 0) {
+      state.shapes.splice(shapeIdx, 1);
+    }
+  });
+}
+//#endregion
+
+//#region Utilities
+function toShapeObjects(
+  shapes: ShapeObject[],
+  shapeIds: string[]
+): ShapeObject[] {
+  return shapeIds.map((shapeId) => shapes.find((s) => s.id === shapeId)!);
+}
+
+function toShapeObject(shapes: ShapeObject[], shapeId: string): ShapeObject {
+  return shapes.find((s) => s.id === shapeId)!;
+}
+
+//#endregion
+
 export const diagramReducer = diagramSlice.reducer;
 export const diagramActions = diagramSlice.actions;
-export const diagramSelectors = diagramSlice.selectors;

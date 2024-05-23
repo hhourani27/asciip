@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
+import { diagramActions } from "../../store/diagramSlice";
 import {
   Box,
   FormControl,
@@ -11,6 +11,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { LINE_STYLE, line_repr } from "../../models/style";
+import { selectors } from "../../store/selectors";
 
 const lineStyleDisplay: {
   [key in LINE_STYLE]: { name: string; repr: string; tooltip: React.ReactNode };
@@ -62,7 +63,7 @@ export function SelectLineStyle(): JSX.Element {
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
   const selectedTool = useAppSelector((state) => state.diagram.selectedTool);
   const selectedShapeObj = useAppSelector((state) =>
-    diagramSelectors.selectedShapeObj(state)
+    selectors.selectedShapeObj(state.diagram)
   );
 
   const isLineStyleSelectEnabled = (): boolean => {

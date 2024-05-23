@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import { useAppSelector } from "../../store/hooks";
-import { diagramSelectors } from "../../store/diagramSlice";
 import InfoIcon from "@mui/icons-material/Info";
+import { selectors } from "../../store/selectors";
 export function FooterTip(): JSX.Element {
   const isTextBeingWritten = useAppSelector(
-    (state) => diagramSelectors.currentEditedText(state) != null
+    (state) => selectors.currentEditedText(state.diagram) != null
   );
   const isLineToolSelected = useAppSelector(
     (state) => state.diagram.selectedTool === "LINE"
@@ -13,8 +13,8 @@ export function FooterTip(): JSX.Element {
     (state) => state.diagram.selectedTool === "MULTI_SEGMENT_LINE"
   );
 
-  const isTextShapeSelected = useAppSelector(
-    (state) => diagramSelectors.selectedShapeObj(state)?.shape.type === "TEXT"
+  const isSingleTextShapeSelected = useAppSelector(
+    (state) => selectors.selectedShapeObj(state.diagram)?.shape.type === "TEXT"
   );
 
   const tip: string | null = isTextBeingWritten
@@ -23,7 +23,7 @@ export function FooterTip(): JSX.Element {
     ? "Click-and-Drag to create a line or arrow."
     : isMultiSegmmentLineToolSelected
     ? "Click once, and then click again to position segments. Double-click to finish creating the line."
-    : isTextShapeSelected && !isTextBeingWritten
+    : isSingleTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
     : null;
 

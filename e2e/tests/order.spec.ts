@@ -77,4 +77,14 @@ test.describe("Order", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("order-03.png");
   });
+
+  test("04-Order buttons are disabled if there's no selection", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    await expect(page.getByLabel("push to back")).toBeDisabled();
+    await expect(page.getByLabel("bring to front")).toBeDisabled();
+  });
 });

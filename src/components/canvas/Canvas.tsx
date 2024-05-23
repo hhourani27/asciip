@@ -2,11 +2,11 @@ import { useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
 import { Coords } from "../../models/shapes";
-import { diagramActions, diagramSelectors } from "../../store/diagramSlice";
-import { CELL_HEIGHT, CELL_WIDTH, canvasDraw } from "./draw";
+import { diagramActions } from "../../store/diagramSlice";
+import { CELL_HEIGHT, CELL_WIDTH, DrawOptions, canvasDraw } from "./draw";
 import _ from "lodash";
 import { TextShapeInput } from "./TextShapeInput";
-import { getPointer } from "../../store/selectors";
+import { selectors } from "../../store/selectors";
 
 export default function Canvas(): JSX.Element {
   const dispatch = useAppDispatch();
@@ -27,18 +27,20 @@ export default function Canvas(): JSX.Element {
 
   const styleMode = useAppSelector((state) => state.diagram.styleMode);
   const globalStyle = useAppSelector((state) => state.diagram.globalStyle);
-  const shapes = useAppSelector((state) => state.diagram.shapes);
-  const selectedShapeObj = useAppSelector((state) =>
-    diagramSelectors.selectedShapeObj(state)
+  const shapeObjs = useAppSelector((state) => state.diagram.shapes);
+  const selectedShapeObjs = useAppSelector((state) =>
+    selectors.selectedShapeObjs(state.diagram)
   );
   const newShape = useAppSelector((state) =>
-    diagramSelectors.currentCreatedShape(state)
+    selectors.currentCreatedShape(state.diagram)
   );
   const currentEditedText = useAppSelector((state) =>
-    diagramSelectors.currentEditedText(state)
+    selectors.currentEditedText(state.diagram)
   );
 
-  const nextActionOnClick = useAppSelector((state) => getPointer(state));
+  const nextActionOnClick = useAppSelector((state) =>
+    selectors.getPointer(state.diagram)
+  );
 
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;
@@ -95,38 +97,26 @@ export default function Canvas(): JSX.Element {
     }
 
     // Draw shapes
+    const selectedShapeIds = selectedShapeObjs.map((s) => s.id);
 
-    // Draw unselected shapes
-    const unselectedShapes = shapes.filter(
-      (shape) => shape.id !== selectedShapeObj?.id
-    );
-    canvasDraw.drawShapes(
-      ctx,
-      unselectedShapes,
-      styleMode,
-      globalStyle,
-      theme.canvas.shape
-    );
+    const drawOpts: DrawOptions[] = shapeObjs.map((so) => {
+      const isShapeSelected = selectedShapeIds.includes(so.id);
+      const color = isShapeSelected
+        ? theme.canvas.selectedShape
+        : theme.canvas.shape;
+      const drawResizePoints: boolean =
+        isShapeSelected && selectedShapeObjs.length === 1;
 
-    // Draw selected shape
-    if (selectedShapeObj)
-      canvasDraw.drawSelectedShape(
-        ctx,
-        selectedShapeObj,
-        styleMode,
-        globalStyle,
-        theme.canvas.selectedShape
-      );
+      return { color, drawResizePoints };
+    });
+
+    canvasDraw.drawShapes(ctx, shapeObjs, styleMode, globalStyle, drawOpts);
 
     // Draw new shape
     if (newShape)
-      canvasDraw.drawShapes(
-        ctx,
-        [newShape],
-        styleMode,
-        globalStyle,
-        theme.canvas.createdShape
-      );
+      canvasDraw.drawShapes(ctx, [newShape], styleMode, globalStyle, [
+        { color: theme.canvas.createdShape, drawResizePoints: false },
+      ]);
   }, [
     canvasHeight,
     canvasWidth,
@@ -136,8 +126,8 @@ export default function Canvas(): JSX.Element {
     newShape,
     nextActionOnClick,
     rowCount,
-    selectedShapeObj,
-    shapes,
+    selectedShapeObjs,
+    shapeObjs,
     styleMode,
     theme.canvas.background,
     theme.canvas.createdShape,
