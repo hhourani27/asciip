@@ -166,7 +166,7 @@ export function ExportDialog() {
             renderValue={renderCommentStyleValue}
           >
             {Object.keys(commentStyleDisplay).map((value) => (
-              <MenuItem value={value}>
+              <MenuItem key={value} value={value}>
                 <ListItemText
                   primary={renderCommentStyleValue(value as COMMENT_STYLE)}
                   secondary={
