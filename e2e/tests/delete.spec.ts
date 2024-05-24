@@ -1,7 +1,7 @@
 import { test, expect } from "../fixtures/fixture";
 
 // A single diagram, in ASCII mode, containing 1 rectangle, 1 line, 1 multi-segment, 1 text
-import data_01 from "../fixtures/select.spec.ts/data_01.json";
+import data_01 from "../fixtures/delete.spec.ts/data_01.json";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("http://localhost:3000/");
@@ -13,7 +13,7 @@ test.afterEach(async ({ page }) => {
   });
 });
 
-test.describe("Select shape", () => {
+test.describe("Delete shapes", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("http://localhost:3000/");
 
@@ -27,22 +27,17 @@ test.describe("Select shape", () => {
     await page.reload();
   });
 
-  test("01-I select a rectangle => It is colored blue with 4 resize points visible", async ({
-    page,
-    canvas,
-  }) => {
+  test("01-Delete a single shape", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
     await canvas.mouse.move(5, 5);
     await canvas.mouse.click();
+    await page.keyboard.press("Delete");
 
-    await expect(canvas.locator()).toHaveScreenshot("select-01.png");
+    await expect(canvas.locator()).toHaveScreenshot("delete-01.png");
   });
 
-  test("02-Select two shapes => They are colored blue with no resize point visible", async ({
-    page,
-    canvas,
-  }) => {
+  test("02-Delete two shapes", async ({ page, canvas }) => {
     await page.getByRole("button", { name: "Select tool" }).click();
 
     await canvas.mouse.move(5, 5);
@@ -52,6 +47,8 @@ test.describe("Select shape", () => {
     await canvas.mouse.click();
     await page.keyboard.up("Control");
 
-    await expect(canvas.locator()).toHaveScreenshot("select-02.png");
+    await page.keyboard.press("Delete");
+
+    await expect(canvas.locator()).toHaveScreenshot("delete-02.png");
   });
 });

@@ -10,8 +10,8 @@
             "id": "083f26b6-0bf7-4096-a828-35a6b1ba5a4e",
             "shape": {
               "type": "RECTANGLE",
-              "tl": { "r": 5, "c": 5 },
-              "br": { "r": 10, "c": 10 }
+              "tl": { "r": 3, "c": 3 },
+              "br": { "r": 6, "c": 6 }
             },
             "style": {
               "lineStyle": "LIGHT",
@@ -21,12 +21,26 @@
             }
           },
           {
-            "id": "3bb95d15-8294-49c9-a504-dc00c31ed917",
+            "id": "848e7bfb-9f6f-439f-8e6d-828eecae237a",
+            "shape": {
+              "type": "RECTANGLE",
+              "tl": { "r": 9, "c": 3 },
+              "br": { "r": 12, "c": 6 }
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "73eebfb9-2943-4814-a7b4-6cb80afef61a",
             "shape": {
               "type": "LINE",
               "axis": "HORIZONTAL",
-              "start": { "r": 5, "c": 15 },
-              "end": { "r": 5, "c": 20 },
+              "start": { "r": 3, "c": 9 },
+              "end": { "r": 3, "c": 12 },
               "direction": "LEFT_TO_RIGHT"
             },
             "style": {
@@ -37,21 +51,81 @@
             }
           },
           {
-            "id": "2dc6501f-e4bf-48ac-bc73-1fb14a296174",
+            "id": "bc79d7f9-04ea-4079-9677-3228cd6fd23c",
+            "shape": {
+              "type": "LINE",
+              "axis": "HORIZONTAL",
+              "start": { "r": 6, "c": 12 },
+              "end": { "r": 6, "c": 9 },
+              "direction": "RIGHT_TO_LEFT"
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "dc949f37-4c8f-4337-a808-2cc23f5c0d9d",
+            "shape": {
+              "type": "LINE",
+              "axis": "VERTICAL",
+              "start": { "r": 9, "c": 9 },
+              "end": { "r": 12, "c": 9 },
+              "direction": "DOWN"
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "6cec57bb-da8f-48d2-b338-3f19b9852ba9",
+            "shape": {
+              "type": "LINE",
+              "axis": "VERTICAL",
+              "start": { "r": 12, "c": 12 },
+              "end": { "r": 9, "c": 12 },
+              "direction": "UP"
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "3986bef4-638f-4c62-86e9-03fb9661ae81",
             "shape": {
               "type": "MULTI_SEGMENT_LINE",
               "segments": [
                 {
                   "axis": "HORIZONTAL",
-                  "start": { "r": 15, "c": 5 },
-                  "end": { "r": 15, "c": 10 },
+                  "start": { "r": 3, "c": 15 },
+                  "end": { "r": 3, "c": 20 },
                   "direction": "LEFT_TO_RIGHT"
                 },
                 {
                   "axis": "VERTICAL",
-                  "start": { "r": 15, "c": 10 },
-                  "end": { "r": 20, "c": 10 },
+                  "start": { "r": 3, "c": 20 },
+                  "end": { "r": 9, "c": 20 },
                   "direction": "DOWN"
+                },
+                {
+                  "axis": "HORIZONTAL",
+                  "start": { "r": 9, "c": 20 },
+                  "end": { "r": 9, "c": 15 },
+                  "direction": "RIGHT_TO_LEFT"
+                },
+                {
+                  "axis": "VERTICAL",
+                  "start": { "r": 9, "c": 15 },
+                  "end": { "r": 6, "c": 15 },
+                  "direction": "UP"
                 }
               ]
             },
@@ -63,11 +137,63 @@
             }
           },
           {
-            "id": "6378eac8-19a6-476e-80a3-eab169f7eb29",
+            "id": "3c4545fe-2245-47ef-ba39-f8adae6848e6",
+            "shape": {
+              "type": "MULTI_SEGMENT_LINE",
+              "segments": [
+                {
+                  "axis": "HORIZONTAL",
+                  "start": { "r": 13, "c": 15 },
+                  "end": { "r": 13, "c": 20 },
+                  "direction": "LEFT_TO_RIGHT"
+                },
+                {
+                  "axis": "VERTICAL",
+                  "start": { "r": 13, "c": 20 },
+                  "end": { "r": 19, "c": 20 },
+                  "direction": "DOWN"
+                },
+                {
+                  "axis": "HORIZONTAL",
+                  "start": { "r": 19, "c": 20 },
+                  "end": { "r": 19, "c": 15 },
+                  "direction": "RIGHT_TO_LEFT"
+                },
+                {
+                  "axis": "VERTICAL",
+                  "start": { "r": 19, "c": 15 },
+                  "end": { "r": 16, "c": 15 },
+                  "direction": "UP"
+                }
+              ]
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "191c7104-d67b-474e-bf23-845d84ed7f7e",
             "shape": {
               "type": "TEXT",
-              "start": { "r": 15, "c": 15 },
-              "lines": ["Hello World"]
+              "start": { "r": 3, "c": 25 },
+              "lines": ["Hello", "world"]
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "4af30e2a-0cc2-4db8-8424-2e5e1d093f3c",
+            "shape": {
+              "type": "TEXT",
+              "start": { "r": 9, "c": 25 },
+              "lines": ["foo"]
             },
             "style": {
               "lineStyle": "LIGHT",

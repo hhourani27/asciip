@@ -19,6 +19,8 @@ const hasSelectedShape = createSelector(
       return state.mode.shapeIds.length > 0;
     } else if (state.mode.M === "RESIZE") {
       return true;
+    } else if (state.mode.M === "TEXT_EDIT") {
+      return true;
     }
 
     return false;
@@ -33,6 +35,8 @@ const hasSingleSelectedShape = createSelector(
     } else if (state.mode.M === "MOVE") {
       return state.mode.shapeIds.length === 1;
     } else if (state.mode.M === "RESIZE") {
+      return true;
+    } else if (state.mode.M === "TEXT_EDIT") {
       return true;
     }
 
@@ -54,6 +58,9 @@ const selectedShapeObjs = createSelector(
     } else if (state.mode.M === "RESIZE") {
       const resizeMode = state.mode;
       return [state.shapes.find((shape) => shape.id === resizeMode.shapeId)!];
+    } else if (state.mode.M === "TEXT_EDIT") {
+      const textEditMode = state.mode;
+      return [state.shapes.find((shape) => shape.id === textEditMode.shapeId)!];
     } else {
       return [];
     }
@@ -63,16 +70,12 @@ const selectedShapeObjs = createSelector(
 const selectedShapeObj = createSelector(
   [(state: DiagramState) => state],
   (state): ShapeObject | undefined => {
-    if (state.mode.M === "SELECT" && hasSelectedShape(state)) {
-      if (state.mode.shapeIds.length === 1) {
-        const selectedShapeId = state.mode.shapeIds[0];
-        return state.shapes.find((shape) => shape.id === selectedShapeId)!;
-      } else {
-        throw new Error("There's more than 1 selected shape");
-      }
-    } else {
+    const selectedShapes = selectedShapeObjs(state);
+    if (selectedShapes.length === 0) {
       return undefined;
-    }
+    } else if (selectedShapes.length > 1) {
+      throw new Error("There's more than 1 selected shape");
+    } else return selectedShapes[0];
   }
 );
 

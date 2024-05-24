@@ -1,0 +1,94 @@
+{
+  "diagrams": [
+    {
+      "id": "cc03790d-db05-412c-8689-6accd9d1a682",
+      "name": "New diagram",
+      "data": {
+        "canvasSize": { "rows": 75, "cols": 250 },
+        "shapes": [
+          {
+            "id": "083f26b6-0bf7-4096-a828-35a6b1ba5a4e",
+            "shape": {
+              "type": "RECTANGLE",
+              "tl": { "r": 5, "c": 5 },
+              "br": { "r": 10, "c": 10 }
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "3bb95d15-8294-49c9-a504-dc00c31ed917",
+            "shape": {
+              "type": "LINE",
+              "axis": "HORIZONTAL",
+              "start": { "r": 5, "c": 15 },
+              "end": { "r": 5, "c": 20 },
+              "direction": "LEFT_TO_RIGHT"
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "2dc6501f-e4bf-48ac-bc73-1fb14a296174",
+            "shape": {
+              "type": "MULTI_SEGMENT_LINE",
+              "segments": [
+                {
+                  "axis": "HORIZONTAL",
+                  "start": { "r": 15, "c": 5 },
+                  "end": { "r": 15, "c": 10 },
+                  "direction": "LEFT_TO_RIGHT"
+                },
+                {
+                  "axis": "VERTICAL",
+                  "start": { "r": 15, "c": 10 },
+                  "end": { "r": 20, "c": 10 },
+                  "direction": "DOWN"
+                }
+              ]
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          },
+          {
+            "id": "6378eac8-19a6-476e-80a3-eab169f7eb29",
+            "shape": {
+              "type": "TEXT",
+              "start": { "r": 15, "c": 15 },
+              "lines": ["Hello World"]
+            },
+            "style": {
+              "lineStyle": "LIGHT",
+              "arrowStyle": "FILLED",
+              "arrowStartHead": false,
+              "arrowEndHead": true
+            }
+          }
+        ],
+        "styleMode": "ASCII",
+        "globalStyle": {
+          "lineStyle": "LIGHT",
+          "arrowStyle": "FILLED",
+          "arrowStartHead": false,
+          "arrowEndHead": true
+        }
+      }
+    }
+  ],
+  "activeDiagramId": "cc03790d-db05-412c-8689-6accd9d1a682",
+  "deleteDiagramInProgress": null,
+  "renameDiagramInProgress": null,
+  "createDiagramInProgress": false
+}
