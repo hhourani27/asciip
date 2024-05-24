@@ -88,4 +88,16 @@ test.describe("Edit text", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("text-04.png");
   });
+
+  test("05-Fix: Edit a text => Text should still appear in blue as selected", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.dblclick();
+
+    await expect(canvas.locator()).toHaveScreenshot("text-05.png");
+  });
 });
