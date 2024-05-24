@@ -25,10 +25,7 @@ export function FooterInfo(): JSX.Element {
             aria-label="View GitHub repo"
             size="medium"
             onClick={() =>
-              window.open(
-                "https://github.com/hhourani27/ascii-diagram",
-                "_blank"
-              )
+              window.open("https://github.com/hhourani27/asciip", "_blank")
             }
           >
             <GitHubIcon fontSize="inherit" />
