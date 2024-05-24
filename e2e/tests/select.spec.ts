@@ -38,4 +38,20 @@ test.describe("Select shape", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("select-01.png");
   });
+
+  test("02-Select two shapes => They are colored blue with no resize point visible", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.click();
+    await page.keyboard.down("Control");
+    await canvas.mouse.move(5, 15);
+    await canvas.mouse.click();
+    await page.keyboard.up("Control");
+
+    await expect(canvas.locator()).toHaveScreenshot("select-02.png");
+  });
 });

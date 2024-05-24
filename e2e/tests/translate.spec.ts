@@ -45,4 +45,30 @@ test.describe("Translate", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("translate-01.png");
   });
+
+  test("02-Select 2 shapes and translate them together", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    // Select a rectangle and a line
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.click();
+    await page.keyboard.down("Control");
+    await canvas.mouse.move(5, 15);
+    await canvas.mouse.click();
+    await page.keyboard.up("Control");
+
+    // Translate them until rectangle touches the left border
+    await canvas.mouse.down();
+    await canvas.mouse.move(5, 10);
+    await canvas.mouse.up();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.click();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot("translate-02.png");
+  });
 });
