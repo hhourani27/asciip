@@ -60,8 +60,8 @@ export function generateMouseClickAction(
   ctrlKey: boolean = false
 ): UnknownAction[] {
   return [
-    diagramActions.onCellMouseDown(cell),
-    diagramActions.onCellMouseUp(cell),
+    // diagramActions.onCellMouseDown(cell),
+    // diagramActions.onCellMouseUp(cell),
     diagramActions.onCellClick({ coords: cell, ctrlKey }),
   ];
 }
@@ -69,7 +69,7 @@ export function generateMouseClickAction(
 export function generateMouseUpAction(cell: Coords): UnknownAction[] {
   return [
     diagramActions.onCellMouseUp(cell),
-    diagramActions.onCellClick({ coords: cell }),
+    // diagramActions.onCellClick({ coords: cell }),
   ];
 }
 

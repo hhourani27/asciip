@@ -73,3 +73,35 @@ test("Select 2 shapes", () => {
 
   expect(selectors.selectedShapeObjs(finalState)).toHaveLength(2);
 });
+
+test("Select 2 shapes, then unselect a shape", () => {
+  const initialState = initDiagramState({
+    shapes: [
+      {
+        id: "1",
+        shape: { type: "RECTANGLE", tl: { r: 1, c: 1 }, br: { r: 5, c: 5 } },
+      },
+      {
+        id: "2",
+        shape: { type: "RECTANGLE", tl: { r: 10, c: 1 }, br: { r: 15, c: 5 } },
+      },
+    ],
+  });
+
+  const actions = [
+    diagramActions.setTool("SELECT"),
+    // Select first rectangle
+    ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
+    ...generateMouseClickAction({ r: 1, c: 1 }),
+    // Select second rectangle
+    ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
+    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+    // Unselect second rectangle
+    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+  ];
+
+  const finalState = applyActions(diagramReducer, initialState, actions);
+
+  expect(selectors.selectedShapeObjs(finalState)).toHaveLength(1);
+  expect(selectors.selectedShapeObj(finalState)?.id).toBe("1");
+});

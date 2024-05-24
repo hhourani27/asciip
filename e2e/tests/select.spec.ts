@@ -54,4 +54,26 @@ test.describe("Select shape", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("select-02.png");
   });
+
+  test("03-Select two shapes => Then unselect one shape => one shape is selected", async ({
+    page,
+    canvas,
+  }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    // Select rectangle
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.click();
+    // Select line
+    await page.keyboard.down("Control");
+    await canvas.mouse.move(5, 15);
+    await canvas.mouse.click();
+    // Unselect rectangle
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.click();
+
+    await page.keyboard.up("Control");
+
+    await expect(canvas.locator()).toHaveScreenshot("select-03.png");
+  });
 });
