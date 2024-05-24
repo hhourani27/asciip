@@ -105,6 +105,21 @@ test.describe("Create Line", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("line-07.png");
   });
+
+  test("15-Create a left-to-right horizontal line with the shortcut key A", async ({
+    page,
+    canvas,
+  }) => {
+    await page.keyboard.press("a");
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.down();
+    await canvas.mouse.move(5, 10);
+    await canvas.mouse.up();
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot("line-15.png");
+  });
 });
 
 test.describe("Resize horizontal Line", () => {

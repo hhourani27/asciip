@@ -34,4 +34,26 @@ test.describe("Create Mult-segment line", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("multisegment-line-01.png");
   });
+
+  test("02-Create a multi-segment line with the shortcut key w", async ({
+    page,
+    canvas,
+  }) => {
+    await page.keyboard.press("w");
+
+    await canvas.mouse.move(5, 5);
+    await canvas.mouse.click();
+    await canvas.mouse.move(5, 10);
+    await canvas.mouse.click();
+    await canvas.mouse.move(10, 10);
+    await canvas.mouse.click();
+    await canvas.mouse.move(10, 5);
+    await canvas.mouse.click();
+    await canvas.mouse.move(7, 5);
+    await canvas.mouse.dblclick();
+
+    await canvas.mouse.leave();
+
+    await expect(canvas.locator()).toHaveScreenshot("multisegment-line-02.png");
+  });
 });
