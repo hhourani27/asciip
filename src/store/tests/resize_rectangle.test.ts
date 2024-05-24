@@ -6,7 +6,6 @@ import {
 } from "../diagramSlice";
 import {
   applyActions,
-  generateMouseClickAction,
   generateMouseMoveActions,
   generateMouseUpAction,
 } from "./utils";
@@ -24,7 +23,7 @@ test("Resize a rectangle", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
@@ -58,7 +57,7 @@ test("Resize a rectangle by inverting it", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 8, c: 8 }),
@@ -92,7 +91,7 @@ test("Cannot resize a rectangle to a single point", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 4 }),
@@ -126,7 +125,7 @@ test("Cannot resize a rectangle to a vertical line", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 0 }),
@@ -160,7 +159,7 @@ test("Cannot resize a rectangle to a horizontal line", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 4 }),
@@ -198,7 +197,7 @@ test("Fix: If a shape has another shape that overlaps it on top, even if I selec
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 2 }),
-    ...generateMouseClickAction({ r: 2, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 2 } }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
   ];

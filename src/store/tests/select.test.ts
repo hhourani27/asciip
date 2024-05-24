@@ -4,11 +4,7 @@ import {
   initDiagramState,
 } from "../diagramSlice";
 import { selectors } from "../selectors";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("I select a shape, I click on an empty cell => selection is cleared", () => {
   const initialState = initDiagramState({
@@ -23,9 +19,9 @@ test("I select a shape, I click on an empty cell => selection is cleared", () =>
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 0, c: 6 }),
-    ...generateMouseClickAction({ r: 0, c: 6 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 6 } }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -64,9 +60,9 @@ test("Select 2 shapes", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseClickAction({ r: 1, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 1 } }),
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
-    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+    diagramActions.onCellClick({ coords: { r: 10, c: 1 }, ctrlKey: true }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -92,12 +88,12 @@ test("Select 2 shapes, then unselect a shape", () => {
     diagramActions.setTool("SELECT"),
     // Select first rectangle
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseClickAction({ r: 1, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 1 } }),
     // Select second rectangle
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
-    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+    diagramActions.onCellClick({ coords: { r: 10, c: 1 }, ctrlKey: true }),
     // Unselect second rectangle
-    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+    diagramActions.onCellClick({ coords: { r: 10, c: 1 }, ctrlKey: true }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

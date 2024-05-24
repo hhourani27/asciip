@@ -4,11 +4,7 @@ import {
   initDiagramState,
 } from "../diagramSlice";
 import { selectors } from "../selectors";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 const initialStateWithTwoRectangles = initDiagramState({
   shapes: [
@@ -60,7 +56,7 @@ test("Select tool: Select a shape and then points to another shape => Pointer = 
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseClickAction({ r: 1, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 1 } }),
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
   ];
 
@@ -78,7 +74,7 @@ test("Select tool: Point to a selected shape (not on its resize points) => Point
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 2 }),
-    ...generateMouseClickAction({ r: 1, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 2 } }),
   ];
 
   const finalState = applyActions(
@@ -95,7 +91,7 @@ test("Select tool: Point to the resize point of a selected shape => Pointer = RE
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseClickAction({ r: 1, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 1 } }),
   ];
 
   const finalState = applyActions(
@@ -112,9 +108,9 @@ test("Select tool: Select 2 shapes and then point to the resize point of a selec
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseClickAction({ r: 1, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 1 } }),
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 10, c: 1 }),
-    ...generateMouseClickAction({ r: 10, c: 1 }, true),
+    diagramActions.onCellClick({ coords: { r: 10, c: 1 }, ctrlKey: true }),
   ];
 
   const finalState = applyActions(
