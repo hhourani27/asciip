@@ -15,7 +15,15 @@ export default function Canvas(): JSX.Element {
 
   // This ref is used to prevent firing unnecessary cell hover events if the hovered cell didn't change.
   const hoveredCellRef = useRef<Coords | null>(null);
+  // This ref is used to distinguish between a series of mouseup and down and a click.
+  const pendingMouseDown = useRef<{
+    timestamp: number;
+    cell: Coords;
+    timeoutId: number;
+    pendingMoveActions: Coords[];
+  } | null>(null);
 
+  //#region selectors
   const rowCount = useAppSelector((state) => state.diagram.canvasSize.rows);
   const colCount = useAppSelector((state) => state.diagram.canvasSize.cols);
   const canvasWidth = colCount * CELL_WIDTH;
@@ -42,6 +50,9 @@ export default function Canvas(): JSX.Element {
     selectors.getPointer(state.diagram)
   );
 
+  // #endregion
+
+  //#region helper functions
   const getCellCoords = (eventX: number, eventY: number): Coords => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
@@ -50,6 +61,71 @@ export default function Canvas(): JSX.Element {
 
     return { r: Math.floor(y / CELL_HEIGHT), c: Math.floor(x / CELL_WIDTH) };
   };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const coords = getCellCoords(e.clientX, e.clientY);
+    const timeoutId = window.setTimeout(() => {
+      console.log(`[Canvas] dispatch onCellMouseDown`);
+      dispatch(diagramActions.onCellMouseDown(coords));
+      if (pendingMouseDown.current) {
+        pendingMouseDown.current.pendingMoveActions.forEach((m) =>
+          dispatch(diagramActions.onCellHover(m))
+        );
+      }
+      pendingMouseDown.current = null;
+    }, 150);
+
+    pendingMouseDown.current = {
+      timestamp: e.timeStamp,
+      cell: coords,
+      timeoutId,
+      pendingMoveActions: [],
+    };
+  };
+
+  const handleMouseMove = (newCoords: Coords) => {
+    if (pendingMouseDown.current) {
+      const { pendingMoveActions } = pendingMouseDown.current;
+      if (pendingMoveActions.length === 0) {
+        if (!_.isEqual(hoveredCellRef.current, newCoords)) {
+          pendingMoveActions.push(newCoords);
+        }
+      } else {
+        if (!_.isEqual(_.last(pendingMoveActions), newCoords)) {
+          pendingMouseDown.current.pendingMoveActions.push(newCoords);
+        }
+      }
+    } else {
+      hoveredCellRef.current = newCoords;
+      dispatch(diagramActions.onCellHover(newCoords));
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    const coords = getCellCoords(e.clientX, e.clientY);
+
+    // If mousedown was not fired => mouse up came up very fast => dispatch a click
+    if (pendingMouseDown.current) {
+      window.clearTimeout(pendingMouseDown.current.timeoutId);
+      console.log(`[Canvas] dispatch onCellClick`);
+      pendingMouseDown.current.pendingMoveActions.forEach((m) =>
+        dispatch(diagramActions.onCellHover(m))
+      );
+      dispatch(
+        diagramActions.onCellClick({
+          coords,
+          ctrlKey: e.ctrlKey,
+        })
+      );
+      pendingMouseDown.current = null;
+    } else {
+      // mousedown was already dispatched => Dispatch mouseup
+      console.log(`[Canvas] dispatch onCellMouseUp`);
+      dispatch(diagramActions.onCellMouseUp(coords));
+    }
+  };
+
+  //#endregion
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -148,41 +224,16 @@ export default function Canvas(): JSX.Element {
     >
       <canvas
         ref={canvasRef}
-        onMouseDown={(e) => {
-          // console.log(`[Canvas] onMouseDown: timestamp=${e.timeStamp}`);
-          dispatch(
-            diagramActions.onCellMouseDown(getCellCoords(e.clientX, e.clientY))
-          );
-        }}
-        onMouseUp={(e) => {
-          // console.log(`[Canvas] onMouseUp: timestamp=${e.timeStamp}`);
-          dispatch(
-            diagramActions.onCellMouseUp(getCellCoords(e.clientX, e.clientY))
-          );
-        }}
-        onMouseMove={(e) => {
-          const newCoords = getCellCoords(e.clientX, e.clientY);
-          if (!_.isEqual(hoveredCellRef.current, newCoords)) {
-            hoveredCellRef.current = newCoords;
-            dispatch(
-              diagramActions.onCellHover(getCellCoords(e.clientX, e.clientY))
-            );
-          }
-        }}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={(e) =>
+          handleMouseMove(getCellCoords(e.clientX, e.clientY))
+        }
         onMouseLeave={(e) => {
           dispatch(diagramActions.onCanvasMouseLeave());
         }}
-        onClick={(e) => {
-          // console.log(`[Canvas] onClick: timestamp=${e.timeStamp}`);
-          dispatch(
-            diagramActions.onCellClick({
-              coords: getCellCoords(e.clientX, e.clientY),
-              ctrlKey: e.ctrlKey,
-            })
-          );
-        }}
         onDoubleClick={(e) => {
-          // console.log(`[Canvas] onDoubleClick: timestamp=${e.timeStamp}`);
+          console.log(`[Canvas] onDoubleClick: timestamp=${e.timeStamp}`);
 
           dispatch(
             diagramActions.onCellDoubleClick(

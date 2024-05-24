@@ -4,12 +4,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Resize all segments", () => {
   const initialState = initDiagramState({
@@ -47,24 +42,24 @@ test("Resize all segments", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
     // Drag first segment
     diagramActions.onCellHover({ r: 0, c: 1 }),
     diagramActions.onCellMouseDown({ r: 0, c: 1 }),
     diagramActions.onCellHover({ r: 1, c: 1 }),
-    ...generateMouseUpAction({ r: 1, c: 1 }),
+    diagramActions.onCellMouseUp({ r: 1, c: 1 }),
 
     // Drag second segment
     ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 2, c: 2 }),
-    ...generateMouseUpAction({ r: 2, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 2 }),
 
     // Drag third segment
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 3, c: 4 }),
     diagramActions.onCellMouseDown({ r: 3, c: 4 }),
     diagramActions.onCellHover({ r: 2, c: 4 }),
-    ...generateMouseUpAction({ r: 2, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -129,12 +124,12 @@ test("Extend start point", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag start point
     diagramActions.onCellHover({ r: 0, c: 1 }),
     diagramActions.onCellMouseDown({ r: 0, c: 1 }),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseUpAction({ r: 0, c: 0 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 0 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -192,12 +187,12 @@ test("Shrink first segment", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag start point
     diagramActions.onCellHover({ r: 0, c: 1 }),
     diagramActions.onCellMouseDown({ r: 0, c: 1 }),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseUpAction({ r: 0, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -255,16 +250,16 @@ test("Add 4 segments at start (all segment types)", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag start point down and add an UP Segment
     diagramActions.onCellHover({ r: 0, c: 1 }),
     diagramActions.onCellMouseDown({ r: 0, c: 1 }),
     ...generateMouseMoveActions({ r: 0, c: 1 }, { r: 3, c: 1 }),
-    ...generateMouseUpAction({ r: 3, c: 1 }),
+    diagramActions.onCellMouseUp({ r: 3, c: 1 }),
     // Drag new start point left and add a RIGHT-TO-LEFT Segment
     diagramActions.onCellMouseDown({ r: 3, c: 1 }),
     ...generateMouseMoveActions({ r: 3, c: 1 }, { r: 3, c: 6 }),
-    ...generateMouseUpAction({ r: 3, c: 6 }),
+    diagramActions.onCellMouseUp({ r: 3, c: 6 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -334,13 +329,13 @@ test("Extend end point", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 3, c: 3 }),
-    ...generateMouseUpAction({ r: 3, c: 3 }),
+    diagramActions.onCellMouseUp({ r: 3, c: 3 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -398,13 +393,13 @@ test("Shrink end point", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 1, c: 3 }),
-    ...generateMouseUpAction({ r: 1, c: 3 }),
+    diagramActions.onCellMouseUp({ r: 1, c: 3 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -462,12 +457,12 @@ test("Add segment at end", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 2 }),
-    ...generateMouseClickAction({ r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
     // Drag end point
     ...generateMouseMoveActions({ r: 0, c: 2 }, { r: 2, c: 3 }),
     diagramActions.onCellMouseDown({ r: 2, c: 3 }),
     diagramActions.onCellHover({ r: 2, c: 4 }),
-    ...generateMouseUpAction({ r: 2, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -537,13 +532,13 @@ test("Merge 3 segments by dragging the middle segment", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 0, c: 2 }),
-    ...generateMouseUpAction({ r: 0, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -602,13 +597,13 @@ test("Cannot have a u-turn when dragging a segment", () => {
     // Select shape
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
 
     // Drag 3rd segment
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 2 }),
     diagramActions.onCellMouseDown({ r: 1, c: 2 }),
     ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 1, c: 0 }),
-    ...generateMouseUpAction({ r: 0, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

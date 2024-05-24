@@ -5,12 +5,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Newly created non-Text shapes are placed below existing text shapes", () => {
   const canvasSize: CanvasSize = { rows: 2, cols: 6 };
@@ -37,7 +32,7 @@ test("Newly created non-Text shapes are placed below existing text shapes", () =
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 1 }, { r: 0, c: 5 }),
-    ...generateMouseUpAction({ r: 0, c: 5 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 5 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -76,7 +71,7 @@ test("ARROW | Rectangle (Touch) => Bring to front => Rectangle | ARROW", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -112,7 +107,7 @@ test("Rectangle (Touch) | ARROW => Bring to front => Rectangle | ARROW", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -152,7 +147,7 @@ test("ARROW | Rectangle 1 (Touch) | Rectangle 2 (Touch) => Bring to front => Rec
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -193,7 +188,7 @@ test("ARROW | Rectangle 1 (Touch) | Rectangle 2 => Bring to front => Rectangle 1
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -234,7 +229,7 @@ test("ARROW | Rectangle 1 | Rectangle 2 => Bring to front => Rectangle 1 | Recta
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -279,7 +274,7 @@ test("ARROW | Rectangle 1 | Rectangle 2 | Text => Bring to front => Rectangle 1 
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 0 }),
-    ...generateMouseClickAction({ r: 1, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 1, c: 0 } }),
     ...generateMouseMoveActions({ r: 1, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -323,7 +318,7 @@ test("Rectangle | TEXT 1 | Text 2 (touch) | Text 3 => Bring to front => Rectangl
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 0 }),
-    ...generateMouseClickAction({ r: 2, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 0 } }),
     ...generateMouseMoveActions({ r: 2, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -368,7 +363,7 @@ test("Rectangle | TEXT 1 | Text 2 | Text 3 => Bring to front => Rectangle | Text
   const actions = [
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 0 }),
-    ...generateMouseClickAction({ r: 2, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 0 } }),
     ...generateMouseMoveActions({ r: 2, c: 0 }, { r: 0, c: 0 }),
     diagramActions.onMoveToFrontButtonClick(),
   ];
@@ -407,7 +402,7 @@ test("Arrow (touch) | RECTANGLE => Push to back => RECTANGLE | Arrow", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onMoveToBackButtonClick(),
   ];
 
@@ -442,7 +437,7 @@ test("RECTANGLE | Arrow (touch)  => Push to back => RECTANGLE | Arrow", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 1 }),
-    ...generateMouseClickAction({ r: 0, c: 1 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 1 } }),
     diagramActions.onMoveToBackButtonClick(),
   ];
 

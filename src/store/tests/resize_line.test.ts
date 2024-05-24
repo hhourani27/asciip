@@ -4,12 +4,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Extend horizontal line by dragging on start", () => {
   const initialState = initDiagramState({
@@ -31,12 +26,12 @@ test("Extend horizontal line by dragging on start", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag start point
     diagramActions.onCellHover({ r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     diagramActions.onCellHover({ r: 2, c: 1 }),
-    ...generateMouseUpAction({ r: 2, c: 1 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 1 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -75,12 +70,12 @@ test("Shrink horizontal line by dragging on start", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag start point
     diagramActions.onCellHover({ r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
-    ...generateMouseUpAction({ r: 2, c: 3 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 3 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -119,12 +114,12 @@ test("Extend horizontal line by dragging on end", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag end point
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     diagramActions.onCellHover({ r: 2, c: 5 }),
-    ...generateMouseUpAction({ r: 2, c: 5 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 5 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -163,12 +158,12 @@ test("Shrink horizontal line by dragging on end", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag end point
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
-    ...generateMouseUpAction({ r: 2, c: 3 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 3 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -207,12 +202,12 @@ test("Turn horizontal line 180 degrees by dragging on End", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag end point
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 0 }),
-    ...generateMouseUpAction({ r: 2, c: 0 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 0 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -251,12 +246,12 @@ test("Turn vertical line 90 degrees anti-clockwise by dragging on End", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag end point
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 0, c: 3 }),
-    ...generateMouseUpAction({ r: 0, c: 1 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 1 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -295,12 +290,12 @@ test("Cannot shrink horizontal line to a zero-length line", () => {
     // Select line
     diagramActions.setTool("SELECT"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 3 }),
-    ...generateMouseClickAction({ r: 2, c: 3 }),
+    diagramActions.onCellClick({ coords: { r: 2, c: 3 } }),
     // Drag end point
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     ...generateMouseMoveActions({ r: 2, c: 4 }, { r: 2, c: 2 }),
-    ...generateMouseUpAction({ r: 2, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

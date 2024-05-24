@@ -3,7 +3,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import { applyActions, generateMouseClickAction } from "./utils";
+import { applyActions } from "./utils";
 
 test("Delete a shape", () => {
   const initialState = initDiagramState({
@@ -18,7 +18,7 @@ test("Delete a shape", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
     diagramActions.onDeletePress(),
   ];
 
@@ -44,9 +44,9 @@ test("Delete 2 shapes on top of each other", () => {
   const actions = [
     diagramActions.setTool("SELECT"),
     diagramActions.onCellHover({ r: 0, c: 0 }),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
     diagramActions.onDeletePress(),
-    ...generateMouseClickAction({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
     diagramActions.onDeletePress(),
   ];
 

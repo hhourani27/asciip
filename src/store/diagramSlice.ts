@@ -70,8 +70,6 @@ export type DiagramState = DiagramData & {
 
   /* Other state of the app */
   exportInProgress: boolean;
-  // Mouse up event is always followed by a click event. This state prevents the click event to change the state, if the mouse up event already changed it
-  disableNextClick: boolean;
 };
 
 export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
@@ -95,7 +93,6 @@ export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
     mode: { M: "SELECT", shapeIds: [] },
 
     exportInProgress: false,
-    disableNextClick: false,
   };
 };
 
@@ -172,23 +169,40 @@ export const diagramSlice = createSlice({
       state,
       action: PayloadAction<{ coords: Coords; ctrlKey?: boolean }>
     ) => {
-      // a cell click event is always fired after a cell mouse up event.
-      // If the cell mouse up resulted in a state change, then the click event should not affect state
-      if (state.disableNextClick) {
-        state.disableNextClick = false;
-        return;
-      }
-
       const { coords, ctrlKey = false } = action.payload;
       if (state.mode.M === "SELECT") {
-        const shape = getShapeObjAtCoords(state.shapes, coords);
+        const selectMode = state.mode;
+        const shapeObj = getShapeObjAtCoords(state.shapes, coords);
+
+        let shapeIds: string[];
+        if (ctrlKey) {
+          // If ctrl is pressed
+          if (shapeObj) {
+            if (selectMode.shapeIds.includes(shapeObj.id)) {
+              // click on a already selected shape => deselect it
+              shapeIds = selectMode.shapeIds.filter((id) => id !== shapeObj.id);
+            } else {
+              // click on an unselected shape => add it to selection
+              shapeIds = [...state.mode.shapeIds, shapeObj.id];
+            }
+          } else {
+            // Click on an empty cell => don't change selection
+            shapeIds = selectMode.shapeIds;
+          }
+        } else {
+          // ctrl is not pressed
+          if (shapeObj) {
+            // Click on a shape => This shape is now selected (other shapes are deselected)
+            shapeIds = [shapeObj.id];
+          } else {
+            // Click on an empty cell => clear selection
+            shapeIds = [];
+          }
+        }
+
         state.mode = {
           M: "SELECT",
-          shapeIds: shape
-            ? ctrlKey
-              ? [...state.mode.shapeIds, shape.id]
-              : [shape.id]
-            : [],
+          shapeIds,
         };
       } else if (state.mode.M === "TEXT_EDIT") {
         const shape = getShapeObjAtCoords(state.shapes, coords);
@@ -315,13 +329,11 @@ export const diagramSlice = createSlice({
           M: "SELECT",
           shapeIds: state.mode.shapeIds,
         };
-        state.disableNextClick = true;
       } else if (state.mode.M === "RESIZE") {
         state.mode = {
           M: "SELECT",
           shapeIds: [state.mode.shapeId],
         };
-        state.disableNextClick = true;
       } else if (
         state.mode.M === "CREATE" &&
         (state.mode.shape.type === "RECTANGLE" ||
@@ -336,7 +348,6 @@ export const diagramSlice = createSlice({
           addNewShape(state, newShape);
         }
         state.mode = { M: "BEFORE_CREATING" };
-        state.disableNextClick = true;
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
