@@ -4,11 +4,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Resize a rectangle", () => {
   const initialState = initDiagramState({
@@ -27,7 +23,7 @@ test("Resize a rectangle", () => {
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 1, c: 1 }),
-    ...generateMouseUpAction({ r: 1, c: 1 }),
+    diagramActions.onCellMouseUp({ r: 1, c: 1 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -61,7 +57,7 @@ test("Resize a rectangle by inverting it", () => {
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 8, c: 8 }),
-    ...generateMouseUpAction({ r: 8, c: 8 }),
+    diagramActions.onCellMouseUp({ r: 8, c: 8 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -95,7 +91,7 @@ test("Cannot resize a rectangle to a single point", () => {
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 4 }),
-    ...generateMouseUpAction({ r: 4, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 4, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -129,7 +125,7 @@ test("Cannot resize a rectangle to a vertical line", () => {
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 4, c: 0 }),
-    ...generateMouseUpAction({ r: 4, c: 0 }),
+    diagramActions.onCellMouseUp({ r: 4, c: 0 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -163,7 +159,7 @@ test("Cannot resize a rectangle to a horizontal line", () => {
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 4 }),
-    ...generateMouseUpAction({ r: 0, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

@@ -4,11 +4,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Create Left-to-right horizontal line", () => {
   const actions = [
@@ -16,7 +12,7 @@ test("Create Left-to-right horizontal line", () => {
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 2, c: 4 }),
-    ...generateMouseUpAction({ r: 2, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -39,7 +35,7 @@ test("Create Right-to-left horizontal line", () => {
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 2, c: 0 }),
-    ...generateMouseUpAction({ r: 2, c: 0 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 0 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -62,7 +58,7 @@ test("Create Downward vertical line", () => {
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 4, c: 2 }),
-    ...generateMouseUpAction({ r: 4, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 4, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -85,7 +81,7 @@ test("Create Upward vertical line", () => {
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
     ...generateMouseMoveActions({ r: 2, c: 2 }, { r: 0, c: 2 }),
-    ...generateMouseUpAction({ r: 0, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
@@ -107,7 +103,7 @@ test("Cannot create zero-length line", () => {
     diagramActions.setTool("LINE"),
     ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 2, c: 2 }),
     diagramActions.onCellMouseDown({ r: 2, c: 2 }),
-    ...generateMouseUpAction({ r: 2, c: 2 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 2 }),
   ];
 
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);

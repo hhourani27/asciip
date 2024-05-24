@@ -5,11 +5,7 @@ import {
   diagramReducer,
   initDiagramState,
 } from "../diagramSlice";
-import {
-  applyActions,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Newly created non-Text shapes are placed below existing text shapes", () => {
   const canvasSize: CanvasSize = { rows: 2, cols: 6 };
@@ -36,7 +32,7 @@ test("Newly created non-Text shapes are placed below existing text shapes", () =
     diagramActions.onCellHover({ r: 0, c: 0 }),
     diagramActions.onCellMouseDown({ r: 0, c: 0 }),
     ...generateMouseMoveActions({ r: 0, c: 1 }, { r: 0, c: 5 }),
-    ...generateMouseUpAction({ r: 0, c: 5 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 5 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

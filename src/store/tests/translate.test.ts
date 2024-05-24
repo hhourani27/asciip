@@ -4,12 +4,7 @@ import {
   initDiagramState,
 } from "../diagramSlice";
 import { selectors } from "../selectors";
-import {
-  applyActions,
-  generateMouseClickAction,
-  generateMouseMoveActions,
-  generateMouseUpAction,
-} from "./utils";
+import { applyActions, generateMouseMoveActions } from "./utils";
 
 test("Translate a rectangle 1 row up", () => {
   const initialState = initDiagramState({
@@ -27,7 +22,7 @@ test("Translate a rectangle 1 row up", () => {
     diagramActions.onCellClick({ coords: { r: 2, c: 4 } }),
     diagramActions.onCellMouseDown({ r: 2, c: 4 }),
     diagramActions.onCellHover({ r: 1, c: 4 }),
-    ...generateMouseUpAction({ r: 1, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 1, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -60,7 +55,7 @@ test("Translate a rectangle 2 rows up", () => {
     diagramActions.onCellMouseDown({ r: 10, c: 12 }),
     diagramActions.onCellHover({ r: 9, c: 12 }),
     diagramActions.onCellHover({ r: 8, c: 12 }),
-    ...generateMouseUpAction({ r: 8, c: 12 }),
+    diagramActions.onCellMouseUp({ r: 8, c: 12 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -90,7 +85,7 @@ test("Fix: If I grab a rectangle from the bottom border, and move it up to the c
     diagramActions.onCellHover({ r: 2, c: 5 }),
     diagramActions.onCellHover({ r: 2, c: 4 }),
     diagramActions.onCellHover({ r: 2, c: 3 }),
-    ...generateMouseUpAction({ r: 2, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 2, c: 4 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -121,7 +116,7 @@ test("Fix: Rectangle was translated beyond the right canvas border if it was gra
     diagramActions.onCellHover({ r: 3, c: 7 }),
     diagramActions.onCellHover({ r: 3, c: 8 }),
     diagramActions.onCellHover({ r: 3, c: 9 }),
-    ...generateMouseUpAction({ r: 3, c: 9 }),
+    diagramActions.onCellMouseUp({ r: 3, c: 9 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);
@@ -157,7 +152,7 @@ test("Fix: Translate 2 rectangle and complete translation => Both rectangles sho
 
     diagramActions.onCellMouseDown({ r: 7, c: 6 }),
     diagramActions.onCellHover({ r: 7, c: 5 }),
-    ...generateMouseUpAction({ r: 7, c: 5 }),
+    diagramActions.onCellMouseUp({ r: 7, c: 5 }),
   ];
 
   const finalState = applyActions(diagramReducer, initialState, actions);

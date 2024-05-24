@@ -52,13 +52,6 @@ export function generateUpdateText(text: string): UnknownAction[] {
   return actions;
 }
 
-export function generateMouseUpAction(cell: Coords): UnknownAction[] {
-  return [
-    diagramActions.onCellMouseUp(cell),
-    // diagramActions.onCellClick({ coords: cell }),
-  ];
-}
-
 export function generateMouseDoubleClickAction(cell: Coords): UnknownAction[] {
   return [
     diagramActions.onCellMouseDown(cell),
