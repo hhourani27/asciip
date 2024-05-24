@@ -3,6 +3,7 @@ import {
   diagramActions,
   initDiagramState,
 } from "../diagramSlice";
+import { selectors } from "../selectors";
 import {
   applyActions,
   generateMouseClickAction,
@@ -71,7 +72,7 @@ test("Translate a rectangle 2 rows up", () => {
   });
 });
 
-test("Fix: If I grab a rectangle from the bottom border, and move it up to the canvas top border, it returned to its original position", () => {
+test("Fix: If I grab a rectangle from the bottom border, and move it up to the canvas top border => it returned to its original position", () => {
   const initialState = initDiagramState({
     shapes: [
       {
@@ -101,7 +102,7 @@ test("Fix: If I grab a rectangle from the bottom border, and move it up to the c
   });
 });
 
-test("Fix: Rectangle could be translated beyond the right canvas border if it was grabbed by the right border", () => {
+test("Fix: Rectangle was translated beyond the right canvas border if it was grabbed by the right border", () => {
   const initialState = initDiagramState({
     canvasSize: { rows: 10, cols: 10 },
     shapes: [
@@ -130,4 +131,36 @@ test("Fix: Rectangle could be translated beyond the right canvas border if it wa
     tl: { r: 2, c: 7 },
     br: { r: 4, c: 9 },
   });
+});
+
+test("Fix: Translate 2 rectangle and complete translation => Both rectangles should remain selected", () => {
+  const initialState = initDiagramState({
+    canvasSize: { rows: 10, cols: 10 },
+    shapes: [
+      {
+        id: "1",
+        shape: { type: "RECTANGLE", tl: { r: 2, c: 6 }, br: { r: 4, c: 8 } },
+      },
+      {
+        id: "2",
+        shape: { type: "RECTANGLE", tl: { r: 5, c: 6 }, br: { r: 8, c: 8 } },
+      },
+    ],
+  });
+
+  const actions = [
+    diagramActions.setTool("SELECT"),
+    ...generateMouseMoveActions({ r: 0, c: 6 }, { r: 3, c: 6 }),
+    ...generateMouseClickAction({ r: 3, c: 6 }),
+    ...generateMouseMoveActions({ r: 3, c: 6 }, { r: 7, c: 6 }),
+    ...generateMouseClickAction({ r: 7, c: 6 }, true),
+
+    diagramActions.onCellMouseDown({ r: 7, c: 6 }),
+    diagramActions.onCellHover({ r: 7, c: 5 }),
+    ...generateMouseUpAction({ r: 7, c: 5 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initialState, actions);
+
+  expect(selectors.selectedShapeObjs(finalState)).toHaveLength(2);
 });

@@ -70,6 +70,8 @@ export type DiagramState = DiagramData & {
 
   /* Other state of the app */
   exportInProgress: boolean;
+  // Mouse up event is always followed by a click event. This state prevents the click event to change the state, if the mouse up event already changed it
+  disableNextClick: boolean;
 };
 
 export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
@@ -93,6 +95,7 @@ export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
     mode: { M: "SELECT", shapeIds: [] },
 
     exportInProgress: false,
+    disableNextClick: false,
   };
 };
 
@@ -169,6 +172,13 @@ export const diagramSlice = createSlice({
       state,
       action: PayloadAction<{ coords: Coords; ctrlKey?: boolean }>
     ) => {
+      // a cell click event is always fired after a cell mouse up event.
+      // If the cell mouse up resulted in a state change, then the click event should not affect state
+      if (state.disableNextClick) {
+        state.disableNextClick = false;
+        return;
+      }
+
       const { coords, ctrlKey = false } = action.payload;
       if (state.mode.M === "SELECT") {
         const shape = getShapeObjAtCoords(state.shapes, coords);
@@ -305,11 +315,13 @@ export const diagramSlice = createSlice({
           M: "SELECT",
           shapeIds: state.mode.shapeIds,
         };
+        state.disableNextClick = true;
       } else if (state.mode.M === "RESIZE") {
         state.mode = {
           M: "SELECT",
           shapeIds: [state.mode.shapeId],
         };
+        state.disableNextClick = true;
       } else if (
         state.mode.M === "CREATE" &&
         (state.mode.shape.type === "RECTANGLE" ||
@@ -324,6 +336,7 @@ export const diagramSlice = createSlice({
           addNewShape(state, newShape);
         }
         state.mode = { M: "BEFORE_CREATING" };
+        state.disableNextClick = true;
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
