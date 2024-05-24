@@ -21,6 +21,9 @@ function App() {
         dispatch(diagramActions.onCtrlEnterPress());
       } else if (event.key === "Delete") {
         dispatch(diagramActions.onDeletePress());
+      } else if ((event.key === "a" || event.key === "A") && event.ctrlKey) {
+        event.preventDefault();
+        dispatch(diagramActions.onCtrlAPress());
       }
 
       if (shortcutsEnabled) {
@@ -30,7 +33,7 @@ function App() {
         if (event.key === "r" || event.key === "R") {
           dispatch(diagramActions.setTool("RECTANGLE"));
         }
-        if (event.key === "a" || event.key === "A") {
+        if ((event.key === "a" || event.key === "A") && !event.ctrlKey) {
           dispatch(diagramActions.setTool("LINE"));
         }
         if (event.key === "w" || event.key === "W") {

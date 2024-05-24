@@ -137,6 +137,8 @@ export const diagramSlice = createSlice({
 
       state.selectedTool = action.payload;
     },
+    //#endregion
+    //#region Mouse actions
     onCellDoubleClick: (state, action: PayloadAction<Coords>) => {
       if (state.mode.M === "SELECT" || state.mode.M === "TEXT_EDIT") {
         const shapeObj = getShapeObjAtCoords(state.shapes, action.payload);
@@ -448,6 +450,8 @@ export const diagramSlice = createSlice({
     onCanvasMouseLeave: (state) => {
       state.currentHoveredCell = null;
     },
+    //#endregion
+    //#region Keyboard actions
     onCtrlEnterPress: (state) => {
       if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
         addNewShape(state, state.mode.shape);
@@ -466,6 +470,13 @@ export const diagramSlice = createSlice({
         state.mode = { M: "SELECT", shapeIds: [] };
       }
     },
+    onCtrlAPress: (state) => {
+      if (state.mode.M === "SELECT") {
+        state.mode.shapeIds = state.shapes.map((s) => s.id);
+      }
+    },
+    //#endregion
+
     updateText: (state, action: PayloadAction<string>) => {
       if (state.mode.M === "CREATE" && state.mode.shape.type === "TEXT") {
         state.mode.shape.lines = capText(

@@ -51,4 +51,14 @@ test.describe("Delete shapes", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("delete-02.png");
   });
+
+  test("03-Delete all shapes", async ({ page, canvas }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    await canvas.mouse.move(0, 0); // To remove the tooltip
+    await page.keyboard.press("Control+A");
+    await page.keyboard.press("Delete");
+
+    await expect(canvas.locator()).toHaveScreenshot("delete-03.png");
+  });
 });

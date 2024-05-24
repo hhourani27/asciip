@@ -76,4 +76,13 @@ test.describe("Select shape", () => {
 
     await expect(canvas.locator()).toHaveScreenshot("select-03.png");
   });
+
+  test("04-Select all shapes with Ctrl+A", async ({ page, canvas }) => {
+    await page.getByRole("button", { name: "Select tool" }).click();
+
+    await canvas.mouse.move(0, 0); // To remove the tooltip
+    await page.keyboard.press("Control+A");
+
+    await expect(canvas.locator()).toHaveScreenshot("select-04.png");
+  });
 });
