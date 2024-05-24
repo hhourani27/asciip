@@ -26,7 +26,7 @@ export function TextShapeInput(): JSX.Element {
       }}
     >
       <TextField
-        id="outlined-multiline-flexible"
+        id="text-shape-input"
         multiline
         variant="filled"
         color="secondary"
