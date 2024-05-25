@@ -68,6 +68,9 @@ export type DiagramState = DiagramData & {
   selectedTool: Tool;
   mode: ActionMode;
 
+  history: DiagramData[];
+  historyIdx: number;
+
   /* Other state of the app */
   exportInProgress: boolean;
 };
@@ -84,13 +87,18 @@ export const initDiagramData = (opt?: Partial<DiagramData>): DiagramData => {
 };
 
 export const initDiagramState = (opt?: Partial<DiagramData>): DiagramState => {
+  const diagramData = initDiagramData(opt);
+
   return {
-    ...initDiagramData(opt),
+    ...diagramData,
 
     currentHoveredCell: null,
 
     selectedTool: "SELECT",
     mode: { M: "SELECT", shapeIds: [] },
+
+    history: [_.cloneDeep(diagramData)],
+    historyIdx: 0,
 
     exportInProgress: false,
   };
@@ -163,6 +171,7 @@ export const diagramSlice = createSlice({
 
         if (newShape) {
           addNewShape(state, normalizeMultiSegmentLine(newShape));
+          pushHistory(state);
         }
         state.mode = { M: "BEFORE_CREATING" };
       }
@@ -207,6 +216,8 @@ export const diagramSlice = createSlice({
           shapeIds,
         };
       } else if (state.mode.M === "TEXT_EDIT") {
+        // Complete editing text
+        pushHistory(state);
         const shape = getShapeObjAtCoords(state.shapes, coords);
         state.mode = {
           M: "SELECT",
@@ -254,7 +265,9 @@ export const diagramSlice = createSlice({
           shape: { type: "TEXT", start: coords, lines: [] },
         };
       } else if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
+        // Complete creating text and create a new one
         addNewShape(state, state.mode.shape);
+        pushHistory(state);
         state.mode = {
           M: "CREATE",
           start: coords,
@@ -327,11 +340,15 @@ export const diagramSlice = createSlice({
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
       if (state.mode.M === "MOVE") {
+        // Complete moving a shape
+        pushHistory(state);
         state.mode = {
           M: "SELECT",
           shapeIds: state.mode.shapeIds,
         };
       } else if (state.mode.M === "RESIZE") {
+        // Complete resizing a shape
+        pushHistory(state);
         state.mode = {
           M: "SELECT",
           shapeIds: [state.mode.shapeId],
@@ -341,13 +358,14 @@ export const diagramSlice = createSlice({
         (state.mode.shape.type === "RECTANGLE" ||
           state.mode.shape.type === "LINE")
       ) {
-        // Else, I finished creating a shape
+        // Complete creating a rectangle or a line
         const newShape: Shape | null = isShapeLegal(state.mode.shape)
           ? state.mode.shape
           : null;
 
         if (newShape) {
           addNewShape(state, newShape);
+          pushHistory(state);
         }
         state.mode = { M: "BEFORE_CREATING" };
       }
@@ -455,9 +473,11 @@ export const diagramSlice = createSlice({
     onCtrlEnterPress: (state) => {
       if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
         addNewShape(state, state.mode.shape);
+        pushHistory(state);
         state.mode = { M: "BEFORE_CREATING" };
       } else if (state.mode.M === "TEXT_EDIT") {
         //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
+        pushHistory(state);
         state.mode = {
           M: "SELECT",
           shapeIds: [state.mode.shapeId],
@@ -467,6 +487,7 @@ export const diagramSlice = createSlice({
     onDeletePress: (state) => {
       if (state.mode.M === "SELECT" && state.mode.shapeIds.length > 0) {
         deleteShapes(state, state.mode.shapeIds);
+        pushHistory(state);
         state.mode = { M: "SELECT", shapeIds: [] };
       }
     },
@@ -504,14 +525,25 @@ export const diagramSlice = createSlice({
     onMoveToFrontButtonClick: (state) => {
       if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
         state.shapes = moveShapeToFront(state.shapes, state.mode.shapeIds[0]);
+        pushHistory(state);
       }
     },
     onMoveToBackButtonClick: (state) => {
       if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
         state.shapes = moveShapeToBack(state.shapes, state.mode.shapeIds[0]);
+        pushHistory(state);
       }
     },
+    //#region history actions
+    moveInHistory: (state, action: PayloadAction<"UNDO" | "REDO">) => {
+      if (state.mode.M === "SELECT") {
+        action.payload === "UNDO" ? undoHistory(state) : redoHistory(state);
+        state.mode = { M: "SELECT", shapeIds: [] };
+      }
+    },
+
     //#endregion
+
     //#region Styling actions
     setStyleMode: (state, action: PayloadAction<StyleMode>) => {
       state.styleMode = action.payload;
@@ -525,6 +557,7 @@ export const diagramSlice = createSlice({
       if (action.payload === "ASCII") {
         state.globalStyle = defaultStyle();
       }
+      pushHistory(state);
     },
     setStyle: (
       state,
@@ -545,6 +578,7 @@ export const diagramSlice = createSlice({
           }
         });
       }
+      pushHistory(state);
     },
     //#endregion
     //#region Other App actions
@@ -599,6 +633,44 @@ function deleteShapes(state: DiagramState, shapeIds: string[]): void {
       state.shapes.splice(shapeIdx, 1);
     }
   });
+}
+
+function pushHistory(state: DiagramState): void {
+  const { canvasSize, shapes, styleMode, globalStyle } = state;
+  state.history = [
+    ...state.history.slice(0, state.historyIdx + 1),
+    _.cloneDeep({ canvasSize, shapes, styleMode, globalStyle }),
+  ];
+
+  state.historyIdx++;
+}
+
+function undoHistory(state: DiagramState): void {
+  if (state.historyIdx > 0) {
+    const { canvasSize, shapes, styleMode, globalStyle } = _.cloneDeep(
+      state.history[state.historyIdx - 1]
+    );
+    state.canvasSize = canvasSize;
+    state.shapes = shapes;
+    state.styleMode = styleMode;
+    state.globalStyle = globalStyle;
+
+    state.historyIdx--;
+  }
+}
+
+function redoHistory(state: DiagramState): void {
+  if (state.historyIdx < state.history.length - 1) {
+    const { canvasSize, shapes, styleMode, globalStyle } = _.cloneDeep(
+      state.history[state.historyIdx + 1]
+    );
+    state.canvasSize = canvasSize;
+    state.shapes = shapes;
+    state.styleMode = styleMode;
+    state.globalStyle = globalStyle;
+
+    state.historyIdx++;
+  }
 }
 //#endregion
 

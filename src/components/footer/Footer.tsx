@@ -2,6 +2,7 @@ import { Box, Divider, Paper } from "@mui/material";
 import { FooterTip } from "./FooterTip";
 import { FooterCanvasSize } from "./FooterCanvasSize";
 import { FooterInfo } from "./FooterInfo";
+import { FooterHistory } from "./FooterHistory";
 
 export function Footer(): JSX.Element {
   return (
@@ -19,6 +20,8 @@ export function Footer(): JSX.Element {
         sx={{ flexGrow: 1, display: "flex", alignItems: "center", gap: 3 }}
       >
         <FooterCanvasSize />
+        <Divider orientation="vertical" variant="middle" flexItem />
+        <FooterHistory />
         <Divider orientation="vertical" variant="middle" flexItem />
         <FooterTip />
       </Box>
