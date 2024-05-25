@@ -29,18 +29,18 @@ function App() {
       if (shortcutsEnabled) {
         if (event.key === "s" || event.key === "S") {
           dispatch(diagramActions.setTool("SELECT"));
-        }
-        if (event.key === "r" || event.key === "R") {
+        } else if (event.key === "r" || event.key === "R") {
           dispatch(diagramActions.setTool("RECTANGLE"));
-        }
-        if ((event.key === "a" || event.key === "A") && !event.ctrlKey) {
+        } else if ((event.key === "a" || event.key === "A") && !event.ctrlKey) {
           dispatch(diagramActions.setTool("LINE"));
-        }
-        if (event.key === "w" || event.key === "W") {
+        } else if (event.key === "w" || event.key === "W") {
           dispatch(diagramActions.setTool("MULTI_SEGMENT_LINE"));
-        }
-        if (event.key === "t" || event.key === "T") {
+        } else if (event.key === "t" || event.key === "T") {
           dispatch(diagramActions.setTool("TEXT"));
+        } else if ((event.key === "z" || event.key === "Z") && event.ctrlKey) {
+          dispatch(diagramActions.moveInHistory("UNDO"));
+        } else if ((event.key === "y" || event.key === "Y") && event.ctrlKey) {
+          dispatch(diagramActions.moveInHistory("REDO"));
         }
       }
     };
