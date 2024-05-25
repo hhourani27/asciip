@@ -17,7 +17,7 @@ export function FooterHistory(): JSX.Element {
 
   return (
     <ButtonGroup size="small">
-      <Tooltip title="Undo" arrow>
+      <Tooltip title="Undo (Ctrl+Z)" arrow>
         <IconButton
           aria-label="Undo"
           size="medium"
@@ -27,7 +27,7 @@ export function FooterHistory(): JSX.Element {
           <UndoIcon fontSize="inherit" />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Redo" arrow>
+      <Tooltip title="Redo (Ctrl+Y)" arrow>
         <IconButton
           aria-label="Redo"
           size="medium"
