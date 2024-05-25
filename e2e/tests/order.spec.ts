@@ -37,6 +37,9 @@ test.describe("Order", () => {
     await canvas.mouse.down();
     await canvas.mouse.move(9, 8);
     await canvas.mouse.up();
+
+    await canvas.mouse.move(0, 0);
+    await canvas.mouse.click();
     await canvas.mouse.leave();
 
     await expect(canvas.locator()).toHaveScreenshot("order-01.png");

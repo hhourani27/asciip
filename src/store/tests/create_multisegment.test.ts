@@ -122,3 +122,49 @@ test("0-length segments are ignored", () => {
   expect((finalState.shapes[0].shape as MultiSegment).segments).toHaveLength(1);
   expect(finalState.shapes[0].shape).toEqual(expectedShape);
 });
+
+test("Cannot create zero-length line", () => {
+  const actions = [
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    ...generateMouseDoubleClickAction({ r: 0, c: 0 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.shapes).toHaveLength(0);
+});
+
+test("After creating a multi-segment line, state is in SELECT mode and shape is selected", () => {
+  const actions = [
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 0 } }),
+    ...generateMouseMoveActions({ r: 0, c: 0 }, { r: 0, c: 2 }),
+    diagramActions.onCellClick({ coords: { r: 0, c: 2 } }),
+    ...generateMouseMoveActions({ r: 1, c: 2 }, { r: 2, c: 2 }),
+    ...generateMouseDoubleClickAction({ r: 2, c: 2 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.selectedTool).toBe("SELECT");
+
+  const selectMode = finalState.mode as { M: "SELECT"; shapeIds: string[] };
+  expect(selectMode.M).toBe("SELECT");
+  expect(selectMode.shapeIds).toHaveLength(1);
+  expect(selectMode.shapeIds[0]).toBe(finalState.shapes[0].id);
+});
+
+test("After failing to create a multi-segment line, state is still in BEFORE_CREATING mode", () => {
+  const actions = [
+    diagramActions.setTool("MULTI_SEGMENT_LINE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    ...generateMouseDoubleClickAction({ r: 0, c: 0 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.selectedTool).toBe("MULTI_SEGMENT_LINE");
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
+});

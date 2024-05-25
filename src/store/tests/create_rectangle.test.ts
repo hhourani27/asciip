@@ -43,6 +43,25 @@ test("Create a 5x5 rectangle by moving the mouse to the top left", () => {
   });
 });
 
+test("After creating a rectangle, state is in SELECT mode and shape is selected", () => {
+  const actions = [
+    diagramActions.setTool("RECTANGLE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
+    ...generateMouseMoveActions({ r: 1, c: 1 }, { r: 4, c: 4 }),
+    diagramActions.onCellMouseUp({ r: 4, c: 4 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.selectedTool).toBe("SELECT");
+
+  const selectMode = finalState.mode as { M: "SELECT"; shapeIds: string[] };
+  expect(selectMode.M).toBe("SELECT");
+  expect(selectMode.shapeIds).toHaveLength(1);
+  expect(selectMode.shapeIds[0]).toBe(finalState.shapes[0].id);
+});
+
 test("Cannot create a 0x0 rectangle", () => {
   const actions = [
     diagramActions.setTool("RECTANGLE"),
@@ -82,4 +101,18 @@ test("Cannot create a 0x5 rectangle", () => {
   const finalState = applyActions(diagramReducer, initDiagramState(), actions);
 
   expect(finalState.shapes).toHaveLength(0);
+});
+
+test("After failing to create a rectangle, state is still in BEFORE_CREATING mode", () => {
+  const actions = [
+    diagramActions.setTool("RECTANGLE"),
+    diagramActions.onCellHover({ r: 0, c: 0 }),
+    diagramActions.onCellMouseDown({ r: 0, c: 0 }),
+    diagramActions.onCellMouseUp({ r: 0, c: 0 }),
+  ];
+
+  const finalState = applyActions(diagramReducer, initDiagramState(), actions);
+
+  expect(finalState.selectedTool).toBe("RECTANGLE");
+  expect(finalState.mode.M).toBe("BEFORE_CREATING");
 });

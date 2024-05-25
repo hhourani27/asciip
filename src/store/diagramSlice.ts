@@ -161,6 +161,7 @@ export const diagramSlice = createSlice({
         state.mode.M === "CREATE" &&
         state.mode.shape.type === "MULTI_SEGMENT_LINE"
       ) {
+        // Complete creating multi-segment line
         const createMode = state.mode;
 
         const newShape: MultiSegment | null = isShapeLegal(
@@ -170,10 +171,13 @@ export const diagramSlice = createSlice({
           : (createMode.checkpoint as MultiSegment | null);
 
         if (newShape) {
-          addNewShape(state, normalizeMultiSegmentLine(newShape));
+          const newId = addNewShape(state, normalizeMultiSegmentLine(newShape));
           pushHistory(state);
+          state.selectedTool = "SELECT";
+          state.mode = { M: "SELECT", shapeIds: [newId] };
+        } else {
+          state.mode = { M: "BEFORE_CREATING" };
         }
-        state.mode = { M: "BEFORE_CREATING" };
       }
     },
     onCellClick: (
@@ -265,15 +269,13 @@ export const diagramSlice = createSlice({
           shape: { type: "TEXT", start: coords, lines: [] },
         };
       } else if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
-        // Complete creating text and create a new one
-        addNewShape(state, state.mode.shape);
+        // Complete creating text
+        const newId = addNewShape(state, state.mode.shape);
         pushHistory(state);
+        state.selectedTool = "SELECT";
         state.mode = {
-          M: "CREATE",
-          start: coords,
-          curr: coords,
-          checkpoint: null,
-          shape: { type: "TEXT", start: coords, lines: [] },
+          M: "SELECT",
+          shapeIds: [newId],
         };
       }
     },
@@ -364,10 +366,13 @@ export const diagramSlice = createSlice({
           : null;
 
         if (newShape) {
-          addNewShape(state, newShape);
+          const newId = addNewShape(state, newShape);
           pushHistory(state);
+          state.selectedTool = "SELECT";
+          state.mode = { M: "SELECT", shapeIds: [newId] };
+        } else {
+          state.mode = { M: "BEFORE_CREATING" };
         }
-        state.mode = { M: "BEFORE_CREATING" };
       }
     },
     onCellHover: (state, action: PayloadAction<Coords>) => {
@@ -472,9 +477,10 @@ export const diagramSlice = createSlice({
     //#region Keyboard actions
     onCtrlEnterPress: (state) => {
       if (state.mode.M === "CREATE" && state.selectedTool === "TEXT") {
-        addNewShape(state, state.mode.shape);
+        const newId = addNewShape(state, state.mode.shape);
         pushHistory(state);
-        state.mode = { M: "BEFORE_CREATING" };
+        state.selectedTool = "SELECT";
+        state.mode = { M: "SELECT", shapeIds: [newId] };
       } else if (state.mode.M === "TEXT_EDIT") {
         //* I am editing a text, I press Ctlr+Enter => I complete editing text (since editing a text is progressively saved, I don't need to save it here)
         pushHistory(state);
@@ -592,9 +598,10 @@ export const diagramSlice = createSlice({
 });
 
 //#region Helper state function that mutate directly the state
-function addNewShape(state: DiagramState, shape: Shape): void {
+function addNewShape(state: DiagramState, shape: Shape): string {
+  const id = uuidv4();
   const newShapeObj: ShapeObject = {
-    id: uuidv4(),
+    id,
     shape: shape,
     style: state.globalStyle,
   };
@@ -615,6 +622,8 @@ function addNewShape(state: DiagramState, shape: Shape): void {
       state.shapes.splice(bottomTextShapeIdx, 0, newShapeObj);
     }
   }
+
+  return id;
 }
 
 function replaceShape(
