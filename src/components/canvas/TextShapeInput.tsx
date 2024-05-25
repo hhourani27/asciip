@@ -3,11 +3,12 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { diagramActions } from "../../store/diagramSlice";
 import { CELL_HEIGHT, FONT_SIZE } from "./draw";
 import { getStringFromShape } from "../../models/text";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
 import { selectors } from "../../store/selectors";
 
 export function TextShapeInput(): JSX.Element {
   const dispatch = useAppDispatch();
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const currentEditedText = useAppSelector((state) =>
     selectors.currentEditedText(state.diagram)
@@ -16,6 +17,14 @@ export function TextShapeInput(): JSX.Element {
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     dispatch(diagramActions.updateText(event.target.value));
   };
+
+  // At mount, put the cursor to the end of the input
+  useEffect(() => {
+    if (inputRef.current) {
+      const length = inputRef.current.value.length;
+      inputRef.current.setSelectionRange(length, length);
+    }
+  }, []);
 
   return (
     <Box
@@ -27,6 +36,7 @@ export function TextShapeInput(): JSX.Element {
     >
       <TextField
         id="text-shape-input"
+        inputRef={inputRef}
         multiline
         variant="filled"
         color="secondary"

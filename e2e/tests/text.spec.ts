@@ -78,7 +78,6 @@ test.describe("Edit text", () => {
     await canvas.mouse.move(5, 5);
     await canvas.mouse.dblclick();
     await page.locator("#text-shape-input").waitFor();
-    await page.keyboard.press("Control+ArrowRight");
     await page.keyboard.type(" world!");
     await page.keyboard.press("Control+Enter");
 
