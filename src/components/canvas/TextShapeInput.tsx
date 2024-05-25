@@ -40,6 +40,7 @@ export function TextShapeInput(): JSX.Element {
           backgroundColor: "secondary",
           width: "300px",
         }}
+        InputProps={{ sx: { pt: 1, pr: 0 } }}
       />
     </Box>
   );
