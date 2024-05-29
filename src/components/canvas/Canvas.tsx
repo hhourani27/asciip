@@ -65,7 +65,6 @@ export default function Canvas(): JSX.Element {
   const handleMouseDown = (e: React.MouseEvent) => {
     const coords = getCellCoords(e.clientX, e.clientY);
     const timeoutId = window.setTimeout(() => {
-      console.log(`[Canvas] dispatch onCellMouseDown`);
       dispatch(diagramActions.onCellMouseDown(coords));
       if (pendingMouseDown.current) {
         pendingMouseDown.current.pendingMoveActions.forEach((m) =>
@@ -107,7 +106,6 @@ export default function Canvas(): JSX.Element {
     // If mousedown was not fired => mouse up came up very fast => dispatch a click
     if (pendingMouseDown.current) {
       window.clearTimeout(pendingMouseDown.current.timeoutId);
-      console.log(`[Canvas] dispatch onCellClick`);
       pendingMouseDown.current.pendingMoveActions.forEach((m) =>
         dispatch(diagramActions.onCellHover(m))
       );
@@ -120,7 +118,6 @@ export default function Canvas(): JSX.Element {
       pendingMouseDown.current = null;
     } else {
       // mousedown was already dispatched => Dispatch mouseup
-      console.log(`[Canvas] dispatch onCellMouseUp`);
       dispatch(diagramActions.onCellMouseUp(coords));
     }
   };
@@ -233,8 +230,6 @@ export default function Canvas(): JSX.Element {
           dispatch(diagramActions.onCanvasMouseLeave());
         }}
         onDoubleClick={(e) => {
-          console.log(`[Canvas] onDoubleClick: timestamp=${e.timeStamp}`);
-
           dispatch(
             diagramActions.onCellDoubleClick(
               getCellCoords(e.clientX, e.clientY)

@@ -18,24 +18,28 @@ export function FooterHistory(): JSX.Element {
   return (
     <ButtonGroup size="small">
       <Tooltip title="Undo (Ctrl+Z)" arrow>
-        <IconButton
-          aria-label="Undo"
-          size="medium"
-          disabled={!canUndo || !inSelectMode}
-          onClick={() => dispatch(diagramActions.moveInHistory("UNDO"))}
-        >
-          <UndoIcon fontSize="inherit" />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="Undo"
+            size="medium"
+            disabled={!canUndo || !inSelectMode}
+            onClick={() => dispatch(diagramActions.moveInHistory("UNDO"))}
+          >
+            <UndoIcon fontSize="inherit" />
+          </IconButton>
+        </span>
       </Tooltip>
       <Tooltip title="Redo (Ctrl+Y)" arrow>
-        <IconButton
-          aria-label="Redo"
-          size="medium"
-          disabled={!canRedo || !inSelectMode}
-          onClick={() => dispatch(diagramActions.moveInHistory("REDO"))}
-        >
-          <RedoIcon fontSize="inherit" />
-        </IconButton>
+        <span>
+          <IconButton
+            aria-label="Redo"
+            size="medium"
+            disabled={!canRedo || !inSelectMode}
+            onClick={() => dispatch(diagramActions.moveInHistory("REDO"))}
+          >
+            <RedoIcon fontSize="inherit" />
+          </IconButton>
+        </span>
       </Tooltip>
     </ButtonGroup>
   );
