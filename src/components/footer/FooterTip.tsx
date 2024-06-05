@@ -23,10 +23,6 @@ export function FooterTip(): JSX.Element {
     (state) => state.diagram.selectedTool === "SELECT"
   );
 
-  const hasSelectedShape = useAppSelector((state) =>
-    selectors.hasSelectedShape(state.diagram)
-  );
-
   const tip: string | null = isTextBeingWritten
     ? "Press Ctrl+Enter to complete editing text."
     : isLineToolSelected
@@ -35,8 +31,8 @@ export function FooterTip(): JSX.Element {
     ? "Click once, and then click again to position segments. Double-click to finish creating the line."
     : isSingleTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
-    : isSelectToolSelected && hasSelectedShape
-    ? "Press Ctrl to select multiple shapes"
+    : isSelectToolSelected
+    ? "Ctrl+Click to select multiple shapes. Ctrl+A to select all shapes"
     : null;
 
   return (
