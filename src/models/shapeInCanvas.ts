@@ -116,6 +116,24 @@ export function getShapeObjAtCoords(
   } else return touchedShapes[touchedShapes.length - 1];
 }
 
+export function getShapeObjsInBox(
+  shapes: ShapeObject[],
+  tl: Coords,
+  br: Coords
+): ShapeObject[] {
+  return shapes.filter((obj) => {
+    const repr = getAbstractShapeRepresentation(obj.shape);
+    for (const r_s in repr) {
+      for (const c_s in repr[r_s]) {
+        const [r, c] = [parseInt(r_s), parseInt(c_s)];
+        if (r >= tl.r && r <= br.r && c >= tl.c && c <= br.c) return true;
+      }
+    }
+
+    return false;
+  });
+}
+
 export function areShapesTouching(shape1: Shape, shape2: Shape): boolean {
   const repr1 = getAbstractShapeRepresentation(shape1);
   const repr2 = getAbstractShapeRepresentation(shape2);

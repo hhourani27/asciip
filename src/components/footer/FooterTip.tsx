@@ -32,7 +32,7 @@ export function FooterTip(): JSX.Element {
     : isSingleTextShapeSelected && !isTextBeingWritten
     ? "Double-click to edit text."
     : isSelectToolSelected
-    ? "Ctrl+Click to select multiple shapes. Ctrl+A to select all shapes"
+    ? "Click to select a shape. Drag or Ctrl+Click to select multiple shapes. Ctrl+A to select all shapes."
     : null;
 
   return (

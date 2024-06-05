@@ -72,6 +72,25 @@ function drawGrid(
   });
 }
 
+function drawSelectBox(
+  ctx: CanvasRenderingContext2D,
+  boxTL: Coords,
+  boxBR: Coords,
+  color: string
+) {
+  ctx.strokeStyle = color;
+  ctx.setLineDash([2, 2]);
+  ctx.lineWidth = 1;
+
+  // Draw the unfilled rectangle
+  ctx.strokeRect(
+    boxTL.c * CELL_WIDTH,
+    boxTL.r * CELL_HEIGHT,
+    (boxBR.c - boxTL.c) * CELL_WIDTH,
+    (boxBR.r - boxTL.r) * CELL_HEIGHT
+  );
+}
+
 function drawHoveredCell(ctx: CanvasRenderingContext2D, cell: Coords) {
   ctx.fillStyle = "LightBlue";
   ctx.fillRect(
@@ -195,4 +214,5 @@ export const canvasDraw = {
   drawGrid,
   drawHoveredCell,
   drawShapes,
+  drawSelectBox,
 };

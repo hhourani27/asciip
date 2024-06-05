@@ -1,7 +1,7 @@
 import { useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useEffect, useRef } from "react";
-import { Coords } from "../../models/shapes";
+import { Coords, normalizeTlBr } from "../../models/shapes";
 import { diagramActions } from "../../store/diagramSlice";
 import { CELL_HEIGHT, CELL_WIDTH, DrawOptions, canvasDraw } from "./draw";
 import _ from "lodash";
@@ -49,6 +49,7 @@ export default function Canvas(): JSX.Element {
   const nextActionOnClick = useAppSelector((state) =>
     selectors.getPointer(state.diagram)
   );
+  const mode = useAppSelector((state) => state.diagram.mode);
 
   // #endregion
 
@@ -178,7 +179,9 @@ export default function Canvas(): JSX.Element {
         ? theme.canvas.selectedShape
         : theme.canvas.shape;
       const drawResizePoints: boolean =
-        isShapeSelected && selectedShapeObjs.length === 1;
+        isShapeSelected &&
+        selectedShapeObjs.length === 1 &&
+        mode.M !== "SELECT_DRAG";
 
       return { color, drawResizePoints };
     });
@@ -186,16 +189,24 @@ export default function Canvas(): JSX.Element {
     canvasDraw.drawShapes(ctx, shapeObjs, styleMode, globalStyle, drawOpts);
 
     // Draw new shape
-    if (newShape)
+    if (newShape) {
       canvasDraw.drawShapes(ctx, [newShape], styleMode, globalStyle, [
         { color: theme.canvas.createdShape, drawResizePoints: false },
       ]);
+    }
+
+    // Draw select box if I'm drag-selecting
+    if (mode.M === "SELECT_DRAG") {
+      const [tl, br] = normalizeTlBr(mode.start, mode.curr);
+      canvasDraw.drawSelectBox(ctx, tl, br, theme.canvas.selectBox);
+    }
   }, [
     canvasHeight,
     canvasWidth,
     colCount,
     currentHoveredCell,
     globalStyle,
+    mode,
     newShape,
     nextActionOnClick,
     rowCount,
@@ -207,6 +218,7 @@ export default function Canvas(): JSX.Element {
     theme.canvas.grid,
     theme.canvas.selectedShape,
     theme.canvas.shape,
+    theme.canvas.selectBox,
   ]);
 
   return (

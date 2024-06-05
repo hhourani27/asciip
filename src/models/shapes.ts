@@ -110,6 +110,19 @@ function isSegmentLegal(segment: Segment): boolean {
   return true;
 }
 
+export function normalizeTlBr(tl: Coords, br: Coords): [Coords, Coords] {
+  return [
+    {
+      r: Math.min(tl.r, br.r),
+      c: Math.min(tl.c, br.c),
+    },
+    {
+      r: Math.max(tl.r, br.r),
+      c: Math.max(tl.c, br.c),
+    },
+  ];
+}
+
 /**
  *
  * Correct the segment in Line

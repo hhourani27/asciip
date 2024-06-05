@@ -22,6 +22,7 @@ declare module "@mui/material/styles" {
     canvas: {
       background: string;
       grid: string;
+      selectBox: string;
       shape: string;
       createdShape: string;
       selectedShape: string;
@@ -31,6 +32,7 @@ declare module "@mui/material/styles" {
     canvas?: {
       background?: string;
       grid: string;
+      selectBox: string;
       shape: string;
       createdShape: string;
       selectedShape: string;
@@ -43,6 +45,7 @@ const themeWithCanvas = createTheme(theme, {
   canvas: {
     background: theme.palette.background.default,
     grid: theme.palette.grey[900],
+    selectBox: theme.palette.grey[500],
     shape: theme.palette.grey[300],
     createdShape: theme.palette.info.main,
     selectedShape: theme.palette.info.main,

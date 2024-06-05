@@ -6,9 +6,11 @@ import {
   TextShape,
   isShapeLegal,
   normalizeMultiSegmentLine,
+  normalizeTlBr,
 } from "../models/shapes";
 import {
   getShapeObjAtCoords,
+  getShapeObjsInBox,
   hasResizePointAtCoords,
   isShapeAtCoords,
   moveShapeToBack,
@@ -50,6 +52,7 @@ export type ActionMode =
       shape: Shape;
     }
   | { M: "SELECT"; shapeIds: string[] }
+  | { M: "SELECT_DRAG"; start: Coords; curr: Coords; shapeIds: string[] }
   | { M: "MOVE"; start: Coords; shapeIds: string[]; startShapes: Shape[] }
   | { M: "RESIZE"; resizePoint: Coords; shapeId: string; startShape: Shape }
   | { M: "TEXT_EDIT"; shapeId: string; startShape: TextShape };
@@ -280,7 +283,20 @@ export const diagramSlice = createSlice({
       }
     },
     onCellMouseDown: (state, action: PayloadAction<Coords>) => {
-      if (state.mode.M === "SELECT" && state.mode.shapeIds.length === 1) {
+      if (
+        state.mode.M === "SELECT" &&
+        getShapeObjAtCoords(state.shapes, action.payload) == null
+      ) {
+        state.mode = {
+          M: "SELECT_DRAG",
+          start: action.payload,
+          curr: action.payload,
+          shapeIds: [],
+        };
+      } else if (
+        state.mode.M === "SELECT" &&
+        state.mode.shapeIds.length === 1
+      ) {
         const shapeObj = toShapeObject(state.shapes, state.mode.shapeIds[0]);
 
         if (hasResizePointAtCoords(shapeObj.shape, state.currentHoveredCell!)) {
@@ -341,7 +357,12 @@ export const diagramSlice = createSlice({
       }
     },
     onCellMouseUp: (state, action: PayloadAction<Coords>) => {
-      if (state.mode.M === "MOVE") {
+      if (state.mode.M === "SELECT_DRAG") {
+        state.mode = {
+          M: "SELECT",
+          shapeIds: state.mode.shapeIds,
+        };
+      } else if (state.mode.M === "MOVE") {
         // Complete moving a shape
         pushHistory(state);
         state.mode = {
@@ -378,7 +399,20 @@ export const diagramSlice = createSlice({
     onCellHover: (state, action: PayloadAction<Coords>) => {
       state.currentHoveredCell = action.payload;
 
-      if (state.mode.M === "MOVE") {
+      if (state.mode.M === "SELECT_DRAG") {
+        const selectDragMode = state.mode;
+        const curr = action.payload;
+
+        const [tl, br] = normalizeTlBr(selectDragMode.start, curr);
+
+        const selectedShapes = getShapeObjsInBox(state.shapes, tl, br);
+
+        state.mode = {
+          ...selectDragMode,
+          curr,
+          shapeIds: selectedShapes.map((s) => s.id),
+        };
+      } else if (state.mode.M === "MOVE") {
         const moveMode = state.mode;
         //* I'm currently moving a Shape and I change mouse position => Update shape position
         // Get selected shape
@@ -428,15 +462,7 @@ export const diagramSlice = createSlice({
           const curr = action.payload;
           switch (creationMode.shape.type) {
             case "RECTANGLE": {
-              const tl: Coords = {
-                r: Math.min(creationMode.start.r, curr.r),
-                c: Math.min(creationMode.start.c, curr.c),
-              };
-
-              const br: Coords = {
-                r: Math.max(creationMode.start.r, curr.r),
-                c: Math.max(creationMode.start.c, curr.c),
-              };
+              const [tl, br] = normalizeTlBr(creationMode.start, curr);
 
               state.mode = {
                 ...creationMode,

@@ -47,7 +47,7 @@ const hasSingleSelectedShape = createSelector(
 const selectedShapeObjs = createSelector(
   [(state: DiagramState) => state],
   (state): ShapeObject[] => {
-    if (state.mode.M === "SELECT") {
+    if (state.mode.M === "SELECT" || state.mode.M === "SELECT_DRAG") {
       return state.mode.shapeIds.map(
         (shapeId) => state.shapes.find((shape) => shape.id === shapeId)!
       );
@@ -142,7 +142,7 @@ const getPointer = createSelector(
             return "MOVE";
           }
         } else {
-          // Else I'm govering an unselected shape
+          // Else I'm hovering an unselected shape
           return "SELECT";
         }
       }
