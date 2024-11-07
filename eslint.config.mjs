@@ -8,4 +8,5 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReactConfig,
+  "plugin:react/jsx-runtime",
 ];
