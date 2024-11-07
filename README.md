@@ -20,3 +20,13 @@ Asciip was created with create-react-app:
 ```
 npm start
 ```
+
+### Running tests
+
+#### End-to-end Playwright tests
+
+Make sure that the app is running locally at `http://localhost:3000` (with `npm start`), then :
+
+```
+npm run e2e
+```
