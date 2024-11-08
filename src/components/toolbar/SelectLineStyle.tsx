@@ -19,12 +19,12 @@ const lineStyleDisplay: {
 } = {
   ASCII: {
     name: "ASCII",
-    repr: `${line_repr.LINE_HORIZONTAL.ASCII}${line_repr.LINE_HORIZONTAL.ASCII}`,
+    repr: `${line_repr.LINE_HORIZONTAL.ASCII}${line_repr.LINE_HORIZONTAL.ASCII}${line_repr.CORNER_TR.ASCII}`,
     tooltip: "This style displays correctly on most monospaced fonts",
   },
   LIGHT: {
     name: "Light",
-    repr: `${line_repr.LINE_HORIZONTAL.LIGHT}${line_repr.LINE_HORIZONTAL.LIGHT}`,
+    repr: `${line_repr.LINE_HORIZONTAL.LIGHT}${line_repr.LINE_HORIZONTAL.LIGHT}${line_repr.CORNER_TR.LIGHT}`,
     tooltip: (
       <span>
         This style may not display correctly on these monospaced fonts:
@@ -33,9 +33,20 @@ const lineStyleDisplay: {
       </span>
     ),
   },
+  LIGHT_ROUNDED: {
+    name: "Light rounded",
+    repr: `${line_repr.LINE_HORIZONTAL.LIGHT_ROUNDED}${line_repr.LINE_HORIZONTAL.LIGHT_ROUNDED}${line_repr.CORNER_TR.LIGHT_ROUNDED}`,
+    tooltip: (
+      <span>
+        This style may not display correctly on these monospaced fonts:
+        <br />
+        <em>{"Courier New, Monaco"}</em>
+      </span>
+    ),
+  },
   HEAVY: {
     name: "Heavy",
-    repr: `${line_repr.LINE_HORIZONTAL.HEAVY}${line_repr.LINE_HORIZONTAL.HEAVY}`,
+    repr: `${line_repr.LINE_HORIZONTAL.HEAVY}${line_repr.LINE_HORIZONTAL.HEAVY}${line_repr.CORNER_TR.HEAVY}`,
     tooltip: (
       <span>
         This style may not display correctly on these monospaced fonts:
@@ -46,7 +57,7 @@ const lineStyleDisplay: {
   },
   DOUBLE: {
     name: "Double",
-    repr: `${line_repr.LINE_HORIZONTAL.DOUBLE}${line_repr.LINE_HORIZONTAL.DOUBLE}`,
+    repr: `${line_repr.LINE_HORIZONTAL.DOUBLE}${line_repr.LINE_HORIZONTAL.DOUBLE}${line_repr.CORNER_TR.DOUBLE}`,
     tooltip: (
       <span>
         This style may not display correctly on these monospaced fonts:

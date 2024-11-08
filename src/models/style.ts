@@ -3,7 +3,12 @@ import { Char, LineChar } from "./representation";
 
 export type StyleMode = "ASCII" | "UNICODE";
 
-export type LINE_STYLE = "ASCII" | "LIGHT" | "HEAVY" | "DOUBLE";
+export type LINE_STYLE =
+  | "ASCII"
+  | "LIGHT"
+  | "LIGHT_ROUNDED"
+  | "HEAVY"
+  | "DOUBLE";
 
 export type ARROW_STYLE = "ASCII" | "OUTLINED" | "FILLED";
 
@@ -26,36 +31,42 @@ export const line_repr = {
   LINE_HORIZONTAL: {
     ASCII: "-",
     LIGHT: "─",
+    LIGHT_ROUNDED: "─",
     HEAVY: "━",
     DOUBLE: "═",
   },
   LINE_VERTICAL: {
     ASCII: "|",
     LIGHT: "│",
+    LIGHT_ROUNDED: "│",
     HEAVY: "┃",
     DOUBLE: "║",
   },
   CORNER_TL: {
     ASCII: "+",
     LIGHT: "┌",
+    LIGHT_ROUNDED: "╭",
     HEAVY: "┏",
     DOUBLE: "╔",
   },
   CORNER_TR: {
     ASCII: "+",
     LIGHT: "┐",
+    LIGHT_ROUNDED: "╮",
     HEAVY: "┓",
     DOUBLE: "╗",
   },
   CORNER_BR: {
     ASCII: "+",
     LIGHT: "┘",
+    LIGHT_ROUNDED: "╯",
     HEAVY: "┛",
     DOUBLE: "╝",
   },
   CORNER_BL: {
     ASCII: "+",
     LIGHT: "└",
+    LIGHT_ROUNDED: "╰",
     HEAVY: "┗",
     DOUBLE: "╚",
   },
